@@ -18,52 +18,7 @@ app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
 server = app.server
 
-theme = {
-    'dark': True,
-    'detail': '#007439',
-    'primary': '#00EA64',
-    'secondary': '#6E6E6E',
-}
-
-app.layout = html.Div([
-    dcc.Upload(
-        id='upload-data',
-        children=html.Div([
-            'Drag and Drop or ',
-            html.A('Select Files')
-        ]),
-        style={
-            'width': '100%',
-            'height': '60px',
-            'lineHeight': '60px',
-            'borderWidth': '1px',
-            'borderStyle': 'dashed',
-            'borderRadius': '5px',
-            'textAlign': 'center',
-            'margin': '10px'
-        },
-        # Allow multiple files to be uploaded
-        multiple=True
-    ),
-    html.Div(id='output-data-upload'),
-])
-
-
-def parse_contents(contents, filename, date):
-    content_type, content_string = contents.split(',')
-
-    decoded = base64.b64decode(content_string)
-    try:
-        if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
-            fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
-                         orientation='h', height=1000,
-                         color_discrete_map={
+profession_colours = {
                              'Guardian': '#72C1D9',
                              'Dragonhunter': '#72C1D9',
                              'Firebrand': '#72C1D9',
@@ -91,9 +46,49 @@ def parse_contents(contents, filename, date):
                              'Necromancer': '#52A76F',
                              'Reaper': '#52A76F',
                              'Scourge': '#52A76F',
-                         })
-            fig.update_layout(yaxis_categoryorder='total ascending')
+                         }
 
+
+app.layout = html.Div([
+    dcc.Upload(
+        id='upload-data',
+        children=html.Div([
+            'Drag and Drop or ',
+            html.A('Select Files')
+        ]),
+        style={
+            'width': '100%',
+            'height': '60px',
+            'lineHeight': '60px',
+            'borderWidth': '1px',
+            'borderStyle': 'dashed',
+            'borderRadius': '5px',
+            'textAlign': 'center',
+            'margin': '10px'
+        },
+        # Allow multiple files to be uploaded
+        multiple=True
+    ),
+    html.Div(id='output-data-upload'),
+])
+
+
+def parse_contents(contents, filename, date):
+    content_type, content_string = contents.split(',')
+    decoded = base64.b64decode(content_string)
+    try:
+        if 'csv' in filename:
+            # Assume that the user uploaded a CSV file
+            df = pd.read_csv(
+                io.StringIO(decoded.decode('utf-8')))
+        elif 'xls' in filename:
+            # Assume that the user uploaded an excel file
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
+            fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
+                         orientation='h', height=1000,
+                         color_discrete_map=profession_colours)
+            fig.update_layout(yaxis_categoryorder='total ascending')
+            #adds the labels for dmg/s and times top/attendance
             for name in df["Name"]:
                 fig.add_annotation(y=name, x=df[df["Name"] == name]["Total dmg"].values[0],
                                    text=str(int(df[df["Name"] == name]["Average dmg per s"].values[0])),
@@ -125,7 +120,7 @@ def parse_contents(contents, filename, date):
             columns=[{'name': i, 'id': i} for i in df.columns]
         ),
 
-        html.Hr(),  # horizontal line
+        html.Hr(),
 
         dcc.Graph(
             id='example-graph',
