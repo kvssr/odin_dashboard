@@ -1,0 +1,10 @@
+body {
+    background-color: #303030;
+    color: #EEE;
+}
+th {
+    background-color: #212121 !important;
+}
+td {
+    background-color: #424242 !important;
+}
