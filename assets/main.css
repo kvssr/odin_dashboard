@@ -8,3 +8,32 @@ th {
 td {
     background-color: #424242 !important;
 }
+
+#upload-data {
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    border-width: 1px;
+    border-style: dashed;
+    border-radius: 5px;
+    text-align: center;
+    margin: 10px;
+}
+
+#header{
+    display: flex;
+}
+
+#container{
+    max-width: 100%;
+}
+
+#title{
+    text-align: center;
+}
+
+#logo{
+    display: block;
+    width: auto;
+    height: auto;
+}
