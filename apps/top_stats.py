@@ -135,30 +135,52 @@ def parse_contents(contents, filename, date):
                 dcc.Graph(
                     id='top-dmg-chart',
                     figure=fig_dmg
-                ), md=6),
+                ), md=6, className='bar-chart'),
             dbc.Col(
                 dcc.Graph(
                     id='top-rips-chart',
                     figure=fig_rips
-                ), md=6)
+                ), md=6, className='bar-chart')
         ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id='top-stab-chart',
                     figure=fig_stab
-                ), md=6),
+                ), md=6, className='bar-chart'),
             dbc.Col(
                 dcc.Graph(
                     id='top-cleanses-chart',
                     figure=fig_cleanses
-                ), md=6)
+                ), md=6, className='bar-chart')
         ])
     ])
 
 
-def get_top_damage_chart(df_dmg):
-    fig = px.bar(df_dmg, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
+# t = type of graph. ex: rips, cleanses
+def add_annotations_graph(fig, df, t):
+    for name in df["Name"]:
+        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
+                           text="{:.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
+                           showarrow=False,
+                           yshift=0,
+                           xshift=0,
+                           xanchor="left"),
+        fig.add_annotation(y=name, x=0,
+                           text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
+                                + " / " +
+                                str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
+                           showarrow=False,
+                           yshift=0,
+                           xshift=0,
+                           xanchor="left",
+                           )
+
+    return fig
+
+
+def get_top_damage_chart(df):
+    fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
     fig.update_layout(
@@ -169,23 +191,7 @@ def get_top_damage_chart(df_dmg):
         title="Top Damage",
         showlegend=False,
     )
-    # adds the labels for dmg/s and times top/attendance
-    for name in df_dmg["Name"]:
-        fig.add_annotation(y=name, x=df_dmg[df_dmg["Name"] == name]["Total dmg"].values[0],
-                           text=str(int(df_dmg[df_dmg["Name"] == name]["Average dmg per s"].values[0])),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left"),
-        fig.add_annotation(y=name, x=0,
-                           text=" " + str(int(df_dmg[df_dmg["Name"] == name]["Times Top"].values[0]))
-                                + " / " +
-                                str(int(df_dmg[df_dmg["Name"] == name]["Attendance (number of fights)"].values[0])),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left",
-                           )
+    fig = add_annotations_graph(fig, df, "dmg")
     return fig
 
 
@@ -201,6 +207,7 @@ def get_top_rips_chart(df):
         title="Top Rips",
         showlegend=False,
     )
+    fig = add_annotations_graph(fig, df, "rips")
     return fig
 
 
@@ -216,6 +223,7 @@ def get_top_stab_chart(df):
         title="Top Stability",
         showlegend=False,
     )
+    fig = add_annotations_graph(fig, df, "stab")
     return fig
 
 
@@ -231,6 +239,7 @@ def get_top_cleanses_chart(df):
         title="Top Cleanses",
         showlegend=False,
     )
+    fig = add_annotations_graph(fig, df, "cleanses")
     return fig
 
 
