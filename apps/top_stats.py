@@ -5,70 +5,11 @@ from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-import plotly.express as px
+from helpers import graphs
 
 import pandas as pd
 from app import app
 
-profession_colours = {
-    'Guardian': '#186885',
-    'Dragonhunter': '#186885',
-    'Firebrand': '#186885',
-    'Revenant': '#661100',
-    'Herald': '#661100',
-    'Renegade': '#661100',
-    'Warrior': '#CAAA2A',
-    'Berserker': '#CAAA2A',
-    'Spellbreaker': '#CAAA2A',
-    'Engineer': '#87581D',
-    'Scrapper': '#87581D',
-    'Holosmith': '#87581D',
-    'Ranger': '#67A833',
-    'Druid': '#67A833',
-    'Soulbeast': '#67A833',
-    'Thief': '#974550',
-    'Daredevil': '#974550',
-    'Deadeye': '#974550',
-    'Elementalist': '#DC423E',
-    'Tempest': '#DC423E',
-    'Weaver': '#DC423E',
-    'Mesmer': '#69278A',
-    'Chronomancer': '#69278A',
-    'Mirage': '#69278A',
-    'Necromancer': '#2C9D5D',
-    'Reaper': '#2C9D5D',
-    'Scourge': '#2C9D5D',
-
-}
-profession_shorts = {
-    'Guardian': 'Gnd',
-    'Dragonhunter': 'Dgh',
-    'Firebrand': 'Fbd',
-    'Revenant': 'Rev',
-    'Herald': 'Her',
-    'Renegade': 'Ren',
-    'Warrior': 'War',
-    'Berserker': 'Brs',
-    'Spellbreaker': 'Spb',
-    'Engineer': 'Eng',
-    'Scrapper': 'Scr',
-    'Holosmith': 'Hls',
-    'Ranger': 'Rgr',
-    'Druid': 'Dru',
-    'Soulbeast': 'Slb',
-    'Thief': 'Thf',
-    'Daredevil': 'Dar',
-    'Deadeye': 'Ded',
-    'Elementalist': 'Ele',
-    'Tempest': 'Tmp',
-    'Weaver': 'Wea',
-    'Mesmer': 'Mes',
-    'Chronomancer': 'Chr',
-    'Mirage': 'Mir',
-    'Necromancer': 'Nec',
-    'Reaper': 'Rea',
-    'Scourge': 'Scg',
-}
 
 layout = dbc.Container(id='container', children=[
     dbc.Row(id='header', children=[
@@ -87,10 +28,6 @@ layout = dbc.Container(id='container', children=[
     html.Hr(),
     html.Div(id='output-data-upload'),
 ])
-
-
-def get_short_profession(profession):
-    return "(" + profession_shorts[profession] + ")"
 
 
 def parse_contents(contents, filename, date):
@@ -115,13 +52,10 @@ def parse_contents(contents, filename, date):
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
             df_cleanses = df.head(5)
 
-            #for index, row in df.iterrows():
-                #df.at[index, 'Name'] = "{:<25}".format(row['Name']) + get_short_profession(row['Profession']) + " "
-
-            fig_dmg = get_top_damage_chart(df_dmg)
-            fig_rips = get_top_rips_chart(df_rips)
-            fig_stab = get_top_stab_chart(df_stab)
-            fig_cleanses = get_top_cleanses_chart(df_cleanses)
+            fig_dmg = graphs.get_top_bar_chart(df_dmg, 'dmg')
+            fig_rips = graphs.get_top_bar_chart(df_rips, 'rips')
+            fig_stab = graphs.get_top_bar_chart(df_stab, 'stab')
+            fig_cleanses = graphs.get_top_bar_chart(df_cleanses, 'cleanses')
 
     except Exception as e:
         print(e)
@@ -155,92 +89,6 @@ def parse_contents(contents, filename, date):
                 ), md=6, className='bar-chart')
         ])
     ])
-
-
-# t = type of graph. ex: rips, cleanses
-def add_annotations_graph(fig, df, t):
-    for name in df["Name"]:
-        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
-                           text="{:.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left"),
-        fig.add_annotation(y=name, x=0,
-                           text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                                + " / " +
-                                str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left",
-                           )
-
-    return fig
-
-
-def get_top_damage_chart(df):
-    fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
-                 orientation='h',
-                 color_discrete_map=profession_colours)
-    fig.update_layout(
-        yaxis_categoryorder='total ascending',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#EEE',
-        title="Top Damage",
-        showlegend=False,
-    )
-    fig = add_annotations_graph(fig, df, "dmg")
-    return fig
-
-
-def get_top_rips_chart(df):
-    fig = px.bar(df, y="Name", x="Total rips", color="Profession", text="Total rips", barmode="relative",
-                 orientation='h',
-                 color_discrete_map=profession_colours)
-    fig.update_layout(
-        yaxis_categoryorder='total ascending',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#EEE',
-        title="Top Rips",
-        showlegend=False,
-    )
-    fig = add_annotations_graph(fig, df, "rips")
-    return fig
-
-
-def get_top_stab_chart(df):
-    fig = px.bar(df, y="Name", x="Total stab", color="Profession", text="Total stab", barmode="relative",
-                 orientation='h',
-                 color_discrete_map=profession_colours)
-    fig.update_layout(
-        yaxis_categoryorder='total ascending',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#EEE',
-        title="Top Stability",
-        showlegend=False,
-    )
-    fig = add_annotations_graph(fig, df, "stab")
-    return fig
-
-
-def get_top_cleanses_chart(df):
-    fig = px.bar(df, y="Name", x="Total cleanses", color="Profession", text="Total cleanses", barmode="relative",
-                 orientation='h',
-                 color_discrete_map=profession_colours)
-    fig.update_layout(
-        yaxis_categoryorder='total ascending',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#EEE',
-        title="Top Cleanses",
-        showlegend=False,
-    )
-    fig = add_annotations_graph(fig, df, "cleanses")
-    return fig
 
 
 @app.callback(Output('output-data-upload', 'children'),

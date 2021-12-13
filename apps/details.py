@@ -106,61 +106,29 @@ def parse_contents(contents, filename, date):
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
 
-            df_pie = df[['Profession', 'Total dmg']].groupby('Profession').sum().reset_index()
-            print(df_pie)
-            pie_chart_average = px.pie(df_pie,
-                                       values='Total dmg',
-                                       names='Profession',
-                                       color='Profession',
-                                       color_discrete_map=profession_colours,
-                                       title='Total dmg%')
-            df_pie_average = df[['Profession', 'Total dmg']].groupby('Profession').mean().reset_index()
-            pie_chart = px.pie(df_pie_average,
-                               values='Total dmg',
-                               names='Profession',
-                               color='Profession',
-                               color_discrete_map=profession_colours,
-                               title='Average dmg%')
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
+            df_dmg = df.head(5)
 
-            pie_chart.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
-            pie_chart_average.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='rips')
+            df_rips = df.head(5)
+
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
+            df_stab = df.head(5)
+
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
+            df_cleanses = df.head(5)
+
+            # for index, row in df.iterrows():
+            # df.at[index, 'Name'] = "{:<25}".format(row['Name']) + get_short_profession(row['Profession']) + " "
+
+            fig_dmg = get_top_damage_chart(df_dmg)
+            fig_rips = get_top_rips_chart(df_rips)
+            fig_stab = get_top_stab_chart(df_stab)
+            fig_cleanses = get_top_cleanses_chart(df_cleanses)
 
             for index, row in df.iterrows():
                 df.at[index, 'Name'] = "{:<25}".format(row['Name']) + get_short_profession(row['Profession']) + " "
-            fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
-                         orientation='h', height=1000,
-                         color_discrete_map=profession_colours)
-            fig.update_layout(
-                yaxis_categoryorder='total ascending',
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
-            # adds the labels for dmg/s and times top/attendance
-            for name in df["Name"]:
-                fig.add_annotation(y=name, x=df[df["Name"] == name]["Total dmg"].values[0],
-                                   text=str(int(df[df["Name"] == name]["Average dmg per s"].values[0])),
-                                   showarrow=False,
-                                   yshift=0,
-                                   xshift=0,
-                                   xanchor="left"),
-                fig.add_annotation(y=name, x=0,
-                                   text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                                        + " / " +
-                                        str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                                   showarrow=False,
-                                   yshift=0,
-                                   xshift=0,
-                                   xanchor="left",
-                                   ),
+
     except Exception as e:
         print(e)
         return html.Div([
@@ -168,45 +136,7 @@ def parse_contents(contents, filename, date):
         ])
 
     return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
-
-        dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df.columns]
-        ),
-        dash_table.DataTable(
-            data=df_pie.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df_pie.columns]
-        ),
-
-        html.Hr(),
-
-        dcc.Graph(
-            id='example-graph',
-            figure=fig
-        ),
-        html.Div([
-            dcc.Graph(
-                id='pie-chart',
-                figure=pie_chart,
-            ),
-            dcc.Graph(
-                id='pie-chart-average',
-                figure=pie_chart_average,
-
-            ),
         ]),
-
-        html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
 
 
 @app.callback(Output('details-output-data-upload', 'children'),
