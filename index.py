@@ -5,6 +5,8 @@ from dash.dependencies import Input, Output
 from app import app
 from apps import top_stats, details
 
+server = app.server
+
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     html.Div(id='page-content')
