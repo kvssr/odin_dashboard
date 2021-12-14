@@ -57,6 +57,8 @@ layout = dbc.Container(id='container', children=[
                 multiple=False
             )])]),
     html.Hr(),
+    html.Div(id='summary'),
+    html.Hr(),
     html.Div(id='details-output-data-upload', children=[
         html.Div([
             dbc.Tabs([
@@ -65,6 +67,7 @@ layout = dbc.Container(id='container', children=[
                 dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
                 dbc.Tab(label='Stability', tab_id='stab-tab'),
                 dbc.Tab(label='Healing', tab_id='heal-tab'),
+                dbc.Tab(label='Summary', tab_id='summary-tab'),
             ],
                 id='tabs',
                 active_tab='dmg-tab'),
@@ -100,12 +103,15 @@ def parse_contents(contents, filename, date):
 
             df_heals = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
 
+            summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
+
             dataset = {
                 'df_dmg': df_dmg.to_json(orient='split'),
                 'df_rips': df_rips.to_json(orient='split'),
                 'df_stab': df_stab.to_json(orient='split'),
                 'df_cleanses': df_cleanses.to_json(orient='split'),
-                'df_heals': df_heals.to_json(orient='split')
+                'df_heals': df_heals.to_json(orient='split'),
+                'summary': summary.to_json(orient='split')
             }
 
             # for index, row in df.iterrows():
@@ -116,7 +122,6 @@ def parse_contents(contents, filename, date):
         return html.Div([
             'There was an error processing this file.'
         ])
-    print(dataset)
     return dataset
 
 
@@ -128,6 +133,20 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         data = parse_contents(list_of_contents, list_of_names, list_of_dates)
         return data
+    return None
+
+
+@app.callback(Output('summary', 'children'),
+              Input('intermediate-value', 'data'))
+def update_summary(datasets):
+    if datasets is not None:
+        print('...summary...')
+        df = pd.read_json(datasets['summary'], orient='split')
+        df_s = df[['Kills', 'Deaths', 'Duration in s', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
+        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%m/%d/%y"), True)
+
+        table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm')
+        return table
     return None
 
 
@@ -186,4 +205,8 @@ def switch_tabs(tab, datasets):
                 id='top-heal-chart',
                 figure=fig
             )
+        elif tab == 'summary-tab':
+            df = pd.read_json(datasets['summary'], orient='split')
+            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
+            return table
     return ""
