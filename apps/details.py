@@ -1,46 +1,15 @@
 import base64
-import datetime
 import io
+import json
 
 from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
-from dash import dash_table
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from app import app
 import pandas as pd
 
-profession_colours = {
-    'Guardian': '#186885',
-    'Dragonhunter': '#186885',
-    'Firebrand': '#186885',
-    'Revenant': '#661100',
-    'Herald': '#661100',
-    'Renegade': '#661100',
-    'Warrior': '#CAAA2A',
-    'Berserker': '#CAAA2A',
-    'Spellbreaker': '#CAAA2A',
-    'Engineer': '#87581D',
-    'Scrapper': '#87581D',
-    'Holosmith': '#87581D',
-    'Ranger': '#67A833',
-    'Druid': '#67A833',
-    'Soulbeast': '#67A833',
-    'Thief': '#974550',
-    'Daredevil': '#974550',
-    'Deadeye': '#974550',
-    'Elementalist': '#DC423E',
-    'Tempest': '#DC423E',
-    'Weaver': '#DC423E',
-    'Mesmer': '#69278A',
-    'Chronomancer': '#69278A',
-    'Mirage': '#69278A',
-    'Necromancer': '#2C9D5D',
-    'Reaper': '#2C9D5D',
-    'Scourge': '#2C9D5D',
-
-}
 profession_shorts = {
     'Guardian': 'Gnd',
     'Dragonhunter': 'Dgh',
@@ -83,10 +52,24 @@ layout = dbc.Container(id='container', children=[
                     html.A('Select Files')
                 ]),
                 # Allow multiple files to be uploaded
-                multiple=True
+                multiple=False
             )])]),
     html.Hr(),
-    html.Div(id='details-output-data-upload'),
+    html.Div(id='details-output-data-upload', children=[
+        html.Div([
+            dbc.Tabs([
+                dbc.Tab(label='Damage', tab_id='dmg-tab'),
+                dbc.Tab(label='Rips', tab_id='rips-tab'),
+                dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
+                dbc.Tab(label='Stability', tab_id='stab-tab'),
+                dbc.Tab(label='Healing', tab_id='heal-tab'),
+            ],
+                id='tabs',
+                active_tab='dmg-tab'),
+            html.Div(id="tab-content"),
+        ])
+    ]),
+    dcc.Store(id='intermediate-value')
 ])
 
 
@@ -104,118 +87,61 @@ def parse_contents(contents, filename, date):
                 io.StringIO(decoded.decode('utf-8')))
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
-            df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
 
-            df_pie = df[['Profession', 'Total dmg']].groupby('Profession').sum().reset_index()
-            print(df_pie)
-            pie_chart_average = px.pie(df_pie,
-                                       values='Total dmg',
-                                       names='Profession',
-                                       color='Profession',
-                                       color_discrete_map=profession_colours,
-                                       title='Total dmg%')
-            df_pie_average = df[['Profession', 'Total dmg']].groupby('Profession').mean().reset_index()
-            pie_chart = px.pie(df_pie_average,
-                               values='Total dmg',
-                               names='Profession',
-                               color='Profession',
-                               color_discrete_map=profession_colours,
-                               title='Average dmg%')
+            df_dmg = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
 
-            pie_chart.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
-            pie_chart_average.update_layout(
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
+            df_rips = pd.read_excel(io.BytesIO(decoded), sheet_name='rips')
 
-            for index, row in df.iterrows():
-                df.at[index, 'Name'] = "{:<25}".format(row['Name']) + get_short_profession(row['Profession']) + " "
-            fig = px.bar(df, y="Name", x="Total dmg", color="Profession", text="Total dmg", barmode="relative",
-                         orientation='h', height=1000,
-                         color_discrete_map=profession_colours)
-            fig.update_layout(
-                yaxis_categoryorder='total ascending',
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                font_color='#EEE'
-            )
-            # adds the labels for dmg/s and times top/attendance
-            for name in df["Name"]:
-                fig.add_annotation(y=name, x=df[df["Name"] == name]["Total dmg"].values[0],
-                                   text=str(int(df[df["Name"] == name]["Average dmg per s"].values[0])),
-                                   showarrow=False,
-                                   yshift=0,
-                                   xshift=0,
-                                   xanchor="left"),
-                fig.add_annotation(y=name, x=0,
-                                   text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                                        + " / " +
-                                        str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                                   showarrow=False,
-                                   yshift=0,
-                                   xshift=0,
-                                   xanchor="left",
-                                   ),
+            df_stab = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
+
+            df_cleanses = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
+
+            df_heals = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
+
+            dataset = {
+                'df_dmg': df_dmg.to_json(orient='split'),
+                'df_rips': df_rips.to_json(orient='split'),
+                'df_stab': df_stab.to_json(orient='split'),
+                'df_cleanses': df_cleanses.to_json(orient='split'),
+                'df_heals': df_heals.to_json(orient='split'),
+            }
+
+            # for index, row in df.iterrows():
+            # df.at[index, 'Name'] = "{:<25}".format(row['Name']) + get_short_profession(row['Profession']) + " "
+
     except Exception as e:
         print(e)
         return html.Div([
             'There was an error processing this file.'
         ])
 
-    return html.Div([
-        html.H5(filename),
-        html.H6(datetime.datetime.fromtimestamp(date)),
-
-        dash_table.DataTable(
-            data=df.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df.columns]
-        ),
-        dash_table.DataTable(
-            data=df_pie.to_dict('records'),
-            columns=[{'name': i, 'id': i} for i in df_pie.columns]
-        ),
-
-        html.Hr(),
-
-        dcc.Graph(
-            id='example-graph',
-            figure=fig
-        ),
-        html.Div([
-            dcc.Graph(
-                id='pie-chart',
-                figure=pie_chart,
-            ),
-            dcc.Graph(
-                id='pie-chart-average',
-                figure=pie_chart_average,
-
-            ),
-        ]),
-
-        html.Hr(),  # horizontal line
-
-        # For debugging, display the raw contents provided by the web browser
-        html.Div('Raw Content'),
-        html.Pre(contents[0:200] + '...', style={
-            'whiteSpace': 'pre-wrap',
-            'wordBreak': 'break-all'
-        })
-    ])
+    return json.dumps(dataset)
 
 
-@app.callback(Output('details-output-data-upload', 'children'),
+@app.callback(Output('intermediate-value', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
 def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
-        children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+        data = parse_contents(list_of_contents, list_of_names, list_of_dates)
+        return data
+    return ""
+
+
+@app.callback(Output('tab-content', 'children'),
+              [Input('tabs', 'active_tab')],
+              State('intermediate-value', 'data'))
+def switch_tabs(tab, datasets):
+    if datasets is not None:
+        datasets = json.loads(datasets)
+        if tab == 'dmg-tab':
+            return html.Div(str(pd.read_json(datasets['df_dmg'], orient='split')))
+        elif tab == 'rips-tab':
+            return
+        elif tab == 'cleanses-tab':
+            return
+        elif tab == 'stab-tab':
+            return
+        elif tab == 'heal-tab':
+            return
