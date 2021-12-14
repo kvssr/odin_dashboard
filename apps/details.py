@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 import plotly.express as px
 from app import app
 import pandas as pd
+from helpers import graphs
 
 profession_shorts = {
     'Guardian': 'Gnd',
@@ -104,7 +105,7 @@ def parse_contents(contents, filename, date):
                 'df_rips': df_rips.to_json(orient='split'),
                 'df_stab': df_stab.to_json(orient='split'),
                 'df_cleanses': df_cleanses.to_json(orient='split'),
-                'df_heals': df_heals.to_json(orient='split'),
+                'df_heals': df_heals.to_json(orient='split')
             }
 
             # for index, row in df.iterrows():
@@ -115,8 +116,8 @@ def parse_contents(contents, filename, date):
         return html.Div([
             'There was an error processing this file.'
         ])
-
-    return json.dumps(dataset)
+    print(dataset)
+    return dataset
 
 
 @app.callback(Output('intermediate-value', 'data'),
@@ -127,7 +128,7 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         data = parse_contents(list_of_contents, list_of_names, list_of_dates)
         return data
-    return ""
+    return None
 
 
 @app.callback(Output('tab-content', 'children'),
@@ -135,14 +136,54 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
               State('intermediate-value', 'data'))
 def switch_tabs(tab, datasets):
     if datasets is not None:
-        datasets = json.loads(datasets)
         if tab == 'dmg-tab':
-            return html.Div(str(pd.read_json(datasets['df_dmg'], orient='split')))
+            df = pd.read_json(datasets['df_dmg'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'dmg')
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                    id='top-dmg-chart',
+                    figure=fig,
+                )
         elif tab == 'rips-tab':
-            return
+            df = pd.read_json(datasets['df_rips'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'rips')
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-rip-chart',
+                figure=fig
+            )
         elif tab == 'cleanses-tab':
-            return
+            df = pd.read_json(datasets['df_cleanses'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'cleanses')
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-cleanses-chart',
+                figure=fig
+            )
         elif tab == 'stab-tab':
-            return
+            df = pd.read_json(datasets['df_stab'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'stab')
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-stab-chart',
+                figure=fig
+            )
         elif tab == 'heal-tab':
-            return
+            df = pd.read_json(datasets['df_heals'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'heal')
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-heal-chart',
+                figure=fig
+            )
+    return ""
