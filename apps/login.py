@@ -5,7 +5,7 @@ from flask_login import login_user, current_user
 
 from app import app, User
 
-login = html.Div([dcc.Location(id='url_login', refresh=True),
+login = html.Div(id='login-div', children=[dcc.Location(id='url_login', refresh=True),
                   html.H2('''Please log in to continue:''', id='h1'),
                   dcc.Input(placeholder='Enter your username',
                             type='text', id='uname-box'),
@@ -13,9 +13,7 @@ login = html.Div([dcc.Location(id='url_login', refresh=True),
                             type='password', id='pwd-box'),
                   html.Button(children='Login', n_clicks=0,
                               type='submit', id='login-button'),
-                  html.Div(children='', id='output-state'),
-                  html.Br(),
-                  dcc.Link('Home', href='/')])
+                  html.Div(children='', id='output-state')])
 
 
 # Successful login

@@ -37,3 +37,13 @@ td {
     width: auto;
     height: auto;
 }
+
+#user-status-div{
+    float: right;
+    padding: 10px;
+    text-align: center;
+}
+
+#login-div{
+    text-align: center;
+}

@@ -42,21 +42,7 @@ profession_shorts = {
     'Scourge': 'Scg',
 }
 
-layout = dbc.Container(id='container', children=[
-    dbc.Row(id='header', children=[
-        html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
-        dbc.Col(children=[
-            html.H1('ODIN Carrot Awards', 'title'),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                # Allow multiple files to be uploaded
-                multiple=False
-            )])]),
-    html.Hr(),
+layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
         html.Div([
             dbc.Tabs([
@@ -124,7 +110,7 @@ def parse_contents(contents, filename, date):
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
-def update_output(list_of_contents, list_of_names, list_of_dates):
+def update_data(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         data = parse_contents(list_of_contents, list_of_names, list_of_dates)
         return data

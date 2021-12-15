@@ -1,6 +1,6 @@
 import base64
 import io
-
+import flask
 from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
@@ -11,21 +11,7 @@ import pandas as pd
 from app import app
 
 
-layout = dbc.Container(id='container', children=[
-    dbc.Row(id='header', children=[
-        html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
-        dbc.Col(children=[
-            html.H1('ODIN Carrot Awards', 'title'),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                # Allow multiple files to be uploaded
-                multiple=True
-            )])]),
-    html.Hr(),
+layout = html.Div(children=[
     html.Div(id='output-data-upload'),
 ])
 
@@ -91,6 +77,7 @@ def parse_contents(contents, filename, date):
     ])
 
 
+@app.server.route('/')
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
@@ -98,7 +85,5 @@ def parse_contents(contents, filename, date):
 def update_output(list_of_contents, list_of_names, list_of_dates):
     print("Getting content..")
     if list_of_contents is not None:
-        children = [
-            parse_contents(c, n, d) for c, n, d in
-            zip(list_of_contents, list_of_names, list_of_dates)]
-        return children
+        data = parse_contents(list_of_contents, list_of_names, list_of_dates)
+        return data

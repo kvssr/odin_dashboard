@@ -2,17 +2,32 @@ from dash import dcc, dash
 from dash import html
 from dash.dependencies import Input, Output
 from flask_login import current_user, logout_user
+import dash_bootstrap_components as dbc
 
 from app import app
 from apps import top_stats, details, login
 
 server = app.server
 
-app.layout = html.Div([
+app.layout = dbc.Container(id='container', children=[
     dcc.Location(id='url', refresh=False),
     dcc.Location(id='redirect', refresh=True),
     dcc.Store(id='login-status', storage_type='session'),
     html.Div(id='user-status-div'),
+    dbc.Row(id='header', children=[
+        html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
+        dbc.Col(children=[
+            html.H1('ODIN Carrot Awards', 'title'),
+            dcc.Upload(
+                id='upload-data',
+                children=html.Div([
+                    'Drag and Drop or ',
+                    html.A('Select Files')
+                ]),
+                # Allow multiple files to be uploaded
+                multiple=False
+            )])]),
+    html.Hr(),
     html.Div(id='page-content')
 ])
 
@@ -28,12 +43,14 @@ def display_page(pathname):
     elif pathname == '/success':
         if current_user.is_authenticated:
             view = login.success
+            url = '/details'
         else:
             view = login.failed
     elif pathname == '/logout':
         if current_user.is_authenticated:
             logout_user()
             view = login.logout
+            url = '/'
         else:
             view = login
             url = '/login'
