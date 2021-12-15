@@ -43,6 +43,8 @@ profession_shorts = {
 }
 
 layout = html.Div(children=[
+    html.Div(id='summary'),
+    html.Hr(), 
     html.Div(id='details-output-data-upload', children=[
         html.Div([
             dbc.Tabs([
