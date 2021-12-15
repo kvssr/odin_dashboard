@@ -38,6 +38,11 @@ def parse_contents(contents, filename, date):
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
             df_cleanses = df.head(5)
 
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
+            df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
+            df_summary.insert(0, "Date", df['Date'].iloc[0], True)
+
+
             fig_dmg = graphs.get_top_bar_chart(df_dmg, 'dmg')
             fig_rips = graphs.get_top_bar_chart(df_rips, 'rips')
             fig_stab = graphs.get_top_bar_chart(df_stab, 'stab')
@@ -50,6 +55,8 @@ def parse_contents(contents, filename, date):
         ])
 
     return html.Div([
+        dbc.Table.from_dataframe(df_summary, striped=True, bordered=True, hover=True, size='sm'),
+        html.Hr(),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
@@ -77,7 +84,6 @@ def parse_contents(contents, filename, date):
     ])
 
 
-@app.server.route('/')
 @app.callback(Output('output-data-upload', 'children'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),

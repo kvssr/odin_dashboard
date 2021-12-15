@@ -43,9 +43,8 @@ profession_shorts = {
 }
 
 layout = html.Div(children=[
-    html.Div(id='summary'),
-    html.Hr(), 
     html.Div(id='details-output-data-upload', children=[
+        html.Div(id='summary'),
         html.Div([
             dbc.Tabs([
                 dbc.Tab(label='Damage', tab_id='dmg-tab'),
@@ -59,7 +58,7 @@ layout = html.Div(children=[
                 active_tab='dmg-tab'),
             html.Div(id="tab-content"),
         ])
-    ]),
+    ]),   
     dcc.Store(id='intermediate-value')
 ])
 
@@ -132,7 +131,7 @@ def update_summary(datasets):
         df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%m/%d/%y"), True)
 
         table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm')
-        return table
+        return [table, html.Hr()]
     return None
 
 

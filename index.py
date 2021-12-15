@@ -66,9 +66,6 @@ def display_page(pathname):
     else:
         view = top_stats.layout
     # You could also return a 404 "URL not found" page here
-    print('....display_page....')
-    print(view)
-    print(url)
     return view, url
 
 
