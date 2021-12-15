@@ -127,9 +127,9 @@ def update_summary(datasets):
     if datasets is not None:
         print('...summary...')
         df = pd.read_json(datasets['summary'], orient='split')
-        df_s = df[['Kills', 'Deaths', 'Duration in s', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
-        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%m/%d/%y"), True)
 
+        df_s = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
+        df_s = df_s.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
         table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm')
         return [table, html.Hr()]
     return None
