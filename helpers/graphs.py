@@ -67,6 +67,7 @@ def get_top_bar_chart(df, t):
                  color_discrete_map=profession_colours)
     fig.update_layout(
         yaxis_categoryorder='total ascending',
+        xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
