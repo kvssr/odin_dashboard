@@ -30,7 +30,7 @@ def parse_contents(contents, filename, date):
             df_dmg = df.head(5)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='rips')
-            df_rips = df.head(5)
+            df_rips = df.head(3)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
             df_stab = df.head(3)
@@ -42,7 +42,7 @@ def parse_contents(contents, filename, date):
             df_heal = df.head(3)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
-            df_dist = df.tail(3)
+            df_dist = df.tail(5)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
