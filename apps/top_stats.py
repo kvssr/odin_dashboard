@@ -42,7 +42,8 @@ def parse_contents(contents, filename, date):
             df_heal = df.head(3)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
-            df_dist = df.tail(5)
+            df_dist = df.head(6)
+            df_dist.drop(df.head(1).index,inplace=True)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
@@ -56,6 +57,9 @@ def parse_contents(contents, filename, date):
             fig_cleanses = graphs.get_top_bar_chart(df_cleanses, 'cleanses')
             fig_heal = graphs.get_top_bar_chart(df_heal, 'heal')
             fig_dist = graphs.get_top_bar_chart(df_dist, 'dist')
+            fig_dist.update_layout(
+                yaxis_categoryorder='total descending',
+            )
 
             graph_list = [fig_dmg,
                             fig_rips,
@@ -80,11 +84,11 @@ def parse_contents(contents, filename, date):
                 dcc.Graph(
                     id='top-dmg-chart',
                     figure=fig_dmg
-                ), md=6, className='bar-chart'),
+                ), md=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
-                    id='top-rips-chart',
-                    figure=fig_rips
+                    id='top-dist-chart',
+                    figure=fig_dist
                 ), md=6, className='bar-chart')
         ]),
         dbc.Row([
@@ -107,8 +111,8 @@ def parse_contents(contents, filename, date):
                 ), md=6, className='bar-chart'),
             dbc.Col(
                 dcc.Graph(
-                    id='top-dist-chart',
-                    figure=fig_dist
+                    id='top-rips-chart',
+                    figure=fig_rips
                 ), md=6, className='bar-chart')
         ])
     ])
