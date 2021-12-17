@@ -33,10 +33,16 @@ def parse_contents(contents, filename, date):
             df_rips = df.head(5)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
-            df_stab = df.head(5)
+            df_stab = df.head(3)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
-            df_cleanses = df.head(5)
+            df_cleanses = df.head(3)
+
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
+            df_heal = df.head(3)
+
+            df = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
+            df_dist = df.tail(3)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
@@ -48,6 +54,17 @@ def parse_contents(contents, filename, date):
             fig_rips = graphs.get_top_bar_chart(df_rips, 'rips')
             fig_stab = graphs.get_top_bar_chart(df_stab, 'stab')
             fig_cleanses = graphs.get_top_bar_chart(df_cleanses, 'cleanses')
+            fig_heal = graphs.get_top_bar_chart(df_heal, 'heal')
+            fig_dist = graphs.get_top_bar_chart(df_dist, 'dist')
+
+            graph_list = [fig_dmg,
+                            fig_rips,
+                            fig_stab,
+                            fig_cleanses,
+                            fig_heal,
+                            fig_dist]
+
+
 
     except Exception as e:
         print(e)
@@ -80,6 +97,18 @@ def parse_contents(contents, filename, date):
                 dcc.Graph(
                     id='top-cleanses-chart',
                     figure=fig_cleanses
+                ), md=6, className='bar-chart')
+        ]),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(
+                    id='top-heal-chart',
+                    figure=fig_heal
+                ), md=6, className='bar-chart'),
+            dbc.Col(
+                dcc.Graph(
+                    id='top-dist-chart',
+                    figure=fig_dist
                 ), md=6, className='bar-chart')
         ])
     ])
