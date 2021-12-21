@@ -1,3 +1,4 @@
+from pandas.core.frame import DataFrame
 import plotly.express as px
 
 profession_colours = {
@@ -96,4 +97,39 @@ def add_annotations_graph(fig, df, t):
                            xanchor="left",
                            )
 
+    return fig
+
+
+def get_top_dist_bar_chart(df):
+    fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
+                 orientation='h',
+                 color_discrete_map=profession_colours)
+    fig.update_layout(
+        yaxis_categoryorder='total ascending',
+        xaxis_ticksuffix=".00%",
+        xaxis_title="% times top closest to tag",
+        xaxis_range=[0,100],
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#EEE',
+        title="Top closest to Tag",
+        showlegend=False,
+    )
+
+    for name in df["Name"]:
+        fig.add_annotation(y=name, x=0,
+                           text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
+                                + " / " +
+                                str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
+                           showarrow=False,
+                           yshift=0,
+                           xshift=0,
+                           xanchor="left",
+                           ),
+        fig.add_annotation(y=name, x=df[df["Name"] == name]["Percentage Top"].values[0],
+                           text="{}%".format(df[df["Name"] ==  name]["Percentage Top"].values[0]),
+                           showarrow=False,
+                           yshift=0,
+                           xshift=0,
+                           xanchor="right")
     return fig

@@ -56,10 +56,7 @@ def parse_contents(contents, filename, date):
             fig_stab = graphs.get_top_bar_chart(df_stab, 'stab')
             fig_cleanses = graphs.get_top_bar_chart(df_cleanses, 'cleanses')
             fig_heal = graphs.get_top_bar_chart(df_heal, 'heal')
-            fig_dist = graphs.get_top_bar_chart(df_dist, 'dist')
-            fig_dist.update_layout(
-                yaxis_categoryorder='total descending',
-            )
+            fig_dist = graphs.get_top_dist_bar_chart(df_dist)
 
             graph_list = [fig_dmg,
                             fig_rips,
