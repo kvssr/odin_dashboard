@@ -62,7 +62,7 @@ profession_shorts = {
 }
 
 
-def get_top_bar_chart(df, t):
+def get_top_bar_chart(df, t, legend = False):
     fig = px.bar(df, y="Name", x="Total " + t, color="Profession", text="Total "+ t, barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
@@ -73,7 +73,7 @@ def get_top_bar_chart(df, t):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
         title="Top " + t,
-        showlegend=False,
+        showlegend=legend,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -100,20 +100,20 @@ def add_annotations_graph(fig, df, t):
     return fig
 
 
-def get_top_dist_bar_chart(df):
+def get_top_dist_bar_chart(df, legend=False):
     fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
     fig.update_layout(
         yaxis_categoryorder='total ascending',
-        xaxis_ticksuffix=".00%",
+        xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
         xaxis_range=[0,100],
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
         title="Top closest to Tag",
-        showlegend=False,
+        showlegend=legend,
     )
 
     for name in df["Name"]:
