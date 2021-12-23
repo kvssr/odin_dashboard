@@ -2,14 +2,17 @@ import os
 
 import dash
 import dash_bootstrap_components as dbc
-import flask
+from flask import Flask
 from flask_login import LoginManager, UserMixin
 #from dotenv import load_dotenv
 
 external_stylesheets = [dbc.themes.DARKLY]
 
-server = flask.Flask(__name__)
+server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
+server.config.from_object(env_config)
+
 # server = app.server
 
 #load_dotenv()
