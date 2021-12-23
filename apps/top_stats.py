@@ -43,7 +43,6 @@ def parse_contents(contents, filename, date):
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
             df_dist = df.head(6)
-            df_dist.drop(df.head(1).index,inplace=True)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
