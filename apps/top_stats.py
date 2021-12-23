@@ -48,7 +48,11 @@ def parse_contents(contents, filename, date):
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
             df_summary = df_summary.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
             df_summary.insert(0, "Date", df['Date'].iloc[0], True)
+            print(df_summary.iloc[0,6:10])
 
+            # Adds thousand seperator for summary
+            for x, value in enumerate(df_summary.iloc[0,6:11]):
+                df_summary.iloc[0,6+x] = f'{int(value):,}'          
 
             fig_dmg = graphs.get_top_bar_chart(df_dmg, 'dmg')
             fig_rips = graphs.get_top_bar_chart(df_rips, 'rips')
