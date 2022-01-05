@@ -4,18 +4,23 @@ import dash
 import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_login import LoginManager, UserMixin
-#from dotenv import load_dotenv
+from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 external_stylesheets = [dbc.themes.DARKLY]
+load_dotenv()
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
 server.config.from_object(env_config)
+server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(server)
+migrate = Migrate(server, db)
 
-# server = app.server
+from models import Result
 
-#load_dotenv()
 server.config.update(SECRET_KEY=os.getenv('SECRET_KEY'))
 
 # Login manager object will be used to login / logout users
