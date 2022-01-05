@@ -62,8 +62,12 @@ profession_shorts = {
 }
 
 
-def get_top_bar_chart(df, t, legend = False):
-    fig = px.bar(df, y="Name", x="Total " + t, color="Profession", text="Total "+ t, barmode="relative",
+def get_top_bar_chart(df, t, legend = True):
+    fig = px.bar(df, y="Name", x="Total " + t, 
+                 color="Profession", 
+                 text="Total "+ t,
+                 text_auto=',',
+                 barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
     fig.update_layout(
@@ -74,6 +78,11 @@ def get_top_bar_chart(df, t, legend = False):
         font_color='#EEE',
         title="Top " + t,
         showlegend=legend,
+        legend_y=0,
+        margin=dict(l=152),
+    )
+    fig.update_yaxes(
+        automargin=False,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -82,7 +91,7 @@ def get_top_bar_chart(df, t, legend = False):
 def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
         fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
-                           text="{:.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
+                           text="{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
                            showarrow=False,
                            yshift=0,
                            xshift=0,
@@ -100,7 +109,7 @@ def add_annotations_graph(fig, df, t):
     return fig
 
 
-def get_top_dist_bar_chart(df, legend=False):
+def get_top_dist_bar_chart(df, legend=True):
     fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
@@ -114,6 +123,11 @@ def get_top_dist_bar_chart(df, legend=False):
         font_color='#EEE',
         title="Top closest to Tag",
         showlegend=legend,
+        legend_y=0,
+        margin=dict(l=152),
+    )
+    fig.update_yaxes(
+        automargin=False,
     )
 
     for name in df["Name"]:
