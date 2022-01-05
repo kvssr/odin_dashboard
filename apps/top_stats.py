@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 import flask
 from dash.dependencies import Input, Output, State
 from dash import dcc
@@ -24,6 +25,10 @@ def parse_contents(contents, filename, date):
             # Assume that the user uploaded a CSV file
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
+        elif 'json' in filename:
+            print("json file uploaded")
+            raw_json = json.loads(decoded.decode('utf-8'))
+            print(raw_json["overall_squad_stats"])
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
