@@ -62,7 +62,7 @@ profession_shorts = {
 }
 
 
-def get_top_bar_chart(df, t, legend = True):
+def get_top_bar_chart(df, t, legend = False):
     fig = px.bar(df, y="Name", x="Total " + t, 
                  color="Profession", 
                  text="Total "+ t,
@@ -73,16 +73,19 @@ def get_top_bar_chart(df, t, legend = True):
     fig.update_layout(
         yaxis_categoryorder='total ascending',
         xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
+        yaxis_title='',
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
         title="Top " + t,
         showlegend=legend,
         legend_y=0,
-        margin=dict(l=152),
+        margin=dict(l=160),
     )
     fig.update_yaxes(
         automargin=False,
+        ticksuffix=' ',
+        tickfont_size=14,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -94,7 +97,7 @@ def add_annotations_graph(fig, df, t):
                            text="{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
                            showarrow=False,
                            yshift=0,
-                           xshift=0,
+                           xshift=2,
                            xanchor="left"),
         fig.add_annotation(y=name, x=0,
                            text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
@@ -109,12 +112,13 @@ def add_annotations_graph(fig, df, t):
     return fig
 
 
-def get_top_dist_bar_chart(df, legend=True):
+def get_top_dist_bar_chart(df, legend=False):
     fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
     fig.update_layout(
         yaxis_categoryorder='total ascending',
+        yaxis_title='',
         xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
         xaxis_range=[0,100],
@@ -124,10 +128,12 @@ def get_top_dist_bar_chart(df, legend=True):
         title="Top closest to Tag",
         showlegend=legend,
         legend_y=0,
-        margin=dict(l=152),
+        margin=dict(l=160),
     )
     fig.update_yaxes(
         automargin=False,
+        ticksuffix=' ',
+        tickfont_size=14,
     )
 
     for name in df["Name"]:

@@ -52,6 +52,7 @@ layout = html.Div(children=[
                 dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
                 dbc.Tab(label='Stability', tab_id='stab-tab'),
                 dbc.Tab(label='Healing', tab_id='heal-tab'),
+                dbc.Tab(label='Barrier', tab_id='barrier-tab'),
                 dbc.Tab(label='Distance', tab_id='dist-tab'),
                 dbc.Tab(label='Summary', tab_id='summary-tab'),
             ],
@@ -90,6 +91,8 @@ def parse_contents(contents, filename, date):
 
             df_heals = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
 
+            df_barrier = pd.read_excel(io.BytesIO(decoded), sheet_name='barrier')
+
             df_dist = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
 
             summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
@@ -101,6 +104,7 @@ def parse_contents(contents, filename, date):
                 'df_stab': df_stab.to_json(orient='split'),
                 'df_cleanses': df_cleanses.to_json(orient='split'),
                 'df_heals': df_heals.to_json(orient='split'),
+                'df_barrier': df_barrier.to_json(orient='split'),
                 'df_dist': df_dist.to_json(orient='split'),
                 'summary': summary.to_json(orient='split')
             }
@@ -200,6 +204,16 @@ def switch_tabs(tab, datasets):
             )
             return dcc.Graph(
                 id='top-heal-chart',
+                figure=fig
+            )
+        elif tab == 'barrier-tab':
+            df = pd.read_json(datasets['df_barrier'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'barrier', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-barrier-chart',
                 figure=fig
             )
         elif tab == 'dist-tab':
