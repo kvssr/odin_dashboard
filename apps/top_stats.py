@@ -28,7 +28,12 @@ def parse_contents(contents, filename, date):
         elif 'json' in filename:
             print("json file uploaded")
             raw_json = json.loads(decoded.decode('utf-8'))
-            print(raw_json["overall_squad_stats"])
+            json_players = raw_json['players']
+            print(raw_json['overall_squad_stats'])
+            print(raw_json['players'][0]['total_stats']['dmg'])
+            #df_players = pd.read_json(raw_json["players"])
+            #print(df_players)
+            return html.Div()
         elif 'xls' in filename:
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
