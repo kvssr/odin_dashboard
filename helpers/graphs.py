@@ -62,7 +62,7 @@ profession_shorts = {
 }
 
 
-def get_top_bar_chart(df, t, legend = False):
+def get_top_bar_chart(df, t, legend = True):
     fig = px.bar(df, y="Name", x="Total " + t, 
                  color="Profession", 
                  text="Total "+ t,
@@ -80,14 +80,15 @@ def get_top_bar_chart(df, t, legend = False):
         title="Top " + t,
         showlegend=legend,
         legend_y=0,
-        margin=dict(l=160),
+        legend_x=0.9,
+        margin=dict(l=200),
         uniformtext_minsize=15, 
         uniformtext_mode='hide'
     )
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
-        tickfont_size=15,
+        tickfont_size=18,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -117,7 +118,7 @@ def add_annotations_graph(fig, df, t):
     return fig
 
 
-def get_top_dist_bar_chart(df, legend=False):
+def get_top_dist_bar_chart(df, legend=True):
     fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
@@ -133,8 +134,9 @@ def get_top_dist_bar_chart(df, legend=False):
         title="Top closest to Tag",
         showlegend=legend,
         legend_y=0,
-        margin=dict(l=160),
-        uniformtext_minsize=15, 
+        legend_x=0.9,
+        margin=dict(l=200),
+        uniformtext_minsize=16, 
         uniformtext_mode='hide',
     )
     fig.update_yaxes(
