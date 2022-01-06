@@ -81,11 +81,13 @@ def get_top_bar_chart(df, t, legend = False):
         showlegend=legend,
         legend_y=0,
         margin=dict(l=160),
+        uniformtext_minsize=15, 
+        uniformtext_mode='hide'
     )
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
-        tickfont_size=14,
+        tickfont_size=15,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -98,7 +100,9 @@ def add_annotations_graph(fig, df, t):
                            showarrow=False,
                            yshift=0,
                            xshift=2,
-                           xanchor="left"),
+                           xanchor="left",
+                           font_size=15,
+        )
         fig.add_annotation(y=name, x=0,
                            text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
                                 + " / " +
@@ -107,7 +111,8 @@ def add_annotations_graph(fig, df, t):
                            yshift=0,
                            xshift=0,
                            xanchor="left",
-                           )
+                           font_size=15,
+        )
 
     return fig
 
@@ -129,11 +134,13 @@ def get_top_dist_bar_chart(df, legend=False):
         showlegend=legend,
         legend_y=0,
         margin=dict(l=160),
+        uniformtext_minsize=15, 
+        uniformtext_mode='hide',
     )
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
-        tickfont_size=14,
+        tickfont_size=15,
     )
 
     for name in df["Name"]:
@@ -145,11 +152,14 @@ def get_top_dist_bar_chart(df, legend=False):
                            yshift=0,
                            xshift=0,
                            xanchor="left",
+                           font_size=15,
                            ),
         fig.add_annotation(y=name, x=df[df["Name"] == name]["Percentage Top"].values[0],
                            text="{}%".format(df[df["Name"] ==  name]["Percentage Top"].values[0]),
                            showarrow=False,
                            yshift=0,
                            xshift=0,
-                           xanchor="right")
+                           xanchor="right",
+                           font_size=15,
+                           )
     return fig
