@@ -2,7 +2,7 @@ body {
     background-color: #303030;
     color: #EEE;
 }
-table{
+table#summary{
     table-layout: fixed;
     width: 100%;
     text-align: center;
@@ -10,7 +10,7 @@ table{
 th {
     background-color: #212121 !important;
     text-align: center;
-    width: 100px;
+    /*width: 100px;*/
 }
 /*
 test {
@@ -20,7 +20,7 @@ test {
 td {
     background-color: #424242 !important;
     text-align: center;
-    width: 100px;
+    /*width: 100px;*/
 }
 
 #upload-data {

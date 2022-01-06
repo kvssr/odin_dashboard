@@ -77,7 +77,7 @@ def parse_contents(contents, filename, date):
         ])
 
     return html.Div([
-        dbc.Table.from_dataframe(df_summary, striped=True, bordered=True, hover=True, size='sm'),
+        dbc.Table.from_dataframe(df_summary, striped=True, bordered=True, hover=True, size='sm', id='summary'),
         html.Hr(),
         dbc.Row([
             dbc.Col(
