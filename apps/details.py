@@ -228,7 +228,7 @@ def switch_tabs(tab, datasets):
             )
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
-            df['Date'] = pd.to_datetime(df['Date']).date()
+            df['Date'].iloc[:].strftime("%Y-%d-%m")
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
             return table
     return ""
