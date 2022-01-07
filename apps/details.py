@@ -140,7 +140,7 @@ def update_summary(datasets):
 
         df_s = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
         df_s = df_s.rename(columns={'Num. Allies': '⌀ Allies', 'Num. Enemies': '⌀ Enemies'})
-        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%d-%m"), True)
+        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%m-%d"), True)
 
         # Adds thousand seperator for summary
         for x, value in enumerate(df_s.iloc[0,6:11]):
@@ -228,7 +228,7 @@ def switch_tabs(tab, datasets):
             )
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
-            df['Date'].iloc[:].strftime("%Y-%d-%m")
+            df['Date'] = df['Date'].dt.strftime("%Y-%m-%d")
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
             return table
     return ""
