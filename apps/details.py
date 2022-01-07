@@ -96,7 +96,6 @@ def parse_contents(contents, filename, date):
             df_dist = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
 
             summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
-            summary['Date'] = pd.to_datetime(summary['Date'])
             summary = summary.iloc[:,1:]
 
             dataset = {
@@ -229,6 +228,7 @@ def switch_tabs(tab, datasets):
             )
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
+            df['Date'] = pd.to_datetime(df['Date']).date()
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
             return table
     return ""
