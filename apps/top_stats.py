@@ -1,14 +1,17 @@
 import base64
 import io
 import flask
+import time
+import datetime
 from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-from helpers import graphs
+from helpers import db_writer, graphs
 
 import pandas as pd
-from app import app
+from app import app, db
+from models import Fight
 
 
 layout = html.Div(children=[
@@ -25,6 +28,8 @@ def parse_contents(contents, filename, date):
             df = pd.read_csv(
                 io.StringIO(decoded.decode('utf-8')))
         elif 'xls' in filename:
+            db_writer.write_xls_to_db(decoded)
+
             # Assume that the user uploaded an excel file
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg')
             df_dmg = df.head(5)
@@ -45,10 +50,10 @@ def parse_contents(contents, filename, date):
             df_dist = df.head(5)
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
+
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
             df_summary = df_summary.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
             df_summary.insert(0, "Date", df['Date'].iloc[0], True)
-            print(df_summary.iloc[0,6:10])
 
             # Adds thousand seperator for summary
             for x, value in enumerate(df_summary.iloc[0,6:11]):
