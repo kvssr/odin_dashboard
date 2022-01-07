@@ -5,11 +5,11 @@ import dash_bootstrap_components as dbc
 from flask import Flask
 from flask_login import LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from flask_migrate import Migrate
 
 external_stylesheets = [dbc.themes.DARKLY]
-load_dotenv()
+#load_dotenv()
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
@@ -19,7 +19,7 @@ server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(server)
 migrate = Migrate(server, db)
 
-from models import Result
+from models import *
 
 server.config.update(SECRET_KEY=os.getenv('SECRET_KEY'))
 
