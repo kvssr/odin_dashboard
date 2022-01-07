@@ -82,8 +82,7 @@ def get_top_bar_chart(df, t, legend = True):
         legend_y=0,
         legend_x=0.9,
         margin=dict(l=200),
-        uniformtext_minsize=15, 
-        uniformtext_mode='hide'
+        font_size=15,
     )
     fig.update_yaxes(
         automargin=False,
@@ -136,8 +135,8 @@ def get_top_dist_bar_chart(df, legend=True):
         legend_y=0,
         legend_x=0.9,
         margin=dict(l=200),
-        uniformtext_minsize=15, 
-        uniformtext_mode='hide',
+        font_size=15,
+
     )
     fig.update_yaxes(
         automargin=False,
