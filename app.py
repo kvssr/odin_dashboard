@@ -17,9 +17,9 @@ env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
 server.config.from_object(env_config)
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(server)
-migrate = Migrate(server, db)
-
 from models import *
+migrate = Migrate(server, db, compare_type=True)
+
 
 server.config.update(SECRET_KEY=os.getenv('SECRET_KEY'))
 
