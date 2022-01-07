@@ -17,3 +17,16 @@ class Result(db.Model):
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
+
+
+class Character(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+
+
+class Player(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    account = db.Column(db.String)
+    attendence_percentage = db.Column(db.Integer)
+    duration_fights_present = db.Column(db.Integer)
+    name = db.Column(db.String)
+    
