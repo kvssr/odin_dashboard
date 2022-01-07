@@ -96,7 +96,7 @@ def parse_contents(contents, filename, date):
             df_dist = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
 
             summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
-            #summary['Date'] = summary['Date'].dt.date
+            summary['Date'] = pd.to_datetime(summary['Date'])
             summary = summary.iloc[:,1:]
 
             dataset = {
