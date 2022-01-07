@@ -97,7 +97,7 @@ def get_top_bar_chart(df, t, legend = True):
 def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
         fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
-                           text="{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
+                           text="{}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
                            showarrow=False,
                            yshift=0,
                            xshift=2,
