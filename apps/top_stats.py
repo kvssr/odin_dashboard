@@ -71,7 +71,7 @@ def parse_contents(contents, filename, date):
 
 
     except Exception as e:
-        print(e)
+        print("Exception: " + str(e))
         return html.Div([
             'There was an error processing this file.'
         ])
