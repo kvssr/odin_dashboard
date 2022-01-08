@@ -20,6 +20,7 @@ class Profession(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String())
     abbreviation = db.Column(db.String())
+    color = db.Column(db.String())
 
 
 class PlayerStat(db.Model):
