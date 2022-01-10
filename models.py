@@ -48,21 +48,21 @@ class PlayerStat(db.Model):
     raid = relationship("Raid", back_populates="playerstats")
     character = relationship("Character", back_populates="playerstats")
 
-    dmg_stat = relationship("DmgStat", back_populates="playerstat", uselist=False)
-    rip_stat = relationship("RipStat", back_populates="playerstat", uselist=False)
-    cleanse_stat = relationship("CleanseStat", back_populates="playerstat", uselist=False)
-    stab_stat = relationship("StabStat", back_populates="playerstat", uselist=False)
-    heal_stat = relationship("HealStat", back_populates="playerstat", uselist=False)
-    dist_stat = relationship("DistStat", back_populates="playerstat", uselist=False)
-    prot_stat = relationship("ProtStat", back_populates="playerstat", uselist=False)
-    aegis_stat = relationship("AegisStat", back_populates="playerstat", uselist=False)
-    might_stat = relationship("MightStat", back_populates="playerstat", uselist=False)
-    fury_stat = relationship("FuryStat", back_populates="playerstat", uselist=False)
-    barrier_stat = relationship("BarrierStat", back_populates="playerstat", uselist=False)
-    dmg_taken_stat = relationship("DmgTakenStat", back_populates="playerstat", uselist=False)
-    death_stat = relationship("DeathStat", back_populates="playerstat", uselist=False)
-    kill_stat = relationship("KillsStat", back_populates="playerstat", uselist=False)
-    
+    dmg_stat = relationship("DmgStat", back_populates="player_stat", uselist=False, lazy='select')
+    rip_stat = relationship("RipStat", back_populates="player_stat", uselist=False, lazy='select')
+    cleanse_stat = relationship("CleanseStat", back_populates="player_stat", uselist=False, lazy='select')
+    stab_stat = relationship("StabStat", back_populates="player_stat", uselist=False, lazy='select')
+    heal_stat = relationship("HealStat", back_populates="player_stat", uselist=False, lazy='select')
+    dist_stat = relationship("DistStat", back_populates="player_stat", uselist=False, lazy='select')
+    prot_stat = relationship("ProtStat", back_populates="player_stat", uselist=False, lazy='select')
+    aegis_stat = relationship("AegisStat", back_populates="player_stat", uselist=False, lazy='select')
+    might_stat = relationship("MightStat", back_populates="player_stat", uselist=False, lazy='select')
+    fury_stat = relationship("FuryStat", back_populates="player_stat", uselist=False, lazy='select')
+    barrier_stat = relationship("BarrierStat", back_populates="player_stat", uselist=False, lazy='select')
+    dmg_taken_stat = relationship("DmgTakenStat", back_populates="player_stat", uselist=False, lazy='select')
+    death_stat = relationship("DeathStat", back_populates="player_stat", uselist=False, lazy='select')
+    kills_stat = relationship("KillsStat", back_populates="player_stat", uselist=False, lazy='select')
+
 
 class Raid(db.Model):
 
@@ -119,10 +119,21 @@ class DmgStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_dmg = db.Column(db.Integer())
     avg_dmg_s = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="dmg_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total dmg': self.total_dmg,
+            'Average dmg per s': self.avg_dmg_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name
+        }
 
 
 class RipStat(db.Model):
@@ -132,6 +143,7 @@ class RipStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_rips = db.Column(db.Integer())
     avg_rips_s = db.Column(db.Float())
 
@@ -146,6 +158,7 @@ class CleanseStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_cleanses = db.Column(db.Integer())
     avg_cleanses_s = db.Column(db.Float())
 
@@ -159,6 +172,7 @@ class StabStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_stab = db.Column(db.Integer())
     avg_stab_s = db.Column(db.Float())
 
@@ -172,6 +186,7 @@ class HealStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_heal = db.Column(db.Integer())
     avg_heal_s = db.Column(db.Float())
 
@@ -186,11 +201,22 @@ class DistStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_dist = db.Column(db.Integer())
     avg_dist_s = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="dist_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total dist': self.total_dist,
+            'Percentage Top': self.percentage_top,
+            'Average dist per s': self.avg_dist_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name
+        }
 
 class ProtStat(db.Model):
 
@@ -199,6 +225,7 @@ class ProtStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_prot = db.Column(db.Integer())
     avg_prot_s = db.Column(db.Float())
 
@@ -212,6 +239,7 @@ class AegisStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_aegis = db.Column(db.Integer())
     avg_aegis_s = db.Column(db.Float())
 
@@ -225,6 +253,7 @@ class MightStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_might = db.Column(db.Integer())
     avg_might_s = db.Column(db.Float())
 
@@ -238,6 +267,7 @@ class FuryStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_fury = db.Column(db.Integer())
     avg_fury_s = db.Column(db.Float())
 
@@ -250,6 +280,7 @@ class BarrierStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_barrier = db.Column(db.Integer())
     avg_barrier_s = db.Column(db.Float())
 
@@ -263,6 +294,7 @@ class DmgTakenStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_dmg_taken = db.Column(db.Integer())
     avg_dmg_taken_s = db.Column(db.Float())
 
@@ -275,6 +307,7 @@ class DeathStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_deaths = db.Column(db.Integer())
     avg_deaths_m = db.Column(db.Float())
 
@@ -288,6 +321,7 @@ class KillsStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
     total_kills = db.Column(db.Integer())
     avg_kills_m = db.Column(db.Float())
 
