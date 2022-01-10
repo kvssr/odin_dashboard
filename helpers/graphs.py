@@ -84,6 +84,7 @@ def get_top_bar_chart(df, t, legend = True):
         margin=dict(l=200),
         font_size=15,
     )
+    fig.update_traces(textangle=0)
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
