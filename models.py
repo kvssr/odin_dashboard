@@ -16,16 +16,22 @@ class Character(db.Model):
 class Profession(db.Model):
 
     __tablename__ = 'profession'
+    __table_args__ = (
+        db.UniqueConstraint('name', name='name_idx'),
+    )
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String())
-    abbreviation = db.Column(db.String())
+    abbreviation = db.Column(db.String(), unique=True)
     color = db.Column(db.String())
 
 
 class PlayerStat(db.Model):
 
     __tablename__ = 'player_stat'
+    __table_args__ = (
+        db.UniqueConstraint('raid_id', 'character_id', name='raid_character_idx'),
+    )
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     raid_id = db.Column(db.Integer(), db.ForeignKey('raid.id', ondelete="CASCADE"))
@@ -49,7 +55,7 @@ class RaidType(db.Model):
     __tablename__ = 'raid_type'
 
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String())
+    name = db.Column(db.String(), unique=True)
 
 
 class Fight(db.Model):
@@ -79,7 +85,7 @@ class DmgStat(db.Model):
     __tablename__ = 'dmg_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_dmg = db.Column(db.Integer())
     avg_dmg_s = db.Column(db.Float())
@@ -90,7 +96,7 @@ class RipStat(db.Model):
     __tablename__ = 'rip_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_rips = db.Column(db.Integer())
     avg_rips_s = db.Column(db.Float())
@@ -101,7 +107,7 @@ class CleanseStat(db.Model):
     __tablename__ = 'cleanse_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_cleanses = db.Column(db.Integer())
     avg_cleanses_s = db.Column(db.Float())
@@ -112,7 +118,7 @@ class StabStat(db.Model):
     __tablename__ = 'stab_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_stab = db.Column(db.Integer())
     avg_stab_s = db.Column(db.Float())
@@ -123,7 +129,7 @@ class HealStat(db.Model):
     __tablename__ = 'heal_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_heal = db.Column(db.Integer())
     avg_heal_s = db.Column(db.Float())
@@ -134,7 +140,7 @@ class DistStat(db.Model):
     __tablename__ = 'dist_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_dist = db.Column(db.Integer())
     avg_dist_s = db.Column(db.Float())
@@ -145,7 +151,7 @@ class ProtStat(db.Model):
     __tablename__ = 'prot_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_prot = db.Column(db.Integer())
     avg_prot_s = db.Column(db.Float())
@@ -156,7 +162,7 @@ class AegisStat(db.Model):
     __tablename__ = 'aegis_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_aegis = db.Column(db.Integer())
     avg_aegis_s = db.Column(db.Float())
@@ -167,7 +173,7 @@ class MightStat(db.Model):
     __tablename__ = 'might_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_might = db.Column(db.Integer())
     avg_might_s = db.Column(db.Float())
@@ -178,7 +184,7 @@ class FuryStat(db.Model):
     __tablename__ = 'fury_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_fury = db.Column(db.Integer())
     avg_fury_s = db.Column(db.Float())
@@ -189,7 +195,7 @@ class BarrierStat(db.Model):
     __tablename__ = 'barrier_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_barrier = db.Column(db.Integer())
     avg_barrier_s = db.Column(db.Float())
@@ -200,7 +206,7 @@ class DmgTakenStat(db.Model):
     __tablename__ = 'dmg_taken_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_dmg_taken = db.Column(db.Integer())
     avg_dmg_taken_s = db.Column(db.Float())
@@ -211,10 +217,10 @@ class DeathStat(db.Model):
     __tablename__ = 'death_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_deaths = db.Column(db.Integer())
-    avg_deaths_s = db.Column(db.Float())
+    avg_deaths_m = db.Column(db.Float())
 
 
 class KillsStat(db.Model):
@@ -222,7 +228,7 @@ class KillsStat(db.Model):
     __tablename__ = 'kills_stat'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"))
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     times_top = db.Column(db.Integer())
     total_kills = db.Column(db.Integer())
-    avg_kill_s = db.Column(db.Float())
+    avg_kills_m = db.Column(db.Float())
