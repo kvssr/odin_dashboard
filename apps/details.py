@@ -42,22 +42,31 @@ profession_shorts = {
     'Scourge': 'Scg',
 }
 
+tab_style={'padding': '.5rem 0'}
+
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
         html.Div(id='summary'),
         html.Div([
             dbc.Tabs([
-                dbc.Tab(label='Damage', tab_id='dmg-tab'),
-                dbc.Tab(label='Rips', tab_id='rips-tab'),
-                dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
-                dbc.Tab(label='Stability', tab_id='stab-tab'),
-                dbc.Tab(label='Healing', tab_id='heal-tab'),
-                dbc.Tab(label='Barrier', tab_id='barrier-tab'),
-                dbc.Tab(label='Distance', tab_id='dist-tab'),
-                dbc.Tab(label='Summary', tab_id='summary-tab'),
+                dbc.Tab(label='Damage', tab_id='dmg-tab', label_style=tab_style),
+                dbc.Tab(label='Rips', tab_id='rips-tab', label_style=tab_style),
+                dbc.Tab(label='Might', tab_id='might-tab', label_style=tab_style),
+                dbc.Tab(label='Fury', tab_id='fury-tab', label_style=tab_style),
+                dbc.Tab(label='Healing', tab_id='heal-tab', label_style=tab_style),
+                dbc.Tab(label='Barrier', tab_id='barrier-tab', label_style=tab_style),
+                dbc.Tab(label='Cleanses', tab_id='cleanses-tab', label_style=tab_style),
+                dbc.Tab(label='Stability', tab_id='stab-tab', label_style=tab_style),
+                dbc.Tab(label='Protection', tab_id='protection-tab', label_style=tab_style),
+                dbc.Tab(label='Aegis', tab_id='aegis-tab', label_style=tab_style),
+                dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
+                dbc.Tab(label='Dmg taken', tab_id='dmgtaken-tab', label_style=tab_style),
+                dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
+                dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
             ],
                 id='tabs',
                 #active_tab='dmg-tab'
+                class_name='nav-justified flex-nowrap'
                 ),
             html.Div(id="tab-content"),
         ])
@@ -228,6 +237,7 @@ def switch_tabs(tab, datasets):
             )
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
+            df['Date'] = df['Date'].dt.strftime("%Y-%m-%d")
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
             return table
     return ""

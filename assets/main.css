@@ -4,9 +4,11 @@ body {
 }
 th {
     background-color: #212121 !important;
+    text-align: center;
 }
 td {
     background-color: #424242 !important;
+    text-align: center;
 }
 
 #upload-data {
