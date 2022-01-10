@@ -166,14 +166,14 @@ def update_summary(datasets):
         df = pd.read_json(datasets['summary'], orient='split')
 
         df_s = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
-        df_s = df_s.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
-        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%d-%m"), True)
+        df_s = df_s.rename(columns={'Num. Allies': '⌀ Allies', 'Num. Enemies': '⌀ Enemies'})
+        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%m-%d"), True)
 
         # Adds thousand seperator for summary
         for x, value in enumerate(df_s.iloc[0,6:11]):
             df_s.iloc[0,6+x] = f'{int(value):,}'  
 
-        table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm')
+        table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm', id='summary')
         return [table, html.Hr()]
     return None
 

@@ -56,7 +56,7 @@ def parse_contents(contents, filename, date):
 
             df = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             df_summary = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
-            df_summary = df_summary.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
+            df_summary = df_summary.rename(columns={'Num. Allies': '⌀ Allies', 'Num. Enemies': '⌀ Enemies'})
             df_summary.insert(0, "Date", df['Date'].iloc[0], True)
             print(df_summary.iloc[0,6:10])
 
@@ -81,13 +81,13 @@ def parse_contents(contents, filename, date):
 
 
     except Exception as e:
-        print(e)
+        print("Exception: " + str(e))
         return html.Div([
             'There was an error processing this file.'
         ])
 
     return html.Div([
-        dbc.Table.from_dataframe(df_summary, striped=True, bordered=True, hover=True, size='sm'),
+        dbc.Table.from_dataframe(df_summary, striped=True, bordered=True, hover=True, size='sm', id='summary'),
         html.Hr(),
         dbc.Row([
             dbc.Col(
