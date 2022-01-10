@@ -71,7 +71,7 @@ def write_raid_to_db(raid_date, raid_type='guild', name=''):
         raid = Raid()
         raid.name = name
         raid.raid_date = raid_date
-        raid.raid_type = db.session.query(RaidType.id).filter_by(name=raid_type).first()[0]
+        raid.raid_type_id = db.session.query(RaidType.id).filter_by(name=raid_type).first()[0]
         db.session.add(raid)
         db.session.commit()
         print(f'raid_id: {raid.id}')
@@ -183,6 +183,7 @@ def write_dmg_to_db(df, raid):
 
             dmgstat.player_stat_id = player_id
             dmgstat.times_top = row['Times Top']
+            dmgstat.percentage_top = row['Percentage Top']
             dmgstat.total_dmg = row['Total dmg']
             dmgstat.avg_dmg_s = row['Average dmg per s']
 
@@ -207,6 +208,7 @@ def write_rips_to_db(df, raid):
 
             rips.player_stat_id = player_id
             rips.times_top = row['Times Top']
+            rips.percentage_top = row['Percentage Top']
             rips.total_rips = row['Total rips']
             rips.avg_rips_s = row['Average rips per s']
 
@@ -231,6 +233,7 @@ def write_cleanses_to_db(df, raid):
 
             cleanses.player_stat_id = player_id
             cleanses.times_top = row['Times Top']
+            cleanses.percentage_top = row['Percentage Top']
             cleanses.total_cleanses = row['Total cleanses']
             cleanses.avg_cleanses_s = row['Average cleanses per s']
 
@@ -255,6 +258,7 @@ def write_heal_to_db(df, raid):
 
             heal.player_stat_id = player_id
             heal.times_top = row['Times Top']
+            heal.percentage_top = row['Percentage Top']
             heal.total_heal = row['Total heal']
             heal.avg_heal_s = row['Average heal per s']
 
@@ -279,6 +283,7 @@ def write_dist_to_db(df, raid):
 
             dist.player_stat_id = player_id
             dist.times_top = row['Times Top']
+            dist.percentage_top = row['Percentage Top']
             dist.total_dist = row['Total dist']
             dist.avg_dist_s = row['Average dist per s']
 
@@ -303,6 +308,7 @@ def write_stab_to_db(df, raid):
 
             stab.player_stat_id = player_id
             stab.times_top = row['Times Top']
+            stab.percentage_top = row['Percentage Top']
             stab.total_stab = row['Total stab']
             stab.avg_stab_s = row['Average stab per s']
 
@@ -327,6 +333,7 @@ def write_prot_to_db(df, raid):
 
             prot.player_stat_id = player_id
             prot.times_top = row['Times Top']
+            prot.percentage_top = row['Percentage Top']
             prot.total_prot = row['Total prot']
             prot.avg_prot_s = row['Average prot per s']
 
@@ -350,6 +357,7 @@ def write_aegis_to_db(df, raid):
 
             aegis.player_stat_id = player_id
             aegis.times_top = row['Times Top']
+            aegis.percentage_top = row['Percentage Top']
             aegis.total_aegis = row['Total aegis']
             aegis.avg_aegis_s = row['Average aegis per s']
 
@@ -374,6 +382,7 @@ def write_might_to_db(df, raid):
 
             might.player_stat_id = player_id
             might.times_top = row['Times Top']
+            might.percentage_top = row['Percentage Top']
             might.total_might = row['Total might']
             might.avg_might_s = row['Average might per s']
 
@@ -398,6 +407,7 @@ def write_fury_to_db(df, raid):
 
             fury.player_stat_id = player_id
             fury.times_top = row['Times Top']
+            fury.percentage_top = row['Percentage Top']
             fury.total_fury = row['Total fury']
             fury.avg_fury_s = row['Average fury per s']
 
@@ -422,6 +432,7 @@ def write_barrier_to_db(df, raid):
 
             barrier.player_stat_id = player_id
             barrier.times_top = row['Times Top']
+            barrier.percentage_top = row['Percentage Top']
             barrier.total_barrier = row['Total barrier']
             barrier.avg_barrier_s = row['Average barrier per s']
 
@@ -446,6 +457,7 @@ def write_dmg_taken_to_db(df, raid):
 
             dmg_taken.player_stat_id = player_id
             dmg_taken.times_top = row['Times Top']
+            dmg_taken.percentage_top = row['Percentage Top']
             dmg_taken.total_dmg_taken = row['Total dmg_taken']
             dmg_taken.avg_dmg_taken_s = row['Average dmg_taken per s']
 
@@ -470,6 +482,7 @@ def write_deaths_to_db(df, raid):
 
             deaths.player_stat_id = player_id
             deaths.times_top = row['Times Top']
+            deaths.percentage_top = row['Percentage Top']
             deaths.total_deaths = row['Total deaths']
             deaths.avg_deaths_m = row['Average deaths per min']
 
@@ -494,6 +507,7 @@ def write_kills_to_db(df, raid):
 
             kills.player_stat_id = player_id
             kills.times_top = row['Times Top']
+            kills.percentage_top = row['Percentage Top']
             kills.total_kills = row['Total kills']
             kills.avg_kills_m = row['Average kills per min']
 
