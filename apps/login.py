@@ -1,4 +1,5 @@
 from dash import html, dcc, Output, Input, State
+from dash.exceptions import PreventUpdate
 
 # Login screen
 from flask_login import login_user, current_user
@@ -50,6 +51,7 @@ def login_button_click(n_clicks, username, password):
             return '/success', ''
         else:
             return '/login', 'Incorrect username or password'
+    return '/login', ''
 
 
 @app.callback(Output('user-status-div', 'children'), Output('login-status', 'data'), [Input('url', 'pathname')])

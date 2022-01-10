@@ -52,6 +52,7 @@ layout = html.Div(children=[
                 dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
                 dbc.Tab(label='Stability', tab_id='stab-tab'),
                 dbc.Tab(label='Healing', tab_id='heal-tab'),
+                dbc.Tab(label='Barrier', tab_id='barrier-tab'),
                 dbc.Tab(label='Distance', tab_id='dist-tab'),
                 dbc.Tab(label='Summary', tab_id='summary-tab'),
             ],
@@ -90,6 +91,8 @@ def parse_contents(contents, filename, date):
 
             df_heals = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
 
+            df_barrier = pd.read_excel(io.BytesIO(decoded), sheet_name='barrier')
+
             df_dist = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
 
             summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
@@ -101,6 +104,7 @@ def parse_contents(contents, filename, date):
                 'df_stab': df_stab.to_json(orient='split'),
                 'df_cleanses': df_cleanses.to_json(orient='split'),
                 'df_heals': df_heals.to_json(orient='split'),
+                'df_barrier': df_barrier.to_json(orient='split'),
                 'df_dist': df_dist.to_json(orient='split'),
                 'summary': summary.to_json(orient='split')
             }
@@ -135,14 +139,14 @@ def update_summary(datasets):
         df = pd.read_json(datasets['summary'], orient='split')
 
         df_s = df[['Kills', 'Deaths', 'Duration in s', 'Num. Allies', 'Num. Enemies', 'Damage', 'Boonrips', 'Cleanses', 'Stability Output', 'Healing']].tail(1)
-        df_s = df_s.rename(columns={'Num. Allies': 'Avg Num. Allies', 'Num. Enemies': 'Avg Num. Enemies'})
-        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%d-%m"), True)
+        df_s = df_s.rename(columns={'Num. Allies': '⌀ Allies', 'Num. Enemies': '⌀ Enemies'})
+        df_s.insert(0, "Date", df['Date'].iloc[0].strftime("%Y-%m-%d"), True)
 
         # Adds thousand seperator for summary
         for x, value in enumerate(df_s.iloc[0,6:11]):
             df_s.iloc[0,6+x] = f'{int(value):,}'  
 
-        table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm')
+        table = dbc.Table.from_dataframe(df_s, striped=True, bordered=True, hover=True, size='sm', id='summary')
         return [table, html.Hr()]
     return None
 
@@ -202,6 +206,16 @@ def switch_tabs(tab, datasets):
                 id='top-heal-chart',
                 figure=fig
             )
+        elif tab == 'barrier-tab':
+            df = pd.read_json(datasets['df_barrier'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'barrier', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-barrier-chart',
+                figure=fig
+            )
         elif tab == 'dist-tab':
             df = pd.read_json(datasets['df_dist'], orient='split')
             fig = graphs.get_top_dist_bar_chart(df, True)
@@ -214,6 +228,7 @@ def switch_tabs(tab, datasets):
             )
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
+            df['Date'] = df['Date'].dt.strftime("%Y-%m-%d")
             table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
             return table
     return ""
