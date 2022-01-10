@@ -1,3 +1,4 @@
+from sqlalchemy.orm import relationship
 from app import db
 
 
@@ -11,6 +12,9 @@ class Character(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String())
     profession_id = db.Column(db.Integer(), db.ForeignKey('profession.id', ondelete="CASCADE"))
+    
+    profession = relationship("Profession", back_populates="characters")
+    playerstats = relationship("PlayerStat", back_populates="character")
 
 
 class Profession(db.Model):
@@ -24,6 +28,8 @@ class Profession(db.Model):
     name = db.Column(db.String())
     abbreviation = db.Column(db.String(), unique=True)
     color = db.Column(db.String())
+
+    characters = relationship("Character", back_populates="profession")
 
 
 class PlayerStat(db.Model):
@@ -39,6 +45,24 @@ class PlayerStat(db.Model):
     attendance_count = db.Column(db.Integer())
     attendance_duration = db.Column(db.Integer())
 
+    raid = relationship("Raid", back_populates="playerstats")
+    character = relationship("Character", back_populates="playerstats")
+
+    dmg_stat = relationship("DmgStat", back_populates="playerstat", uselist=False)
+    rip_stat = relationship("RipStat", back_populates="playerstat", uselist=False)
+    cleanse_stat = relationship("CleanseStat", back_populates="playerstat", uselist=False)
+    stab_stat = relationship("StabStat", back_populates="playerstat", uselist=False)
+    heal_stat = relationship("HealStat", back_populates="playerstat", uselist=False)
+    dist_stat = relationship("DistStat", back_populates="playerstat", uselist=False)
+    prot_stat = relationship("ProtStat", back_populates="playerstat", uselist=False)
+    aegis_stat = relationship("AegisStat", back_populates="playerstat", uselist=False)
+    might_stat = relationship("MightStat", back_populates="playerstat", uselist=False)
+    fury_stat = relationship("FuryStat", back_populates="playerstat", uselist=False)
+    barrier_stat = relationship("BarrierStat", back_populates="playerstat", uselist=False)
+    dmg_taken_stat = relationship("DmgTakenStat", back_populates="playerstat", uselist=False)
+    death_stat = relationship("DeathStat", back_populates="playerstat", uselist=False)
+    kill_stat = relationship("KillsStat", back_populates="playerstat", uselist=False)
+    
 
 class Raid(db.Model):
 
@@ -47,7 +71,11 @@ class Raid(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     raid_date = db.Column(db.Date())
     name = db.Column(db.String())
-    raid_type = db.Column(db.Integer(), db.ForeignKey('raid_type.id', ondelete="CASCADE"))
+    raid_type_id = db.Column(db.Integer(), db.ForeignKey('raid_type.id', ondelete="CASCADE"))
+
+    raid_type = relationship("RaidType", back_populates="raids")
+    playerstats = relationship("PlayerStat", back_populates="raid")
+    fights = relationship("Fight", back_populates="raid")
 
 
 class RaidType(db.Model):
@@ -56,6 +84,8 @@ class RaidType(db.Model):
 
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(), unique=True)
+
+    raids = relationship("Raid", back_populates="raid_type")
 
 
 class Fight(db.Model):
@@ -79,6 +109,8 @@ class Fight(db.Model):
     deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
 
+    raid = relationship("Raid", back_populates="fights")
+
 
 class DmgStat(db.Model):
 
@@ -89,6 +121,8 @@ class DmgStat(db.Model):
     times_top = db.Column(db.Integer())
     total_dmg = db.Column(db.Integer())
     avg_dmg_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="dmg_stat")
 
 
 class RipStat(db.Model):
@@ -101,6 +135,9 @@ class RipStat(db.Model):
     total_rips = db.Column(db.Integer())
     avg_rips_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="rip_stat")
+
+
 
 class CleanseStat(db.Model):
 
@@ -111,6 +148,8 @@ class CleanseStat(db.Model):
     times_top = db.Column(db.Integer())
     total_cleanses = db.Column(db.Integer())
     avg_cleanses_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="cleanse_stat")
 
 
 class StabStat(db.Model):
@@ -123,6 +162,8 @@ class StabStat(db.Model):
     total_stab = db.Column(db.Integer())
     avg_stab_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="stab_stat")
+
 
 class HealStat(db.Model):
 
@@ -133,6 +174,9 @@ class HealStat(db.Model):
     times_top = db.Column(db.Integer())
     total_heal = db.Column(db.Integer())
     avg_heal_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="heal_stat")
+
 
 
 class DistStat(db.Model):
@@ -145,6 +189,8 @@ class DistStat(db.Model):
     total_dist = db.Column(db.Integer())
     avg_dist_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="dist_stat")
+
 
 class ProtStat(db.Model):
 
@@ -155,6 +201,8 @@ class ProtStat(db.Model):
     times_top = db.Column(db.Integer())
     total_prot = db.Column(db.Integer())
     avg_prot_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="prot_stat")
 
 
 class AegisStat(db.Model):
@@ -167,6 +215,8 @@ class AegisStat(db.Model):
     total_aegis = db.Column(db.Integer())
     avg_aegis_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="aegis_stat")
+
 
 class MightStat(db.Model):
 
@@ -177,6 +227,8 @@ class MightStat(db.Model):
     times_top = db.Column(db.Integer())
     total_might = db.Column(db.Integer())
     avg_might_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="might_stat")
 
 
 class FuryStat(db.Model):
@@ -189,6 +241,7 @@ class FuryStat(db.Model):
     total_fury = db.Column(db.Integer())
     avg_fury_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="fury_stat")
 
 class BarrierStat(db.Model):
 
@@ -199,6 +252,8 @@ class BarrierStat(db.Model):
     times_top = db.Column(db.Integer())
     total_barrier = db.Column(db.Integer())
     avg_barrier_s = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="barrier_stat")
 
 
 class DmgTakenStat(db.Model):
@@ -211,6 +266,7 @@ class DmgTakenStat(db.Model):
     total_dmg_taken = db.Column(db.Integer())
     avg_dmg_taken_s = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="dmg_taken_stat")
 
 class DeathStat(db.Model):
 
@@ -222,6 +278,8 @@ class DeathStat(db.Model):
     total_deaths = db.Column(db.Integer())
     avg_deaths_m = db.Column(db.Float())
 
+    player_stat = relationship("PlayerStat", back_populates="death_stat")
+
 
 class KillsStat(db.Model):
 
@@ -232,3 +290,5 @@ class KillsStat(db.Model):
     times_top = db.Column(db.Integer())
     total_kills = db.Column(db.Integer())
     avg_kills_m = db.Column(db.Float())
+
+    player_stat = relationship("PlayerStat", back_populates="kills_stat")
