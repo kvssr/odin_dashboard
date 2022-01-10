@@ -7,16 +7,52 @@ from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
+from sqlalchemy.sql.elements import Null
 from helpers import db_writer, graphs
 
 import pandas as pd
 from app import app, db
-from models import Fight
+from models import DistStat, DmgStat, Fight
+
+
+def get_fig_dmg():
+    dmg_list = db.session.query(DmgStat).limit(5).all()
+    if dmg_list:
+        df = pd.DataFrame([s.to_dict() for s in dmg_list])
+        fig = graphs.get_top_bar_chart(df, 'dmg')
+        return fig
+
+
+def get_fig_dist():
+    dist_list = db.session.query(DistStat).limit(5).all()
+    if dist_list:
+        df = pd.DataFrame([s.to_dict() for s in dist_list])
+        fig = graphs.get_top_dist_bar_chart(df)
+        return fig
 
 
 layout = html.Div(children=[
     html.Div(id='output-data-upload'),
+    html.Div(children=[
+        html.Div([
+        #dbc.Table.from_dataframe(get_df_summary(), striped=True, bordered=True, hover=True, size='sm', id='summary'),
+        html.Hr(),
+        dbc.Row([
+            dbc.Col(
+                dcc.Graph(
+                    id='top-dmg-chart',
+                    figure=get_fig_dmg()
+                ), md=6, className='bar-chart'),     
+            dbc.Col(
+                dcc.Graph(
+                    id='top-dist-chart',
+                    figure=get_fig_dist()
+                ), md=6, className='bar-chart')
+        ])
+        ])
+    ])
 ])
+
 
 
 def parse_contents(contents, filename, date):
@@ -131,4 +167,4 @@ def update_output(list_of_contents, list_of_names, list_of_dates):
     print("Getting content..")
     if list_of_contents is not None:
         data = parse_contents(list_of_contents, list_of_names, list_of_dates)
-        return data
+        #return data
