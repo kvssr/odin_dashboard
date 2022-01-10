@@ -42,22 +42,31 @@ profession_shorts = {
     'Scourge': 'Scg',
 }
 
+tab_style={'padding': '.5rem 0'}
+
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
         html.Div(id='summary'),
         html.Div([
             dbc.Tabs([
-                dbc.Tab(label='Damage', tab_id='dmg-tab'),
-                dbc.Tab(label='Rips', tab_id='rips-tab'),
-                dbc.Tab(label='Cleanses', tab_id='cleanses-tab'),
-                dbc.Tab(label='Stability', tab_id='stab-tab'),
-                dbc.Tab(label='Healing', tab_id='heal-tab'),
-                dbc.Tab(label='Barrier', tab_id='barrier-tab'),
-                dbc.Tab(label='Distance', tab_id='dist-tab'),
-                dbc.Tab(label='Summary', tab_id='summary-tab'),
+                dbc.Tab(label='Damage', tab_id='dmg-tab', label_style=tab_style),
+                dbc.Tab(label='Rips', tab_id='rips-tab', label_style=tab_style),
+                dbc.Tab(label='Might', tab_id='might-tab', label_style=tab_style),
+                dbc.Tab(label='Fury', tab_id='fury-tab', label_style=tab_style),
+                dbc.Tab(label='Healing', tab_id='heal-tab', label_style=tab_style),
+                dbc.Tab(label='Barrier', tab_id='barrier-tab', label_style=tab_style),
+                dbc.Tab(label='Cleanses', tab_id='cleanses-tab', label_style=tab_style),
+                dbc.Tab(label='Stability', tab_id='stab-tab', label_style=tab_style),
+                dbc.Tab(label='Protection', tab_id='prot-tab', label_style=tab_style),
+                dbc.Tab(label='Aegis', tab_id='aegis-tab', label_style=tab_style),
+                dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
+                dbc.Tab(label='Dmg taken', tab_id='dmg_taken-tab', label_style=tab_style),
+                dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
+                dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
             ],
                 id='tabs',
                 #active_tab='dmg-tab'
+                class_name='nav-justified flex-nowrap'
                 ),
             html.Div(id="tab-content"),
         ])
@@ -85,15 +94,27 @@ def parse_contents(contents, filename, date):
 
             df_rips = pd.read_excel(io.BytesIO(decoded), sheet_name='rips')
 
-            df_stab = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
+            df_might = pd.read_excel(io.BytesIO(decoded), sheet_name='might')
 
-            df_cleanses = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
+            df_fury = pd.read_excel(io.BytesIO(decoded), sheet_name='fury')
 
             df_heals = pd.read_excel(io.BytesIO(decoded), sheet_name='heal')
 
             df_barrier = pd.read_excel(io.BytesIO(decoded), sheet_name='barrier')
 
+            df_cleanses = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses')
+
+            df_stab = pd.read_excel(io.BytesIO(decoded), sheet_name='stab')
+
+            df_prot = pd.read_excel(io.BytesIO(decoded), sheet_name='prot')
+
+            df_aegis = pd.read_excel(io.BytesIO(decoded), sheet_name='aegis')
+
             df_dist = pd.read_excel(io.BytesIO(decoded), sheet_name='dist')
+
+            df_dmg_taken = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg_taken')
+
+            df_deaths = pd.read_excel(io.BytesIO(decoded), sheet_name='deaths')
 
             summary = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
             summary = summary.iloc[:,1:]
@@ -101,11 +122,17 @@ def parse_contents(contents, filename, date):
             dataset = {
                 'df_dmg': df_dmg.to_json(orient='split'),
                 'df_rips': df_rips.to_json(orient='split'),
-                'df_stab': df_stab.to_json(orient='split'),
-                'df_cleanses': df_cleanses.to_json(orient='split'),
+                'df_might': df_might.to_json(orient='split'),
+                'df_fury': df_fury.to_json(orient='split'),
                 'df_heals': df_heals.to_json(orient='split'),
                 'df_barrier': df_barrier.to_json(orient='split'),
+                'df_cleanses': df_cleanses.to_json(orient='split'),
+                'df_stab': df_stab.to_json(orient='split'),
+                'df_prot': df_prot.to_json(orient='split'),
+                'df_aegis': df_aegis.to_json(orient='split'),
                 'df_dist': df_dist.to_json(orient='split'),
+                'df_dmg_taken': df_dmg_taken.to_json(orient='split'),
+                'df_deaths': df_deaths.to_json(orient='split'),
                 'summary': summary.to_json(orient='split')
             }
 
@@ -176,24 +203,24 @@ def switch_tabs(tab, datasets):
                 id='top-rip-chart',
                 figure=fig
             )
-        elif tab == 'cleanses-tab':
-            df = pd.read_json(datasets['df_cleanses'], orient='split')
-            fig = graphs.get_top_bar_chart(df, 'cleanses', True)
+        elif tab == 'might-tab':
+            df = pd.read_json(datasets['df_might'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'might', True)
             fig.update_layout(
                 height=1000,
             )
             return dcc.Graph(
-                id='top-cleanses-chart',
+                id='top-might-chart',
                 figure=fig
             )
-        elif tab == 'stab-tab':
-            df = pd.read_json(datasets['df_stab'], orient='split')
-            fig = graphs.get_top_bar_chart(df, 'stab', True)
+        elif tab == 'fury-tab':
+            df = pd.read_json(datasets['df_fury'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'fury', True)
             fig.update_layout(
                 height=1000,
             )
             return dcc.Graph(
-                id='top-stab-chart',
+                id='top-fury-chart',
                 figure=fig
             )
         elif tab == 'heal-tab':
@@ -216,6 +243,46 @@ def switch_tabs(tab, datasets):
                 id='top-barrier-chart',
                 figure=fig
             )
+        elif tab == 'cleanses-tab':
+            df = pd.read_json(datasets['df_cleanses'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'cleanses', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-cleanses-chart',
+                figure=fig
+            )
+        elif tab == 'stab-tab':
+            df = pd.read_json(datasets['df_stab'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'stab', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-stab-chart',
+                figure=fig
+            )
+        elif tab == 'prot-tab':
+            df = pd.read_json(datasets['df_prot'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'prot', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-prot-chart',
+                figure=fig
+            )
+        elif tab == 'aegis-tab':
+            df = pd.read_json(datasets['df_aegis'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'aegis', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-aegis-chart',
+                figure=fig
+            )
         elif tab == 'dist-tab':
             df = pd.read_json(datasets['df_dist'], orient='split')
             fig = graphs.get_top_dist_bar_chart(df, True)
@@ -224,6 +291,26 @@ def switch_tabs(tab, datasets):
             )
             return dcc.Graph(
                 id='top-dist-chart',
+                figure=fig
+            )
+        elif tab == 'dmg_taken-tab':
+            df = pd.read_json(datasets['df_dmg_taken'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'dmg_taken', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-dmg_taken-chart',
+                figure=fig
+            )
+        elif tab == 'deaths-tab':
+            df = pd.read_json(datasets['df_deaths'], orient='split')
+            fig = graphs.get_top_bar_chart(df, 'deaths', True)
+            fig.update_layout(
+                height=1000,
+            )
+            return dcc.Graph(
+                id='top-deaths-chart',
                 figure=fig
             )
         elif tab == 'summary-tab':
