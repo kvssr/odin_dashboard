@@ -61,6 +61,12 @@ profession_shorts = {
     'Scourge': 'Scg',
 }
 
+raid_types = {
+    'morning',
+    'afternoon',
+    'guild',
+    'unknown'
+}
 
 def get_top_bar_chart(df, t, legend = False):
     fig = px.bar(df, y="Name", x="Total " + t, color="Profession", text="Total "+ t, barmode="relative",
