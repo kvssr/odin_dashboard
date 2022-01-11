@@ -1,5 +1,11 @@
+import pandas as pd
 from pandas.core.frame import DataFrame
 import plotly.express as px
+
+from app import db
+from models import Fight, FightSummary, Profession
+import dash_bootstrap_components as dbc
+from dash import html
 
 profession_colours = {
     'Guardian': '#186885',
@@ -29,8 +35,8 @@ profession_colours = {
     'Necromancer': '#2C9D5D',
     'Reaper': '#2C9D5D',
     'Scourge': '#2C9D5D',
-
 }
+
 profession_shorts = {
     'Guardian': 'Gnd',
     'Dragonhunter': 'Dgh',
@@ -68,7 +74,9 @@ raid_types = {
     'unknown'
 }
 
+
 def get_top_bar_chart(df, t, legend = True):
+
     fig = px.bar(df, y="Name", x="Total " + t, 
                  color="Profession", 
                  text="Total "+ t,
@@ -170,3 +178,15 @@ def get_top_dist_bar_chart(df, legend=True):
                            font_size=15,
                            )
     return fig
+
+
+def get_summary_table(df):
+    try:
+        if df is not None:
+            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, size='sm', id='summary')
+            return [table, html.Hr()]
+        return None
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+        return None
