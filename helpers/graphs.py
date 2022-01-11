@@ -166,3 +166,17 @@ def get_top_dist_bar_chart(df, legend=True):
                            font_size=15,
                            )
     return fig
+
+def get_pie_chart(df, title, colors):
+    fig = px.pie(df, values="values", names="names",
+                 color_discrete_sequence=colors)
+    fig.update_layout(
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        font_color='#EEE',
+        title=title,
+        title_x=0.5,
+        height=500,
+    )
+    fig.update_traces(textinfo='value')
+    return fig

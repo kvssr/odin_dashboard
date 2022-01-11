@@ -62,6 +62,7 @@ layout = html.Div(children=[
                 dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
                 dbc.Tab(label='Dmg taken', tab_id='dmg_taken-tab', label_style=tab_style),
                 dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
+                dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
                 dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
             ],
                 id='tabs',
@@ -313,6 +314,38 @@ def switch_tabs(tab, datasets):
                 id='top-deaths-chart',
                 figure=fig
             )
+        elif tab == 'global-tab':
+            df = pd.read_json(datasets['summary'], orient='split').iloc[-1]
+
+            kd_data = {"values": [df['Kills'],df['Deaths']], "names": ['Kills','Deaths']}
+            kd_fig = graphs.get_pie_chart(kd_data,'Kills/Deaths Ratio',['#0AABD1','#D02500'])
+
+            damage_data = {"values": [df['Damage'],10000000], "names": ['Damage Output','Damage Input']}
+            damage_fig = graphs.get_pie_chart(damage_data,'Damage Ratio',['#FFD814','#D13617'])
+
+            pack_data = {"values": [df['Num. Allies'],df['Num. Enemies']], "names": ['Wolves','Lambs']}
+            pack_fig = graphs.get_pie_chart(pack_data,'Wolves/Lambs Ratio',['#7D7A7A','#850000'])
+
+            return html.Div([
+                dbc.Row([
+                    dbc.Col(
+                        dcc.Graph(
+                            id='kd-pie-chart',
+                            figure=kd_fig
+                        ), md=4, className='pie-chart'),     
+                    dbc.Col(
+                        dcc.Graph(
+                            id='damage-pie-chart',
+                            figure=damage_fig
+                        ), md=4, className='pie-chart'),
+                    dbc.Col(
+                        dcc.Graph(
+                            id='pack-pie-chart',
+                            figure=pack_fig
+                        ), md=4, className='pie-chart')
+                ]),
+            ])
+
         elif tab == 'summary-tab':
             df = pd.read_json(datasets['summary'], orient='split')
             df['Date'] = df['Date'].dt.strftime("%Y-%m-%d")
