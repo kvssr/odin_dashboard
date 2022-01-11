@@ -31,6 +31,13 @@ class Profession(db.Model):
 
     characters = relationship("Character", back_populates="profession")
 
+    def to_dict(self):
+        return{
+            'name': self.name,
+            'abbreviation': self.abbreviation,
+            'color': self.color
+        }
+
 
 class PlayerStat(db.Model):
 
@@ -76,6 +83,7 @@ class Raid(db.Model):
     raid_type = relationship("RaidType", back_populates="raids")
     playerstats = relationship("PlayerStat", back_populates="raid")
     fights = relationship("Fight", back_populates="raid")
+    fightsummary = relationship("FightSummary", back_populates="raid")
 
 
 class RaidType(db.Model):
@@ -132,7 +140,8 @@ class DmgStat(db.Model):
             'Total dmg': self.total_dmg,
             'Average dmg per s': self.avg_dmg_s,
             'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
         }
 
 
@@ -149,6 +158,17 @@ class RipStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="rip_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total rips': self.total_rips,
+            'Average rips per s': self.avg_rips_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 
 class CleanseStat(db.Model):
@@ -164,6 +184,17 @@ class CleanseStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="cleanse_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total cleanses': self.total_cleanses,
+            'Average cleanses per s': self.avg_cleanses_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 class StabStat(db.Model):
 
@@ -178,6 +209,17 @@ class StabStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="stab_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total stab': self.total_stab,
+            'Average stab per s': self.avg_stab_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 class HealStat(db.Model):
 
@@ -191,6 +233,17 @@ class HealStat(db.Model):
     avg_heal_s = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="heal_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total heal': self.total_heal,
+            'Average heal per s': self.avg_heal_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 
 
@@ -215,7 +268,8 @@ class DistStat(db.Model):
             'Percentage Top': self.percentage_top,
             'Average dist per s': self.avg_dist_s,
             'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
         }
 
 class ProtStat(db.Model):
@@ -231,6 +285,17 @@ class ProtStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="prot_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total prot': self.total_prot,
+            'Average prot per s': self.avg_prot_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 class AegisStat(db.Model):
 
@@ -244,6 +309,17 @@ class AegisStat(db.Model):
     avg_aegis_s = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="aegis_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total aegis': self.total_aegis,
+            'Average aegis per s': self.avg_aegis_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 
 class MightStat(db.Model):
@@ -259,6 +335,17 @@ class MightStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="might_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total might': self.total_might,
+            'Average might per s': self.avg_might_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 class FuryStat(db.Model):
 
@@ -273,6 +360,17 @@ class FuryStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="fury_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total fury': self.total_fury,
+            'Average fury per s': self.avg_fury_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 class BarrierStat(db.Model):
 
     __tablename__ = 'barrier_stat'
@@ -285,6 +383,17 @@ class BarrierStat(db.Model):
     avg_barrier_s = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="barrier_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total barrier': self.total_barrier,
+            'Average barrier per s': self.avg_barrier_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 
 class DmgTakenStat(db.Model):
@@ -300,6 +409,17 @@ class DmgTakenStat(db.Model):
 
     player_stat = relationship("PlayerStat", back_populates="dmg_taken_stat")
 
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total dmg_taken': self.total_dmg_taken,
+            'Average dmg_taken per s': self.avg_dmg_taken_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 class DeathStat(db.Model):
 
     __tablename__ = 'death_stat'
@@ -312,6 +432,17 @@ class DeathStat(db.Model):
     avg_deaths_m = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="death_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total deaths': self.total_deaths,
+            'Average deaths per min': self.avg_deaths_m,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 
 class KillsStat(db.Model):
@@ -326,3 +457,48 @@ class KillsStat(db.Model):
     avg_kills_m = db.Column(db.Float())
 
     player_stat = relationship("PlayerStat", back_populates="kills_stat")
+
+    def to_dict(self):
+        return {
+            'Name': self.player_stat.character.name,
+            'Times Top': self.times_top,
+            'Total kills': self.total_kills,
+            'Average kills per min': self.avg_kills_m,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
+
+class FightSummary(db.Model):
+    __tablename__ = 'fight_summary'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    raid_id = db.Column(db.Integer(), db.ForeignKey('raid.id', ondelete="CASCADE"))
+    duration = db.Column(db.Integer())
+    avg_allies = db.Column(db.Float())
+    avg_enemies = db.Column(db.Float())
+    damage = db.Column(db.Integer())
+    boonrips = db.Column(db.Integer())
+    cleanses = db.Column(db.Integer())
+    stability = db.Column(db.Integer())
+    healing = db.Column(db.Integer())
+    deaths = db.Column(db.Integer())
+    kills = db.Column(db.Integer())
+
+    raid = relationship("Raid", back_populates="fightsummary")
+
+    def to_dict(self):
+        return {
+            'Date': self.raid.raid_date,
+            'Kills': self.kills,
+            'Deaths': self.deaths,
+            'Duration in s': self.duration,
+            '⌀ Allies': self.avg_allies,
+            '⌀ Enemies': self.avg_enemies,
+            'Damage': f'{self.damage:,}',
+            'Boonrips': f'{self.boonrips:,}',
+            'Cleanses': f'{self.cleanses:,}',
+            'Stability Output': f'{self.stability:,}',
+            'healing': f'{self.healing:,}',
+        }
