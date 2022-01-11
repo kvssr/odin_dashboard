@@ -18,15 +18,7 @@ app.layout = dbc.Container(id='container', children=[
         html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
         dbc.Col(children=[
             html.H1('ODIN Carrot Awards', 'title'),
-            dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                # Allow multiple files to be uploaded
-                multiple=False
-            )])]),
+            ])]),
     html.Hr(),
     html.Div(id='page-content')
 ])

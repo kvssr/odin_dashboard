@@ -37,6 +37,7 @@ td {
 
 #title{
     text-align: center;
+    margin-top: revert;
 }
 
 #logo{
