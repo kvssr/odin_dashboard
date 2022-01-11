@@ -1,11 +1,12 @@
 import io
 from threading import Barrier
+from flask_sqlalchemy.model import Model
 from numpy import character, e
 import pandas as pd
 from sqlalchemy.orm import session
 
-from models import AegisStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, PlayerStat, Profession, ProtStat, Raid, RaidType, RipStat, StabStat
-from app import db
+from models import AegisStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, KillsStat, MightStat, PlayerStat, Profession, ProtStat, Raid, RaidType, RipStat, StabStat
+from app import db, server
 from helpers import graphs
 
 
@@ -20,33 +21,42 @@ def write_xls_to_db(xls):
         print(f'db_time: {db_fight_time} - xls_time: {xls_fight_time}')
         if((db_fight_date == xls_fight_date) and (db_fight_time == xls_fight_time)):
             print('Database is up to date')
-            #return
+            return "The Database is up-to-date"
     except Exception as e:
         print('Cant check date')
         print(e)
-    write_professions_to_db(graphs.profession_shorts, graphs.profession_colours)
-    write_character_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'))
-    
-    write_raid_type_to_db(graphs.raid_types)
-    raid_id = write_raid_to_db(xls_fight_date)
-    write_player_stat_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
-    write_fights_to_db(df_fights, raid_id)
 
-    # player stats
-    write_dmg_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
-    write_rips_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='rips'), raid_id)
-    write_cleanses_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='cleanses'), raid_id)
-    write_heal_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='heal'), raid_id)
-    write_dist_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dist'), raid_id)
-    write_stab_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='stab'), raid_id)
-    write_prot_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='prot'), raid_id)
-    write_aegis_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='aegis'), raid_id)
-    write_might_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='might'), raid_id)
-    write_fury_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='fury'), raid_id)
-    write_barrier_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='barrier'), raid_id)
-    write_dmg_taken_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg_taken'), raid_id)
-    write_deaths_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='deaths'), raid_id)
-    write_kills_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='kills'), raid_id)
+    try:
+        recreate_tables()
+        write_professions_to_db(graphs.profession_shorts, graphs.profession_colours)
+        write_character_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'))
+        
+        write_raid_type_to_db(graphs.raid_types)
+        raid_id = write_raid_to_db(xls_fight_date)
+        write_player_stat_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
+        write_fights_to_db(df_fights, raid_id)
+        write_fight_summary_to_db(df_fights.iloc[-1], raid_id)
+
+        # player stats
+        write_dmg_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
+        write_rips_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='rips'), raid_id)
+        write_cleanses_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='cleanses'), raid_id)
+        write_heal_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='heal'), raid_id)
+        write_dist_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dist'), raid_id)
+        write_stab_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='stab'), raid_id)
+        write_prot_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='prot'), raid_id)
+        write_aegis_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='aegis'), raid_id)
+        write_might_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='might'), raid_id)
+        write_fury_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='fury'), raid_id)
+        write_barrier_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='barrier'), raid_id)
+        write_dmg_taken_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg_taken'), raid_id)
+        write_deaths_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='deaths'), raid_id)
+        write_kills_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='kills'), raid_id)
+
+        return "Updated database successfully"
+    except Exception as e:
+        print(e)
+        return "There was an error updating the database"
 
 
 def write_raid_type_to_db(types):
@@ -170,6 +180,30 @@ def write_fights_to_db(df, raid_id):
         print('Couldnt add fights to database')
         print(e)
     print(f'Added {counter} new fights to the db')
+
+
+def write_fight_summary_to_db(df, raid):
+    try:
+        fight = FightSummary()
+        fight.raid_id = raid
+        fight.kills = int(df['Kills'])
+        fight.deaths = int(df['Deaths'])
+        fight.duration = int(df['Duration in s'])
+        fight.avg_allies = df['Num. Allies'].astype(float)
+        fight.avg_enemies = df['Num. Enemies'].astype(float)
+        fight.damage = int(df['Damage'])
+        fight.boonrips = int(df['Boonrips'])
+        fight.cleanses = int(df['Cleanses'])
+        fight.stability = int(df['Stability Output'])
+        fight.healing = int(df['Healing'])
+        db.session.add(fight)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        print('Couldnt add fight_summary to database')
+        print(e)
+    else:
+        print(f'Added fight_summary to the db')
 
 
 def write_dmg_to_db(df, raid):
@@ -519,3 +553,17 @@ def write_kills_to_db(df, raid):
         print('Couldnt add kills_stat to database')
         print(e)
     print(f'Added {counter} new kills_stats to the db')
+
+
+def recreate_tables():
+    try:
+        print('#################')
+        session.close_all_sessions()
+        print('Dropping tables')
+        db.metadata.drop_all(db.engine)
+        db.session.commit()
+        print('Creating tables')
+        db.metadata.create_all(db.engine)
+        print('#################')
+    except Exception as e:
+        print(e)
