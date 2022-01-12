@@ -121,7 +121,7 @@ def switch_tabs(tab, datasets):
         except Exception as e:
             db.session.rollback()
             print(e)
-        fig = graphs.get_top_bar_chart(df, 'dmg', True)
+        fig = graphs.get_top_bar_chart(df, 'dmg', "Top Damage", True)
         fig.update_layout(
             height=1000,
         )
@@ -132,7 +132,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'rips-tab':
         query = db.session.query(RipStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'rips', True)
+        fig = graphs.get_top_bar_chart(df, 'rips', "Top Boons Removal", True)
         fig.update_layout(
             height=1000,
         )
@@ -143,7 +143,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'might-tab':
         query = db.session.query(MightStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'might', True)
+        fig = graphs.get_top_bar_chart(df, 'might', "Top Might Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -154,7 +154,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'fury-tab':
         query = db.session.query(FuryStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'fury', True)
+        fig = graphs.get_top_bar_chart(df, 'fury', "Top Fury Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -165,7 +165,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'cleanses-tab':
         query = db.session.query(CleanseStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'cleanses', True)
+        fig = graphs.get_top_bar_chart(df, 'cleanses', "Top Conditions Cleansed", True)
         fig.update_layout(
             height=1000,
         )
@@ -176,7 +176,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'stab-tab':
         query = db.session.query(StabStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'stab', True)
+        fig = graphs.get_top_bar_chart(df, 'stab', "Top Stability Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -187,7 +187,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'heal-tab':
         query = db.session.query(HealStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'heal', True)
+        fig = graphs.get_top_bar_chart(df, 'heal', "Top Healing Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -198,7 +198,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'barrier-tab':
         query = db.session.query(BarrierStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'barrier', True)
+        fig = graphs.get_top_bar_chart(df, 'barrier', "Top Barrier Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -220,7 +220,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'prot-tab':
         query = db.session.query(ProtStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'prot', True)
+        fig = graphs.get_top_bar_chart(df, 'prot', "Top Protection Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -231,7 +231,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'aegis-tab':
         query = db.session.query(AegisStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'aegis', True)
+        fig = graphs.get_top_bar_chart(df, 'aegis', "Top Aegis Output", True)
         fig.update_layout(
             height=1000,
         )
@@ -242,7 +242,7 @@ def switch_tabs(tab, datasets):
     elif tab == 'dmg_taken-tab':
         query = db.session.query(DmgTakenStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'dmg_taken', True)
+        fig = graphs.get_top_bar_chart(df, 'dmg_taken', "Least Damage Taken", True)
         fig.update_layout(
             height=1000,
         )
@@ -253,12 +253,12 @@ def switch_tabs(tab, datasets):
     elif tab == 'deaths-tab':
         query = db.session.query(DeathStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'deaths', True)
+        fig = graphs.get_top_bar_chart(df, 'deaths', "Top Survivor", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-rip-chart',
+            id='top-deaths-chart',
             figure=fig
         )
     elif tab == 'global-tab':
