@@ -531,5 +531,5 @@ class FightSummary(db.Model):
             'Boonrips': f'{self.boonrips:,}',
             'Cleanses': f'{self.cleanses:,}',
             'Stability Output': f'{self.stability:,}',
-            'healing': f'{self.healing:,}',
+            'Healing': f'{self.healing:,}',
         }

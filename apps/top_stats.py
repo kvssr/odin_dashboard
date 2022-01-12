@@ -13,7 +13,7 @@ from helpers import db_writer, graphs
 
 import pandas as pd
 from app import app, db
-from models import CleanseStat, DistStat, DmgStat, Fight, HealStat, RipStat, StabStat
+from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, RipStat, StabStat
 
 
 def get_fig_with_model(model, t, limit):
@@ -39,12 +39,23 @@ def get_fig_dist():
     except Exception as e:
         print(e)
 
+def get_summary_table():
+    df = []
+    try:
+        query = db.session.query(FightSummary).first()
+        db.session.commit()
+        df = pd.DataFrame(query.to_dict(), index=[0])
+    except Exception as e:
+        db.session.rollback()
+        print(e)
+    
+    return graphs.get_summary_table(df)
 
 layout = html.Div(children=[
     html.Div(id='output-data-upload'),
     html.Div(children=[
         html.Div([
-        #html.Div(graphs.get_summary_table()),
+        html.Div(get_summary_table()),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
