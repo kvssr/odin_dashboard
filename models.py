@@ -119,6 +119,22 @@ class Fight(db.Model):
 
     raid = relationship("Raid", back_populates="fights")
 
+    def to_dict(self):
+        return {
+            'number': self.number,
+            'start time': self.start_time,
+            'end time': self.end_time,
+            'skipped': self.skipped,
+            '# Allies': self.num_allies,
+            '# Enemies': self.num_enemies,
+            'kills': self.kills,
+            'deaths': self.deaths,
+            'damage': f'{self.damage:,}',
+            'boonrips': f'{self.boonrips:,}',
+            'cleanses': f'{self.cleanses:,}',
+            'healing': f'{self.healing:,}'
+        }
+
 
 class DmgStat(db.Model):
 

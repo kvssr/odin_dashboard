@@ -15,7 +15,7 @@ import pandas as pd
 from helpers import db_writer, graphs
 from sqlalchemy.orm.session import close_all_sessions
 
-from models import BarrierStat, CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, RipStat, StabStat
+from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, ProtStat, RipStat, StabStat
 
 
 def get_summary_table():
@@ -140,6 +140,28 @@ def switch_tabs(tab, datasets):
             id='top-rip-chart',
             figure=fig
         )
+    elif tab == 'might-tab':
+        query = db.session.query(MightStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'might', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-might-chart',
+            figure=fig
+        )
+    elif tab == 'fury-tab':
+        query = db.session.query(FuryStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'fury', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-fury-chart',
+            figure=fig
+        )
     elif tab == 'cleanses-tab':
         query = db.session.query(CleanseStat).all()
         df = pd.DataFrame([s.to_dict() for s in query])
@@ -195,16 +217,61 @@ def switch_tabs(tab, datasets):
             id='top-dist-chart',
             figure=fig
         )
+    elif tab == 'prot-tab':
+        query = db.session.query(ProtStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'prot', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-prot-chart',
+            figure=fig
+        )
+    elif tab == 'aegis-tab':
+        query = db.session.query(AegisStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'aegis', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-aegis-chart',
+            figure=fig
+        )
+    elif tab == 'dmg_taken-tab':
+        query = db.session.query(DmgTakenStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'dmg_taken', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-dmg_taken-chart',
+            figure=fig
+        )
+    elif tab == 'deaths-tab':
+        query = db.session.query(DeathStat).all()
+        df = pd.DataFrame([s.to_dict() for s in query])
+        fig = graphs.get_top_bar_chart(df, 'deaths', True)
+        fig.update_layout(
+            height=1000,
+        )
+        return dcc.Graph(
+            id='top-rip-chart',
+            figure=fig
+        )
     elif tab == 'global-tab':
-        df = pd.read_json(datasets['summary'], orient='split').iloc[-1]
-
+        #df = pd.read_json(datasets['summary'], orient='split').iloc[-1]
+        query = db.session.query(FightSummary).first()
+        df = pd.DataFrame(query.to_dict(), index=[0]).iloc[0]
         kd_data = {"values": [df['Kills'],df['Deaths']], "names": ['Kills','Deaths']}
         kd_fig = graphs.get_pie_chart(kd_data,'Kills/Deaths Ratio',['#0AABD1','#D02500'])
 
-        damage_data = {"values": [df['Damage'],10000000], "names": ['Damage Output','Damage Input']}
+        damage_data = {"values": [int(df['Damage'].replace(',', '')),10000000], "names": ['Damage Output','Damage Input']}
         damage_fig = graphs.get_pie_chart(damage_data,'Damage Ratio',['#FFD814','#D13617'])
 
-        pack_data = {"values": [df['Num. Allies'],df['Num. Enemies']], "names": ['Wolves','Lambs']}
+        pack_data = {"values": [df['⌀ Allies'],df['⌀ Enemies']], "names": ['Wolves','Lambs']}
         pack_fig = graphs.get_pie_chart(pack_data,'Wolves/Lambs Ratio',['#7D7A7A','#850000'])
 
         return html.Div([
@@ -229,6 +296,5 @@ def switch_tabs(tab, datasets):
     elif tab == 'summary-tab':
         query = db.session.query(Fight).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        df['Date'] = df['Date'].dt.strftime("%Y-%m-%d")
         table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
         return table
