@@ -75,8 +75,7 @@ raid_types = {
 }
 
 
-def get_top_bar_chart(df, t, legend = True):
-
+def get_top_bar_chart(df, t, title, legend = True):
     fig = px.bar(df, y="Name", x="Total " + t, 
                  color="Profession", 
                  text="Total "+ t,
@@ -91,7 +90,7 @@ def get_top_bar_chart(df, t, legend = True):
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
-        title="Top " + t,
+        title=title,
         title_xanchor='center',
         title_x=0.5,
         showlegend=legend,
@@ -136,6 +135,10 @@ def add_annotations_graph(fig, df, t):
 
 
 def get_top_dist_bar_chart(df, legend=True):
+    #only range from 0-100 in detailed
+    xaxis_range = None
+    if len(df) > 5:
+        xaxis_range = [0,100]
     fig = px.bar(df, y="Name", x="Percentage Top", color="Profession", barmode="relative",
                  orientation='h',
                  color_discrete_map=profession_colours)
@@ -144,11 +147,11 @@ def get_top_dist_bar_chart(df, legend=True):
         yaxis_title='',
         xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
-        xaxis_range=[0,100],
+        xaxis_range=xaxis_range,
         paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(33,33,33,0)',
         font_color='#EEE',
-        title="Top closest to Tag",
+        title="Top Closest To Tag",
         title_xanchor='center',
         title_x=0.5,
         showlegend=legend,
