@@ -114,8 +114,15 @@ class Fight(db.Model):
     cleanses = db.Column(db.Integer())
     stability = db.Column(db.Integer())
     healing = db.Column(db.Integer())
+    distance_to_tag = db.Column(db.Integer())
     deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
+    protection = db.Column(db.Integer())
+    aegis = db.Column(db.Integer())
+    might = db.Column(db.Integer())
+    fury = db.Column(db.Integer())
+    barrier = db.Column(db.Integer())
+    dmg_taken = db.Column(db.Integer())
 
     raid = relationship("Raid", back_populates="fights")
 
@@ -492,6 +499,7 @@ class FightSummary(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     raid_id = db.Column(db.Integer(), db.ForeignKey('raid.id', ondelete="CASCADE"))
     duration = db.Column(db.Integer())
+    skipped = db.Column(db.Integer())
     avg_allies = db.Column(db.Float())
     avg_enemies = db.Column(db.Float())
     damage = db.Column(db.Integer())
@@ -501,6 +509,13 @@ class FightSummary(db.Model):
     healing = db.Column(db.Integer())
     deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
+    distance_to_tag = db.Column(db.Integer())
+    protection = db.Column(db.Integer())
+    aegis = db.Column(db.Integer())
+    might = db.Column(db.Integer())
+    fury = db.Column(db.Integer())
+    barrier = db.Column(db.Integer())
+    dmg_taken = db.Column(db.Integer())
 
     raid = relationship("Raid", back_populates="fightsummary")
 
