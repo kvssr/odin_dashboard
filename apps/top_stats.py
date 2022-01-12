@@ -50,36 +50,36 @@ layout = html.Div(children=[
                 dcc.Graph(
                     id='top-dmg-chart',
                     figure=get_fig_with_model(DmgStat, 'dmg', 5)
-                ), md=6, className='bar-chart'),     
+                ), xs=12, md=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id='top-dist-chart',
                     figure=get_fig_dist()
-                ), md=6, className='bar-chart')
+                ), xs=12,md=6, className='bar-chart')
         ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id='top-stab-chart',
                     figure=get_fig_with_model(StabStat, 'stab', 3)
-                ), md=6, className='bar-chart'),     
+                ), xs=12, md=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id='top-cleanses-chart',
                     figure=get_fig_with_model(CleanseStat, 'cleanses', 3)
-                ), md=6, className='bar-chart')
+                ), xs=12, md=6, className='bar-chart')
         ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id='top-heal-chart',
                     figure=get_fig_with_model(HealStat, 'heal', 3)
-                ), md=6, className='bar-chart'),     
+                ), xs=12, md=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id='top-rips-chart',
                     figure=get_fig_with_model(RipStat, 'rips', 3)
-                ), md=6, className='bar-chart')
+                ), xs=12, md=6, className='bar-chart')
         ]),
         ])
     ])
