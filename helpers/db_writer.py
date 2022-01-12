@@ -166,9 +166,16 @@ def write_fights_to_db(df, raid_id):
             fight.num_allies = row['Num. Allies']
             fight.num_enemies = row['Num. Enemies']
             fight.damage = row['Damage']
-            fight.boonrips = row['Boonrips']
-            fight.cleanses = row['Cleanses']
+            fight.boonrips = row['Boon Strips']
+            fight.cleanses = row['Condition Cleanses']
+            fight.distance_to_tag = row['Distance to Tag']
             fight.stability = row['Stability Output']
+            fight.protection = row['Protection Output']
+            fight.aegis = row['Aegis Output']
+            fight.might = row['Might Output']
+            fight.fury = row['Fury Output']
+            fight.barrier = row['Barrier']
+            fight.dmg_taken = row['Damage Taken']
             fight.healing = row['Healing']
             fight.deaths = row['Deaths']
             fight.kills = row['Kills']
@@ -189,13 +196,21 @@ def write_fight_summary_to_db(df, raid):
         fight.kills = int(df['Kills'])
         fight.deaths = int(df['Deaths'])
         fight.duration = int(df['Duration in s'])
+        fight.skipped = int(df['Skipped'])
         fight.avg_allies = df['Num. Allies'].astype(float)
         fight.avg_enemies = df['Num. Enemies'].astype(float)
         fight.damage = int(df['Damage'])
-        fight.boonrips = int(df['Boonrips'])
-        fight.cleanses = int(df['Cleanses'])
+        fight.boonrips = int(df['Boon Strips'])
+        fight.cleanses = int(df['Condition Cleanses'])
         fight.stability = int(df['Stability Output'])
         fight.healing = int(df['Healing'])
+        fight.distance_to_tag = int(df['Distance to Tag'])
+        fight.protection = int(df['Protection Output'])
+        fight.aegis = int(df['Aegis Output'])
+        fight.might = int(df['Might Output'])
+        fight.fury = int(df['Fury Output'])
+        fight.barrier = int(df['Barrier'])
+        fight.dmg_taken = int(df['Damage Taken'])
         db.session.add(fight)
         db.session.commit()
     except Exception as e:
