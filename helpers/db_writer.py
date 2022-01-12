@@ -135,7 +135,8 @@ def write_player_stat_to_db(df, raid_id):
         for index, row in df.iterrows():
             player_stat = PlayerStat()
             player_stat.raid_id = raid_id
-            player_stat.character_id = db.session.query(Character.id).filter_by(name=row['Name'])
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            player_stat.character_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
             player_stat.attendance_count = row['Attendance (number of fights)']
             player_stat.attendance_duration = row['Attendance (duration fights)']
             db.session.add(player_stat)
@@ -227,7 +228,9 @@ def write_dmg_to_db(df, raid):
         for index, row in df.iterrows():
             dmgstat = DmgStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             dmgstat.player_stat_id = player_id
@@ -252,7 +255,9 @@ def write_rips_to_db(df, raid):
         for index, row in df.iterrows():
             rips = RipStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             rips.player_stat_id = player_id
@@ -277,7 +282,9 @@ def write_cleanses_to_db(df, raid):
         for index, row in df.iterrows():
             cleanses = CleanseStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             cleanses.player_stat_id = player_id
@@ -302,7 +309,9 @@ def write_heal_to_db(df, raid):
         for index, row in df.iterrows():
             heal = HealStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             heal.player_stat_id = player_id
@@ -327,7 +336,9 @@ def write_dist_to_db(df, raid):
         for index, row in df.iterrows():
             dist = DistStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             dist.player_stat_id = player_id
@@ -352,7 +363,9 @@ def write_stab_to_db(df, raid):
         for index, row in df.iterrows():
             stab = StabStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             stab.player_stat_id = player_id
@@ -377,7 +390,9 @@ def write_prot_to_db(df, raid):
         for index, row in df.iterrows():
             prot = ProtStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             prot.player_stat_id = player_id
@@ -401,7 +416,9 @@ def write_aegis_to_db(df, raid):
         for index, row in df.iterrows():
             aegis = AegisStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             aegis.player_stat_id = player_id
@@ -426,7 +443,9 @@ def write_might_to_db(df, raid):
         for index, row in df.iterrows():
             might = MightStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             might.player_stat_id = player_id
@@ -451,7 +470,9 @@ def write_fury_to_db(df, raid):
         for index, row in df.iterrows():
             fury = FuryStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             fury.player_stat_id = player_id
@@ -476,7 +497,9 @@ def write_barrier_to_db(df, raid):
         for index, row in df.iterrows():
             barrier = BarrierStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             barrier.player_stat_id = player_id
@@ -501,7 +524,9 @@ def write_dmg_taken_to_db(df, raid):
         for index, row in df.iterrows():
             dmg_taken = DmgTakenStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             dmg_taken.player_stat_id = player_id
@@ -526,7 +551,9 @@ def write_deaths_to_db(df, raid):
         for index, row in df.iterrows():
             deaths = DeathStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             deaths.player_stat_id = player_id
@@ -551,7 +578,9 @@ def write_kills_to_db(df, raid):
         for index, row in df.iterrows():
             kills = KillsStat()
 
-            char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
+            professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            char_id = db.session.query(Character.id).filter_by(name=row['Name'], profession_id=professionId).first()[0]
+            #char_id = db.session.query(Character.id).filter_by(name=row['Name']).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid).first()[0]
 
             kills.player_stat_id = player_id
