@@ -92,17 +92,19 @@ def get_top_bar_chart(df, t, legend = True):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
         title="Top " + t,
+        title_xanchor='center',
+        title_x=0.5,
         showlegend=legend,
         legend_y=0,
         legend_x=0.9,
         margin=dict(l=200),
-        font_size=15,
+        font_size=13,
     )
     fig.update_traces(textangle=0)
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
-        tickfont_size=18,
+        tickfont_size=15,
     )
     fig = add_annotations_graph(fig, df, t)
     return fig
@@ -117,7 +119,7 @@ def add_annotations_graph(fig, df, t):
                                yshift=0,
                                xshift=2,
                                xanchor="left",
-                               font_size=15,
+                               font_size=13,
             )
         fig.add_annotation(y=name, x=0,
                            text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
@@ -127,7 +129,7 @@ def add_annotations_graph(fig, df, t):
                            yshift=0,
                            xshift=0,
                            xanchor="left",
-                           font_size=15,
+                           font_size=13,
         )
 
     return fig
@@ -147,17 +149,19 @@ def get_top_dist_bar_chart(df, legend=True):
         plot_bgcolor='rgba(0,0,0,0)',
         font_color='#EEE',
         title="Top closest to Tag",
+        title_xanchor='center',
+        title_x=0.5,
         showlegend=legend,
         legend_y=0,
         legend_x=0.9,
         margin=dict(l=200),
-        font_size=15,
+        font_size=13,
 
     )
     fig.update_yaxes(
         automargin=False,
         ticksuffix=' ',
-        tickfont_size=18,
+        tickfont_size=15,
     )
 
     for name in df["Name"]:
@@ -169,7 +173,7 @@ def get_top_dist_bar_chart(df, legend=True):
                            yshift=0,
                            xshift=0,
                            xanchor="left",
-                           font_size=15,
+                           font_size=13,
                            ),
         fig.add_annotation(y=name, x=df[df["Name"] == name]["Percentage Top"].values[0],
                            text="{}%".format(df[df["Name"] ==  name]["Percentage Top"].values[0]),
@@ -177,7 +181,7 @@ def get_top_dist_bar_chart(df, legend=True):
                            yshift=0,
                            xshift=0,
                            xanchor="right",
-                           font_size=15,
+                           font_size=13,
                            )
     return fig
 
