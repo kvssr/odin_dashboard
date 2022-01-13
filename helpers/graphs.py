@@ -113,7 +113,7 @@ def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
         if t != 'deaths':
             fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
-                               text="{:,.0f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]) if t in ['dmg', 'heal'] else "{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
+                               text="{:,.0f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]) if t in ['dmg', 'heal', 'barrier', 'dmg_taken'] else "{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
                                showarrow=False,
                                yshift=0,
                                xshift=2,
