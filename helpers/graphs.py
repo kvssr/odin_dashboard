@@ -231,3 +231,32 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
         )
     return fig
 
+
+def get_top_survivor_chart(df, t, title, legend = False):
+    print('....')
+    print(df)
+    print('....')
+
+    fig = px.bar(df, y=df["Name"], x=df["Total deaths"], 
+                color=df["Name"],
+                hover_name="Name",
+                text=df['Profession'],
+                text_auto=',',
+                barmode="relative",
+                orientation='h',
+                color_discrete_sequence=df["Profession_color"]
+                )
+    fig.update_layout(
+                xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
+        title=title,
+        showlegend=legend,
+        legend_y=1,
+        legend_x=0.9,
+    )
+    fig.update_layout(general_layout)
+    fig.update_traces(textangle=0)
+    fig = add_times_top_annotation(fig, df)
+    return fig
+
+
+

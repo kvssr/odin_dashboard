@@ -15,7 +15,7 @@ import pandas as pd
 from helpers import db_writer, graphs
 from sqlalchemy.orm.session import close_all_sessions
 
-from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, ProtStat, RipStat, StabStat
+from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, RipStat, StabStat
 
 
 def get_summary_table():
@@ -251,9 +251,10 @@ def switch_tabs(tab, datasets):
             figure=fig
         )
     elif tab == 'deaths-tab':
-        query = db.session.query(DeathStat).all()
+        query = db.session.query(DeathStat).join(PlayerStat).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total_deaths.asc()).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'deaths', "Top Survivor", True)
+        print(df)
+        fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
         fig.update_layout(
             height=1000,
         )
