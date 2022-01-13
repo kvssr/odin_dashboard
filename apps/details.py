@@ -267,13 +267,13 @@ def switch_tabs(tab, datasets):
         query = db.session.query(FightSummary).first()
         df = pd.DataFrame(query.to_dict(), index=[0]).iloc[0]
         kd_data = {"values": [df['Kills'],df['Deaths']], "names": ['Kills','Deaths']}
-        kd_fig = graphs.get_pie_chart(kd_data,'Kills/Deaths Ratio',['#0AABD1','#D02500'])
+        kd_fig = graphs.get_pie_chart(kd_data,'Kills/Deaths Ratio',['#262527','#87000A'])
 
-        damage_data = {"values": [int(df['Damage'].replace(',', '')),10000000], "names": ['Damage Output','Damage Input']}
-        damage_fig = graphs.get_pie_chart(damage_data,'Damage Ratio',['#FFD814','#D13617'])
+        damage_data = {"values": [int(df['Damage'].replace(',', '')),int(df['Damage Taken'].replace(',', ''))], "names": ['Damage Output','Damage Input']}
+        damage_fig = graphs.get_pie_chart(damage_data,'Damage Ratio',['#262527','#87000A'])
 
-        pack_data = {"values": [df['⌀ Allies'],df['⌀ Enemies']], "names": ['Wolves','Lambs']}
-        pack_fig = graphs.get_pie_chart(pack_data,'Wolves/Lambs Ratio',['#7D7A7A','#850000'])
+        pack_data = {"values": [df['⌀ Allies'],df['⌀ Enemies']], "names": ['⌀ Wolves','⌀ Lambs']}
+        pack_fig = graphs.get_pie_chart(pack_data,'Wolves/Lambs Ratio',['#262527','#87000A'])
 
         return html.Div([
             dbc.Row([

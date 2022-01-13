@@ -532,4 +532,5 @@ class FightSummary(db.Model):
             'Cleanses': f'{self.cleanses:,}',
             'Stability Output': f'{self.stability:,}',
             'Healing': f'{self.healing:,}',
+            'Damage Taken': f'{self.dmg_taken:,}',
         }

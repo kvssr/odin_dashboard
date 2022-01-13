@@ -173,8 +173,7 @@ def add_times_top_annotation(fig, df):
     
 
 def get_pie_chart(df, title, colors):
-    fig = px.pie(df, values="values", names="names",
-                 color_discrete_sequence=colors)
+    fig = px.pie(df, values="values", names="names",color_discrete_sequence=colors)
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
@@ -183,7 +182,11 @@ def get_pie_chart(df, title, colors):
         title_x=0.5,
         height=500,
     )
-    fig.update_traces(textinfo='value')
+    fig.update_traces(
+        marker=dict(colors=colors, line=dict(color='#7C8789', width=2)),
+        textposition='inside',
+        textinfo='percent+label'
+    )
     return fig
 
 
