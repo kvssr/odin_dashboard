@@ -240,9 +240,9 @@ def switch_tabs(tab, datasets):
             figure=fig
         )
     elif tab == 'dmg_taken-tab':
-        query = db.session.query(DmgTakenStat).all()
+        query = db.session.query(DmgTakenStat).order_by(DmgTakenStat.avg_dmg_taken_s.asc()).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        fig = graphs.get_top_bar_chart(df, 'dmg_taken', "Least Damage Taken", True)
+        fig = graphs.get_top_dmg_taken_chart(df, 'dmg_taken', "Least Damage Taken", False)
         fig.update_layout(
             height=1000,
         )

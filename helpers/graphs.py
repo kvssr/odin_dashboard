@@ -74,6 +74,21 @@ raid_types = {
     'unknown'
 }
 
+general_layout = {
+        'title_xanchor':'center',
+        'title_x':0.5,
+        'legend_y':0,
+        'legend_x':0.9,
+        'margin':dict(l=200),
+        'font_size':13,
+        'yaxis_title':'',
+        'paper_bgcolor':'rgba(0,0,0,0)',
+        'plot_bgcolor':'rgba(0,0,0,0)',
+        'font_color':'#EEE',
+        'yaxis_automargin': False,
+        'yaxis_ticksuffix': ' ',
+        'yaxis_tickfont_size': 15
+}
 
 def get_top_bar_chart(df, t, title, legend = True):
     fig = px.bar(df, y="Name", x="Total " + t, 
@@ -82,30 +97,18 @@ def get_top_bar_chart(df, t, title, legend = True):
                  text_auto=',',
                  barmode="relative",
                  orientation='h',
-                 color_discrete_map=profession_colours)
+                 color_discrete_map=profession_colours
+                 )
     fig.update_layout(
         yaxis_categoryorder='total ascending',
         xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
-        yaxis_title='',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        font_color='#EEE',
         title=title,
-        title_xanchor='center',
-        title_x=0.5,
         showlegend=legend,
-        legend_y=0,
-        legend_x=0.9,
-        margin=dict(l=200),
-        font_size=13,
     )
+    fig.update_layout(general_layout)
     fig.update_traces(textangle=0)
-    fig.update_yaxes(
-        automargin=False,
-        ticksuffix=' ',
-        tickfont_size=15,
-    )
     fig = add_annotations_graph(fig, df, t)
+    fig = add_times_top_annotation(fig, df)
     return fig
 
 
@@ -120,17 +123,6 @@ def add_annotations_graph(fig, df, t):
                                xanchor="left",
                                font_size=13,
             )
-        fig.add_annotation(y=name, x=0,
-                           text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                                + " / " +
-                                str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left",
-                           font_size=13,
-        )
-
     return fig
 
 
@@ -144,40 +136,16 @@ def get_top_dist_bar_chart(df, legend=True):
                  color_discrete_map=profession_colours)
     fig.update_layout(
         yaxis_categoryorder='total ascending',
-        yaxis_title='',
         xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
         xaxis_range=xaxis_range,
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(33,33,33,0)',
-        font_color='#EEE',
         title="Top Closest To Tag",
-        title_xanchor='center',
-        title_x=0.5,
-        showlegend=legend,
-        legend_y=0,
-        legend_x=0.9,
-        margin=dict(l=200),
-        font_size=13,
+    )
+    fig.update_layout(general_layout)
+    fig = add_times_top_annotation(fig, df)
 
-    )
-    fig.update_yaxes(
-        automargin=False,
-        ticksuffix=' ',
-        tickfont_size=15,
-    )
 
     for name in df["Name"]:
-        fig.add_annotation(y=name, x=0,
-                           text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                                + " / " +
-                                str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                           showarrow=False,
-                           yshift=0,
-                           xshift=0,
-                           xanchor="left",
-                           font_size=13,
-                           ),
         fig.add_annotation(y=name, x=df[df["Name"] == name]["Percentage Top"].values[0],
                            text="{}%".format(df[df["Name"] ==  name]["Percentage Top"].values[0]),
                            showarrow=False,
@@ -187,6 +155,22 @@ def get_top_dist_bar_chart(df, legend=True):
                            font_size=13,
                            )
     return fig
+
+
+def add_times_top_annotation(fig, df):
+    for name in df["Name"]:
+        fig.add_annotation(y=name, x=0,
+                    text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
+                        + " / " +
+                        str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
+                    showarrow=False,
+                    yshift=0,
+                    xshift=0,
+                    xanchor="left",
+                    font_size=13,
+        )
+    return fig
+    
 
 def get_pie_chart(df, title, colors):
     fig = px.pie(df, values="values", names="names",
@@ -202,6 +186,7 @@ def get_pie_chart(df, title, colors):
     fig.update_traces(textinfo='value')
     return fig
 
+
 def get_summary_table(df):
     try:
         if df is not None:
@@ -212,3 +197,37 @@ def get_summary_table(df):
         db.session.rollback()
         print(e)
         return None
+
+
+def get_top_dmg_taken_chart(df, t, title, legend = True):
+    fig = px.bar(df, y=df["Name"], x=df["Total dmg_taken"], 
+                 color=df["Name"],
+                 hover_name="Name",
+                 text=df['Profession'],
+                 text_auto=',',
+                 barmode="relative",
+                 orientation='h',
+                 color_discrete_sequence=df["Profession_color"].values
+                 )
+    fig.update_layout(
+        xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
+        title=title,
+        showlegend=legend,
+        legend_y=1,
+        legend_x=0.9,
+    )
+    fig.update_layout(general_layout)
+    fig.update_traces(textangle=0)
+    fig = add_times_top_annotation(fig, df)
+
+    for name in df['Name']:
+        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total dmg_taken"].values[0]),
+                                text="{:,.0f}".format(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
+                                showarrow=False,
+                                yshift=0,
+                                xshift=2,
+                                xanchor="left",
+                                font_size=13,
+        )
+    return fig
+
