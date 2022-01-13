@@ -131,7 +131,7 @@ class Fight(db.Model):
             'number': self.number,
             'start time': self.start_time,
             'end time': self.end_time,
-            'skipped': self.skipped,
+            'skipped': 'yes' if self.skipped else 'no',
             '# Allies': self.num_allies,
             '# Enemies': self.num_enemies,
             'kills': self.kills,
