@@ -158,7 +158,7 @@ class DmgStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total dmg': self.total_dmg,
             'Average dmg per s': self.avg_dmg_s,
@@ -183,7 +183,7 @@ class RipStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total rips': self.total_rips,
             'Average rips per s': self.avg_rips_s,
@@ -209,7 +209,7 @@ class CleanseStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total cleanses': self.total_cleanses,
             'Average cleanses per s': self.avg_cleanses_s,
@@ -234,7 +234,7 @@ class StabStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total stab': self.total_stab,
             'Average stab per s': self.avg_stab_s,
@@ -259,7 +259,7 @@ class HealStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total heal': self.total_heal,
             'Average heal per s': self.avg_heal_s,
@@ -285,7 +285,7 @@ class DistStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total dist': self.total_dist,
             'Percentage Top': self.percentage_top,
@@ -310,7 +310,7 @@ class ProtStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total prot': self.total_prot,
             'Average prot per s': self.avg_prot_s,
@@ -335,7 +335,7 @@ class AegisStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total aegis': self.total_aegis,
             'Average aegis per s': self.avg_aegis_s,
@@ -360,7 +360,7 @@ class MightStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total might': self.total_might,
             'Average might per s': self.avg_might_s,
@@ -385,7 +385,7 @@ class FuryStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total fury': self.total_fury,
             'Average fury per s': self.avg_fury_s,
@@ -409,7 +409,7 @@ class BarrierStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total barrier': self.total_barrier,
             'Average barrier per s': self.avg_barrier_s,
@@ -434,7 +434,7 @@ class DmgTakenStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total dmg_taken': self.total_dmg_taken,
             'Average dmg_taken per s': self.avg_dmg_taken_s,
@@ -458,7 +458,7 @@ class DeathStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total deaths': self.total_deaths,
             'Average deaths per min': self.avg_deaths_m,
@@ -483,7 +483,7 @@ class KillsStat(db.Model):
 
     def to_dict(self):
         return {
-            'Name': self.player_stat.character.name,
+            'Name': f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})',
             'Times Top': self.times_top,
             'Total kills': self.total_kills,
             'Average kills per min': self.avg_kills_m,
