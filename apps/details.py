@@ -61,7 +61,7 @@ layout = html.Div(children=[
                 dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
                 dbc.Tab(label='Dmg taken', tab_id='dmg_taken-tab', label_style=tab_style),
                 dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
-                dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
+                #dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
                 dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
             ],
                 id='tabs',
@@ -253,7 +253,6 @@ def switch_tabs(tab, datasets):
     elif tab == 'deaths-tab':
         query = db.session.query(DeathStat).join(PlayerStat).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total_deaths.asc()).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        print(df)
         fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
         fig.update_layout(
             height=1000,
