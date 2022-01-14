@@ -51,47 +51,51 @@ def get_summary_table():
     
     return graphs.get_summary_table(df)
 
-layout = html.Div(children=[
-    html.Div(id='output-data-upload'),
-    html.Div(children=[
-        html.Div([
-        html.Div(get_summary_table()),
-        dbc.Row([
-            dbc.Col(
-                dcc.Graph(
-                    id='top-dmg-chart',
-                    figure=get_fig_with_model(DmgStat, 'dmg', 'Top Damage', 5)
-                ), md=12, lg=6, className='bar-chart'),     
-            dbc.Col(
-                dcc.Graph(
-                    id='top-dist-chart',
-                    figure=get_fig_dist()
-                ), md=12,lg=6, className='bar-chart')
-        ]),
-        dbc.Row([
-            dbc.Col(
-                dcc.Graph(
-                    id='top-stab-chart',
-                    figure=get_fig_with_model(StabStat, 'stab', 'Top Stability Output', 3)
-                ), md=12, lg=6, className='bar-chart'),     
-            dbc.Col(
-                dcc.Graph(
-                    id='top-cleanses-chart',
-                    figure=get_fig_with_model(CleanseStat, 'cleanses', 'Top Condition Cleanse', 3)
-                ), md=12, lg=6, className='bar-chart')
-        ]),
-        dbc.Row([
-            dbc.Col(
-                dcc.Graph(
-                    id='top-heal-chart',
-                    figure=get_fig_with_model(HealStat, 'heal', 'Top Healing Output', 3)
-                ), md=12, lg=6, className='bar-chart'),     
-            dbc.Col(
-                dcc.Graph(
-                    id='top-rips-chart',
-                    figure=get_fig_with_model(RipStat, 'rips', 'Top Boon Removal', 3)
-                ), md=12, lg=6, className='bar-chart')
-        ]),
-        ])
-    ])
+
+layout = html.Div(id='top-stats-layout', children=[
+        
 ])
+
+@app.callback(Output('top-stats-layout', 'children'),
+              Input('db-update-date', 'data'))
+def update_on_page_load(data):
+    if ((data == None) or (data=="Updated database successfully")):
+        return html.Div([
+            html.Div(get_summary_table()),
+            dbc.Row([
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-dmg-chart',
+                        figure=get_fig_with_model(DmgStat, 'dmg', 'Top Damage', 5)
+                    ), md=12, lg=6, className='bar-chart'),     
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-dist-chart',
+                        figure=get_fig_dist()
+                    ), md=12,lg=6, className='bar-chart')
+            ]),
+            dbc.Row([
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-stab-chart',
+                        figure=get_fig_with_model(StabStat, 'stab', 'Top Stability Output', 3)
+                    ), md=12, lg=6, className='bar-chart'),     
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-cleanses-chart',
+                        figure=get_fig_with_model(CleanseStat, 'cleanses', 'Top Condition Cleanse', 3)
+                    ), md=12, lg=6, className='bar-chart')
+            ]),
+            dbc.Row([
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-heal-chart',
+                        figure=get_fig_with_model(HealStat, 'heal', 'Top Healing Output', 3)
+                    ), md=12, lg=6, className='bar-chart'),     
+                dbc.Col(
+                    dcc.Graph(
+                        id='top-rips-chart',
+                        figure=get_fig_with_model(RipStat, 'rips', 'Top Boon Removal', 3)
+                    ), md=12, lg=6, className='bar-chart')
+            ]),
+        ])

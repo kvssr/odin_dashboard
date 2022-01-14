@@ -18,17 +18,6 @@ from sqlalchemy.orm.session import close_all_sessions
 from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, RipStat, StabStat
 
 
-def get_summary_table():
-    df = []
-    try:
-        query = db.session.query(FightSummary).first()
-        db.session.commit()
-        df = pd.DataFrame(query.to_dict(), index=[0])
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-    
-    return graphs.get_summary_table(df)
 
 
 tab_style={'padding': '.5rem 0'}
@@ -45,7 +34,7 @@ layout = html.Div(children=[
                 multiple=False
             ),
         html.Div(id='upload-msg'),
-        html.Div(get_summary_table()),
+        html.Div(id='summary-table'),
         html.Div([
             dbc.Tabs([
                 dbc.Tab(label='Damage', tab_id='dmg-tab', label_style=tab_style),
@@ -99,14 +88,30 @@ def parse_contents(contents, filename, date):
 
 
 @app.callback(Output('upload-msg', 'children'),
+              Output('db-update-date', 'data'),
               Input('upload-data', 'contents'),
               State('upload-data', 'filename'),
               State('upload-data', 'last_modified'))
 def update_data(list_of_contents, list_of_names, list_of_dates):
     if list_of_contents is not None:
         data = parse_contents(list_of_contents, list_of_names, list_of_dates)
-        return data
-    return None
+        print(f'{data} - {json.dumps(data)}')
+        return data, json.dumps(data)
+    return None, None
+
+
+@app.callback(Output('summary-table', 'children'),
+              Input('db-update-date', 'data'))
+def get_summary_table(data):
+    df = []
+    try:
+        query = db.session.query(FightSummary).first()
+        db.session.commit()
+        df = pd.DataFrame(query.to_dict(), index=[0])
+    except Exception as e:
+        db.session.rollback()
+        print(e)   
+    return graphs.get_summary_table(df)
 
 
 @app.callback(Output('tab-content', 'children'),

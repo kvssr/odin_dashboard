@@ -25,7 +25,6 @@ def write_xls_to_db(xls):
     except Exception as e:
         print('Cant check date')
         print(e)
-
     try:
         recreate_tables()
         write_professions_to_db(graphs.profession_shorts, graphs.profession_colours)
