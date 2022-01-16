@@ -5,7 +5,7 @@ from flask_login import current_user, logout_user
 import dash_bootstrap_components as dbc
 
 from app import app
-from apps import top_stats, details, login
+from apps import top_stats, details, login, upload_page
 
 server = app.server
 
@@ -53,6 +53,12 @@ def display_page(pathname):
     elif pathname == '/details':
         if current_user.is_authenticated:
             view = details.layout
+        else:
+            view = 'Redirecting to login...'
+            url = '/login'
+    elif pathname == '/upload':
+        if current_user.is_authenticated:
+            view = upload_page.layout
         else:
             view = 'Redirecting to login...'
             url = '/login'

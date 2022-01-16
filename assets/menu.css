@@ -1,0 +1,18 @@
+.menu {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    width: 100px;
+  }
+  
+.menu .nav-link {
+    display: block;
+    color: rgb(255, 255, 255);
+    padding: 2px 0px;
+    text-decoration: none;
+  }
+  
+  /* Change the link color on hover */
+.menu .nav-link:hover {
+    color: rgb(116, 0, 0);
+  }
