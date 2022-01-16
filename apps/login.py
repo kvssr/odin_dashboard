@@ -1,5 +1,6 @@
 from dash import html, dcc, Output, Input, State
 from dash.exceptions import PreventUpdate
+import dash_bootstrap_components as dbc
 
 # Login screen
 from flask_login import login_user, current_user
@@ -39,6 +40,20 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    ])
 
 
+logged_in_menu = dbc.Nav(className='menu', children=[
+    dbc.NavItem(dbc.NavLink("Home", href='/')),
+    dbc.NavItem(dbc.NavLink("Details", href='/details')),
+    dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
+    dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
+],
+vertical="sm"
+)
+
+loggin_menu = dbc.Nav(className='menu', children=[
+    dbc.NavItem(dbc.NavLink("Login", href='/login'))
+], vertical="sm")
+
+
 @app.callback(Output('url_login', 'pathname'),
               Output('output-state', 'children'),
               [Input('login-button', 'n_clicks')],
@@ -59,6 +74,7 @@ def login_status(url):
     ''' callback to display login/logout link in the header '''
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
-        return dcc.Link('logout', href='/logout'), current_user.get_id()
+        return logged_in_menu ,current_user.get_id()
+
     else:
-        return dcc.Link('login', href='/login'), 'loggedout'
+        return loggin_menu, 'loggedout'
