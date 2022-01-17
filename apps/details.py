@@ -301,5 +301,5 @@ def switch_tabs(tab, datasets):
     elif tab == 'summary-tab':
         query = db.session.query(Fight).all()
         df = pd.DataFrame([s.to_dict() for s in query])
-        table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True)
+        table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True, class_name='tableFixHead')
         return table
