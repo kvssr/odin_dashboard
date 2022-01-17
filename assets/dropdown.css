@@ -1,0 +1,23 @@
+.Select-control {
+    background-color: rgb(255, 255, 255);
+    background-clip: padding-box;
+    border: 1px solid #222;
+    color: rgb(0, 0, 0);
+    font-size: 0.9375rem;
+    font-weight: 400;
+    height: calc(1.5em + 0.75rem + 2px);
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+.Select-menu-outer {
+    position: absolute;
+    background-color: rgb(255, 255, 255);
+    color: #222;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    cursor: pointer;
+  }
