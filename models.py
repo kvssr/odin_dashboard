@@ -498,6 +498,8 @@ class FightSummary(db.Model):
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     raid_id = db.Column(db.Integer(), db.ForeignKey('raid.id', ondelete="CASCADE"))
+    start_time = db.Column(db.String())
+    end_time = db.Column(db.String())
     duration = db.Column(db.Integer())
     skipped = db.Column(db.Integer())
     avg_allies = db.Column(db.Float())
