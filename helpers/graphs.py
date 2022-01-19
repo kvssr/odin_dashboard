@@ -236,10 +236,6 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
 
 
 def get_top_survivor_chart(df, t, title, legend = False):
-    print('....')
-    print(df)
-    print('....')
-
     fig = px.bar(df, y=df["Name"], x=df["Total deaths"], 
                 color=df["Name"],
                 hover_name="Name",
