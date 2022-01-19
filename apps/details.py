@@ -15,26 +15,26 @@ import pandas as pd
 from helpers import db_writer, graphs
 from sqlalchemy.orm.session import close_all_sessions
 
-from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, RipStat, StabStat
+from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
 
 
+dropdown_options = [{'label':f'{s.id}: {s.raid_date} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
 
-
-tab_style={'padding': '.5rem 0'}
+tab_style={'padding': '.5rem 0',
+            'cursor': 'pointer'}
 
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
-        dcc.Upload(
-                id='upload-data',
-                children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ]),
-                # Allow multiple files to be uploaded
-                multiple=False
-            ),
-        html.Div(id='upload-msg'),
         html.Div(id='summary-table'),
+        dbc.Row([
+            dbc.Col([
+                "Select Raid",
+                dcc.Dropdown(id='raids-dropdown',
+                                        placeholder='Select raid type',
+                                        options=dropdown_options,
+                                        value=dropdown_options[0]['value'])
+                ],md=4),
+        ]),
         html.Div([
             dbc.Tabs([
                 dbc.Tab(label='Damage', tab_id='dmg-tab', label_style=tab_style),
@@ -57,47 +57,11 @@ layout = html.Div(children=[
                 #active_tab='dmg-tab'
                 class_name='nav-justified flex-nowrap'
                 ),
-            html.Div(id="tab-content"),
+            dcc.Loading(html.Div(id="tab-content"), color='grey'),
         ])
     ]),   
     dcc.Store(id='intermediate-value')
 ])
-
-
-
-
-def parse_contents(contents, filename, date):
-    content_type, content_string = contents.split(',')
-    decoded = base64.b64decode(content_string)
-    db_msg = ''
-    try:
-        if 'csv' in filename:
-            # Assume that the user uploaded a CSV file
-            df = pd.read_csv(
-                io.StringIO(decoded.decode('utf-8')))
-        elif 'xls' in filename:
-            # Assume that the user uploaded an excel file           
-            db_msg = db_writer.write_xls_to_db(decoded)
-
-    except Exception as e:
-        print(e)
-        return html.Div([
-            'There was an error processing this file.'
-        ])
-    return db_msg
-
-
-@app.callback(Output('upload-msg', 'children'),
-              Output('db-update-date', 'data'),
-              Input('upload-data', 'contents'),
-              State('upload-data', 'filename'),
-              State('upload-data', 'last_modified'))
-def update_data(list_of_contents, list_of_names, list_of_dates):
-    if list_of_contents is not None:
-        data = parse_contents(list_of_contents, list_of_names, list_of_dates)
-        print(f'{data} - {json.dumps(data)}')
-        return data, json.dumps(data)
-    return None, None
 
 
 @app.callback(Output('summary-table', 'children'),
@@ -115,12 +79,14 @@ def get_summary_table(data):
 
 
 @app.callback(Output('tab-content', 'children'),
-              [Input('tabs', 'active_tab')],
+#@app.callback(Output('content-graph', 'figure'),
+              [Input('tabs', 'active_tab'),
+              Input('raids-dropdown', 'value')],
               State('intermediate-value', 'data'))
-def switch_tabs(tab, datasets):
+def switch_tabs(tab, raid, datasets):
     if tab == 'dmg-tab':
         try:
-            query = db.session.query(DmgStat).all()
+            query = db.session.query(DmgStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
             db.session.commit()
             df = pd.DataFrame([s.to_dict() for s in query])
         except Exception as e:
@@ -131,139 +97,143 @@ def switch_tabs(tab, datasets):
             height=1000,
         )
         return dcc.Graph(
-                id='top-dmg-chart',
+                id=f'top-dmg-chart-{raid}',
                 figure=fig,
             )
     elif tab == 'rips-tab':
-        query = db.session.query(RipStat).all()
+        query = db.session.query(RipStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'rips', "Top Boons Removal", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-rip-chart',
+            id=f'top-rip-chart-{raid}',
             figure=fig
         )
     elif tab == 'might-tab':
-        query = db.session.query(MightStat).all()
+        graph = dcc.Graph()
+        fig= {}
+        query = db.session.query(MightStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
+        #print(df)
         fig = graphs.get_top_bar_chart(df, 'might', "Top Might Output", True)
-        fig.update_layout(
+        #print(fig)
+        fig.update_layout(          
             height=1000,
         )
         return dcc.Graph(
-            id='top-might-chart',
+            id=f'top-might-chart-{raid}',
             figure=fig
         )
     elif tab == 'fury-tab':
-        query = db.session.query(FuryStat).all()
+        query = db.session.query(FuryStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'fury', "Top Fury Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-fury-chart',
+            id=f'top-fury-chart-{raid}',
             figure=fig
         )
     elif tab == 'cleanses-tab':
-        query = db.session.query(CleanseStat).all()
+        query = db.session.query(CleanseStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'cleanses', "Top Conditions Cleansed", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-cleanses-chart',
+            id=f'top-cleanses-chart-{raid}',
             figure=fig
         )
     elif tab == 'stab-tab':
-        query = db.session.query(StabStat).all()
+        query = db.session.query(StabStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'stab', "Top Stability Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-stab-chart',
+            id=f'top-stab-chart-{raid}',
             figure=fig
         )
     elif tab == 'heal-tab':
-        query = db.session.query(HealStat).all()
+        query = db.session.query(HealStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'heal', "Top Healing Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-heal-chart',
+            id=f'top-heal-chart-{raid}',
             figure=fig
         )
     elif tab == 'barrier-tab':
-        query = db.session.query(BarrierStat).all()
+        query = db.session.query(BarrierStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'barrier', "Top Barrier Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-barrier-chart',
+            id=f'top-barrier-chart-{raid}',
             figure=fig
         )
     elif tab == 'dist-tab':
-        query = db.session.query(DistStat).all()
+        query = db.session.query(DistStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_dist_bar_chart(df, True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-dist-chart',
+            id=f'top-dist-chart-{raid}',
             figure=fig
         )
     elif tab == 'prot-tab':
-        query = db.session.query(ProtStat).all()
+        query = db.session.query(ProtStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'prot', "Top Protection Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-prot-chart',
+            id=f'top-prot-chart-{raid}',
             figure=fig
         )
     elif tab == 'aegis-tab':
-        query = db.session.query(AegisStat).all()
+        query = db.session.query(AegisStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_bar_chart(df, 'aegis', "Top Aegis Output", True)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-aegis-chart',
+            id=f'top-aegis-chart-{raid}',
             figure=fig
         )
     elif tab == 'dmg_taken-tab':
-        query = db.session.query(DmgTakenStat).order_by(DmgTakenStat.avg_dmg_taken_s.asc()).all()
+        query = db.session.query(DmgTakenStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(DmgTakenStat.avg_dmg_taken_s.asc()).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_dmg_taken_chart(df, 'dmg_taken', "Least Damage Taken", False)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-dmg_taken-chart',
+            id=f'top-dmg_taken-chart-{raid}',
             figure=fig
         )
     elif tab == 'deaths-tab':
-        query = db.session.query(DeathStat).join(PlayerStat).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total_deaths.asc()).all()
+        query = db.session.query(DeathStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total_deaths.asc()).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
         fig.update_layout(
             height=1000,
         )
         return dcc.Graph(
-            id='top-deaths-chart',
+            id=f'top-deaths-chart-{raid}',
             figure=fig
         )
     elif tab == 'global-tab':
@@ -299,7 +269,7 @@ def switch_tabs(tab, datasets):
             ]),
         ])
     elif tab == 'summary-tab':
-        query = db.session.query(Fight).all()
+        query = db.session.query(Fight).join(Raid).filter_by(id=raid).all()
         df = pd.DataFrame([s.to_dict() for s in query])
         table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, responsive=True, class_name='tableFixHead')
         return table
