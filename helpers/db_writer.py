@@ -26,11 +26,11 @@ def write_xls_to_db(xls):
         print('Cant check date')
         print(e)
     try:
-        recreate_tables()
+        #recreate_tables()
         write_professions_to_db(graphs.profession_shorts, graphs.profession_colours)
-        write_character_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'))
-        
+        write_character_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'))      
         write_raid_type_to_db(graphs.raid_types)
+
         raid_id = write_raid_to_db(xls_fight_date)
         write_player_stat_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
         write_fights_to_db(df_fights, raid_id)
@@ -60,17 +60,19 @@ def write_xls_to_db(xls):
 
 def write_raid_type_to_db(types):
     counter = 0
-    try:
-        for t in types:
+    for t in types:
+        try:
             raid_type = RaidType()
             raid_type.name = t
             db.session.add(raid_type)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add raid_types to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add raid_types to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new raid_types to the db')
 
 
@@ -89,14 +91,16 @@ def write_raid_to_db(raid_date, raid_type='guild', name=''):
         db.session.rollback()
         print('Couldnt add raid to database')
         print(e)
+    finally:
+        db.session.close()
     print(f'Added {counter} new raids to the db')
     return raid.id
 
 
 def write_professions_to_db(profs, colors):
     counter = 0
-    try:
-        for prof, abr in profs.items():
+    for prof, abr in profs.items():
+        try:
             profession = Profession()
             profession.name = prof
             profession.abbreviation = abr
@@ -104,34 +108,38 @@ def write_professions_to_db(profs, colors):
             db.session.add(profession)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add professions to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add professions to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new professions to the db')
 
 
 def write_character_to_db(df):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             character = Character()
             character.name = row['Name']
             character.profession_id = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
             db.session.add(character)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add characters to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add characters to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new characters to the db')
 
 
 def write_player_stat_to_db(df, raid_id):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             player_stat = PlayerStat()
             player_stat.raid_id = raid_id
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -141,17 +149,19 @@ def write_player_stat_to_db(df, raid_id):
             db.session.add(player_stat)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add player_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add player_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new player_stats to the db')
 
 
 def write_fights_to_db(df, raid_id):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             #print(f'index:{index} - {len(df)}')
             if index >= len(df) - 1:
                 continue
@@ -182,10 +192,12 @@ def write_fights_to_db(df, raid_id):
             db.session.add(fight)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add fights to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add fights to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new fights to the db')
 
 
@@ -193,6 +205,8 @@ def write_fight_summary_to_db(df, raid):
     try:
         fight = FightSummary()
         fight.raid_id = raid
+        fight.start_time = str(df['Start Time'])
+        fight.end_time = str(df['End Time'])
         fight.kills = int(df['Kills'])
         fight.deaths = int(df['Deaths'])
         fight.duration = int(df['Duration in s'])
@@ -219,12 +233,14 @@ def write_fight_summary_to_db(df, raid):
         print(e)
     else:
         print(f'Added fight_summary to the db')
+    finally:
+            db.session.close()
 
 
 def write_dmg_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             dmgstat = DmgStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -241,17 +257,19 @@ def write_dmg_to_db(df, raid):
             db.session.add(dmgstat)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add dmg_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add dmg_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new dmg_stats to the db')
 
 
 def write_rips_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             rips = RipStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -268,17 +286,19 @@ def write_rips_to_db(df, raid):
             db.session.add(rips)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add rip_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add rip_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new rip_stats to the db')
 
 
 def write_cleanses_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             cleanses = CleanseStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -295,17 +315,19 @@ def write_cleanses_to_db(df, raid):
             db.session.add(cleanses)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add cleanse_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add cleanse_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new cleanse_stats to the db')
 
 
 def write_heal_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             heal = HealStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -322,17 +344,19 @@ def write_heal_to_db(df, raid):
             db.session.add(heal)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add heal_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add heal_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new heal_stats to the db')
 
 
 def write_dist_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             dist = DistStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -349,17 +373,19 @@ def write_dist_to_db(df, raid):
             db.session.add(dist)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add dist_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add dist_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new dist_stats to the db')
 
 
 def write_stab_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             stab = StabStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -376,17 +402,19 @@ def write_stab_to_db(df, raid):
             db.session.add(stab)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add stab_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add stab_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new stab_stats to the db')
 
 
 def write_prot_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             prot = ProtStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -403,16 +431,18 @@ def write_prot_to_db(df, raid):
             db.session.add(prot)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add prot_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add prot_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new prot_stats to the db')
 
 def write_aegis_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             aegis = AegisStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -429,17 +459,19 @@ def write_aegis_to_db(df, raid):
             db.session.add(aegis)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add aegis_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add aegis_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new aegis_stats to the db')
 
 
 def write_might_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             might = MightStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -456,17 +488,19 @@ def write_might_to_db(df, raid):
             db.session.add(might)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add might_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add might_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new might_stats to the db')
 
 
 def write_fury_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             fury = FuryStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -483,17 +517,19 @@ def write_fury_to_db(df, raid):
             db.session.add(fury)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add fury_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add fury_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new fury_stats to the db')
 
 
 def write_barrier_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             barrier = BarrierStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -510,17 +546,19 @@ def write_barrier_to_db(df, raid):
             db.session.add(barrier)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add barrier_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add barrier_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new barrier_stats to the db')
 
 
 def write_dmg_taken_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             dmg_taken = DmgTakenStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -537,17 +575,19 @@ def write_dmg_taken_to_db(df, raid):
             db.session.add(dmg_taken)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add dmg_taken_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add dmg_taken_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new dmg_taken_stats to the db')
 
 
 def write_deaths_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             deaths = DeathStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -564,17 +604,19 @@ def write_deaths_to_db(df, raid):
             db.session.add(deaths)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add deaths_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add deaths_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new deaths_stats to the db')
 
 
 def write_kills_to_db(df, raid):
     counter = 0
-    try:
-        for index, row in df.iterrows():
+    for index, row in df.iterrows():
+        try:
             kills = KillsStat()
 
             professionId = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
@@ -591,10 +633,12 @@ def write_kills_to_db(df, raid):
             db.session.add(kills)
             db.session.commit()
             counter += 1
-    except Exception as e:
-        db.session.rollback()
-        print('Couldnt add kills_stat to database')
-        print(e)
+        except Exception as e:
+            db.session.rollback()
+            print('Couldnt add kills_stat to database')
+            print(e)
+        finally:
+            db.session.close()
     print(f'Added {counter} new kills_stats to the db')
 
 
@@ -610,3 +654,20 @@ def recreate_tables():
         print('#################')
     except Exception as e:
         print(e)
+
+
+def delete_raid(raid):
+    try:
+        db.session.query(Raid).filter_by(Raid.id == raid).delete()
+        db.session.commit()
+    except Exception as e:
+        print('Couldnt delete raid')
+        print(e)
+
+
+def check_if_raid_exists(date, time):
+    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary, aliased=True).filter_by(start_time=time).first()
+    if raid:
+        return raid
+    return False
+
