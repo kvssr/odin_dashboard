@@ -46,12 +46,11 @@ logged_in_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
     dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
 ],
-vertical="sm"
 )
 
 loggin_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("Login", href='/login'))
-], vertical="sm")
+])
 
 
 @app.callback(Output('url_login', 'pathname'),

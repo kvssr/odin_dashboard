@@ -13,7 +13,7 @@ app.layout = dbc.Container(id='container', children=[
     dcc.Location(id='url', refresh=False),
     dcc.Location(id='redirect', refresh=True),
     dcc.Store(id='login-status', storage_type='session'),
-    html.Div(id='user-status-div'),
+    dbc.Row(id='login-row', children=dbc.Col(html.Div(id='user-status-div'))),
     dbc.Row(id='header', children=[
         html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
         dbc.Col(children=[
