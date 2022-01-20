@@ -68,6 +68,10 @@ td {
 .tableFixHead          { overflow: auto; height: 100px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
 
-#upload-input-row{
+.input-row{
     margin-bottom: 10px;
+}
+
+#input-row-top{
+    display: none;
 }
