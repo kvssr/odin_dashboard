@@ -60,7 +60,7 @@ loggin_menu = dbc.Nav(className='menu', children=[
               [State('uname-box', 'value'), State('pwd-box', 'value')])
 def login_button_click(n_clicks, username, password):
     if n_clicks > 0:
-        if username == 'test' and password == 'test':
+        if username == 'Odin' and password == 'Wolves0fCov1d':
             user = User(username)
             login_user(user)
             return '/success', ''
