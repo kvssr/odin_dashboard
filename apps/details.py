@@ -18,8 +18,6 @@ from sqlalchemy.orm.session import close_all_sessions
 from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
 
 
-dropdown_options = [{'label':f'{s.id}: {s.raid_date} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
-
 tab_style={'padding': '.5rem 0',
             'cursor': 'pointer'}
 
@@ -31,8 +29,7 @@ layout = html.Div(children=[
                 "Select Raid",
                 dcc.Dropdown(id='raids-dropdown',
                             placeholder='Select raid type',
-                            options=dropdown_options,
-                            value=dropdown_options[0]['value'])
+                            options=[],)
                 ],md=4),
         ]),
         html.Div([

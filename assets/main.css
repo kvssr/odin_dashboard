@@ -55,16 +55,6 @@ td {
     height: auto;
 }
 
-#user-status-div{
-    float: right;
-    padding: 10px;
-    text-align: center;
-}
-
-#login-div{
-    text-align: center;
-}
-
 .tableFixHead          { overflow: auto; height: 100px; }
 .tableFixHead thead th { position: sticky; top: 0; z-index: 1; }
 

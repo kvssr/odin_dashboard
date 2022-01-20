@@ -10,7 +10,8 @@ import pandas as pd
 from app import app, db
 from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, PlayerStat, Raid, RipStat, StabStat
 
-dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
+#dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
+
 config = {
     'displayModeBar': False,
     'displaylogo': False,
@@ -60,8 +61,8 @@ layout = html.Div(children=[
                 "Select Raid",
                 dcc.Dropdown(id='raids-dropdown',
                             placeholder='Select raid type',
-                            options=dropdown_options,
-                            value=dropdown_options[-1]['value'])
+                            options=[],
+                            )
                 ],md=4),
         ]),
     dbc.Row(
@@ -77,6 +78,14 @@ def hide_dropdown_not_logged_in(data):
         return {'display': 'block'}
     else:
         return {'display': 'block'}
+
+
+@app.callback(Output('raids-dropdown', 'option'),
+        Output('raids-dropdown', 'value'),
+        Input('url', 'pathname'))
+def get_drop_down_options(url):
+    options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).order_by(Raid.raid_date).all()]
+    return options, options[-1]['value']
 
 
 @app.callback(Output('top-stats-layout', 'children'),
