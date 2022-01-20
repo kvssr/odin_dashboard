@@ -42,7 +42,7 @@ layout = [
     ]),
     dbc.Row([
         dbc.Col([
-            dbc.Row(id='upload-input-row', children=[
+            dbc.Row(id='input-row', children=[
                 dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
                 dbc.Col(dbc.Input(placeholder='Raid title (optionel)')),
                 dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
