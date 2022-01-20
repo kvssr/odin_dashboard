@@ -26,13 +26,13 @@ tab_style={'padding': '.5rem 0',
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
         html.Div(id='summary-table'),
-        dbc.Row([
+        dbc.Row(id='input-row', class_name='input-row', children=[
             dbc.Col([
                 "Select Raid",
                 dcc.Dropdown(id='raids-dropdown',
-                                        placeholder='Select raid type',
-                                        options=dropdown_options,
-                                        value=dropdown_options[0]['value'])
+                            placeholder='Select raid type',
+                            options=dropdown_options,
+                            value=dropdown_options[0]['value'])
                 ],md=4),
         ]),
         html.Div([
@@ -65,11 +65,10 @@ layout = html.Div(children=[
 
 
 @app.callback(Output('summary-table', 'children'),
-              Input('db-update-date', 'data'))
-def get_summary_table(data):
-    df = []
+              Input('raids-dropdown', 'value'))
+def get_summary_table(raid):
     try:
-        query = db.session.query(FightSummary).first()
+        query = db.session.query(FightSummary).join(Raid).filter_by(id = raid).first()
         db.session.commit()
         df = pd.DataFrame(query.to_dict(), index=[0])
     except Exception as e:
@@ -78,8 +77,14 @@ def get_summary_table(data):
     return graphs.get_summary_table(df)
 
 
+@app.callback(Output('raids-dropdown', 'options'),
+                Input('raids-dropdown', 'value'))
+def get_dropdown_raids(value):
+    dropdown_options = [{'label':f'{s.id}: {s.raid_date} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
+    return dropdown_options
+
+
 @app.callback(Output('tab-content', 'children'),
-#@app.callback(Output('content-graph', 'figure'),
               [Input('tabs', 'active_tab'),
               Input('raids-dropdown', 'value')],
               State('intermediate-value', 'data'))
