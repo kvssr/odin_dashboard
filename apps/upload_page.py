@@ -42,7 +42,7 @@ layout = [
     ]),
     dbc.Row([
         dbc.Col([
-            dbc.Row(id='input-row', children=[
+            dbc.Row(id='input-row', class_name='input-row', children=[
                 dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
                 dbc.Col(dbc.Input(placeholder='Raid title (optionel)')),
                 dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
@@ -51,12 +51,6 @@ layout = [
                 dbc.Col(dbc.Button("Save", id='save-button')),
             ]),
         ])
-    ]),
-    dbc.Row([
-        dbc.Col(id='dmg-table'),
-        dbc.Col(id='rips-table'),
-        dbc.Col(id='cleanse-table'),
-        dbc.Col(id='heal-table'),
     ]),
     dbc.Row([
         html.Div(
@@ -96,9 +90,11 @@ def on_delete_click(n):
 
 @app.callback(
     Output('raids-table', 'data'),
-    Input('raids-update-output', 'children')
+    Input('raids-update-output', 'children'),
+    Input('save-msg', 'children'),
+    Input("temp-raid", "data")
 )
-def update_raids_table(msg):
+def update_raids_table(msg, save_msg, data):
     raids_dict = [s.to_dict() for s in db.session.query(FightSummary).all()]
     return raids_dict
 
@@ -119,53 +115,6 @@ def confirm_delete_row(submit_n_clicks, rows, data):
         return [f'Just removed {row}:{row.raid_date}' for row in row_list]
 
 
-
-""" 
-@app.callback(Output('fights-table', 'children'),
-            Input('temp-data', 'data'))
-def show_fights_table(content):
-    if content:
-        decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview')
-        return ["Fights overview",dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True, class_name='tableFixHead')]
-
-
-@app.callback(Output('dmg-table', 'children'),
-            Input('temp-data', 'data'))
-def show_dmg_table(content):
-    if content:
-        decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='dmg').head(5)
-        return dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True)
-
-
-@app.callback(Output('rips-table', 'children'),
-            Input('temp-data', 'data'))
-def show_dmg_table(content):
-    if content:
-        decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='rips').head(5)
-        return dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True)
-
-
-@app.callback(Output('cleanse-table', 'children'),
-            Input('temp-data', 'data'))
-def show_dmg_table(content):
-    if content:
-        decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='cleanses').head(5)
-        return dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True)
-
-
-@app.callback(Output('heal-table', 'children'),
-            Input('temp-data', 'data'))
-def show_dmg_table(content):
-    if content:
-        decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='heal').head(5)
-        return dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True) """
-
-
 @app.callback(Output('raid-summary', 'children'),
             Input('temp-data', 'data'))
 def show_fights_summary_table(content):
@@ -181,7 +130,7 @@ def show_fights_summary_table(content):
     [Input("save-button", "n_clicks")],
     [State('temp-data', 'data')]
 )
-def on_button_click(n, content):
+def on_save_click(n, content):
     db_msg = ''
     if n and content:
         decoded = base64.b64decode(content)
@@ -196,8 +145,11 @@ def on_button_click(n, content):
 
 @app.callback(Output('save-msg', 'children'),
               Input('confirm-raid-exists', 'submit_n_clicks'),
-              State('temp-raid', 'data'))
-def update_output(submit_n_clicks, raid):
+              State('temp-raid', 'data'),
+              State('temp-data', 'data'))
+def update_output(submit_n_clicks, raid, xls):
     if submit_n_clicks:
-
+        db_writer.delete_raid(raid)
+        decoded = base64.b64decode(xls)
+        db_writer.write_xls_to_db(decoded)
         return f'Overwriting raid {raid}'
