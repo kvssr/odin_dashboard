@@ -11,6 +11,12 @@ from app import app, db
 from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, PlayerStat, Raid, RipStat, StabStat
 
 dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
+config = {
+    'displayModeBar': False,
+    'displaylogo': False,
+    'scrollZoom': False
+}
+
 
 def get_fig_with_model(model, t, title, limit, raid):
     try:
@@ -82,36 +88,42 @@ def update_on_page_load(raid):
             dbc.Col(
                 dcc.Graph(
                     id=f'top-dmg-chart-{raid}',
-                    figure=get_fig_with_model(DmgStat, 'dmg', 'Top Damage', 5, raid)
+                    figure=get_fig_with_model(DmgStat, 'dmg', 'Top Damage', 5, raid),
+                    config=config
                 ), md=12, lg=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id=f'top-dist-chart-{raid}',
-                    figure=get_fig_dist(raid)
+                    figure=get_fig_dist(raid),
+                    config=config
                 ), md=12,lg=6, className='bar-chart')
         ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id=f'top-stab-chart-{raid}',
-                    figure=get_fig_with_model(StabStat, 'stab', 'Top Stability Output', 3, raid)
+                    figure=get_fig_with_model(StabStat, 'stab', 'Top Stability Output', 3, raid),
+                    config=config
                 ), md=12, lg=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id=f'top-cleanse-chart-{raid}',
-                    figure=get_fig_with_model(CleanseStat, 'cleanses', 'Top Condition Cleanse', 3, raid)
+                    figure=get_fig_with_model(CleanseStat, 'cleanses', 'Top Condition Cleanse', 3, raid),
+                    config=config
                 ), md=12, lg=6, className='bar-chart')
         ]),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(
                     id=f'top-heal-chart-{raid}',
-                    figure=get_fig_with_model(HealStat, 'heal', 'Top Healing Output', 3, raid)
+                    figure=get_fig_with_model(HealStat, 'heal', 'Top Healing Output', 3, raid),
+                    config=config
                 ), md=12, lg=6, className='bar-chart'),     
             dbc.Col(
                 dcc.Graph(
                     id=f'top-rips-chart-{raid}',
-                    figure=get_fig_with_model(RipStat, 'rips', 'Top Boon Removal', 3, raid)
+                    figure=get_fig_with_model(RipStat, 'rips', 'Top Boon Removal', 3, raid),
+                    config=config
                 ), md=12, lg=6, className='bar-chart')
         ]),
     ])
