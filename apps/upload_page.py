@@ -1,9 +1,5 @@
-from ast import Call
 import base64
-from gc import callbacks
 import io
-from turtle import width
-import dash
 from pydoc import classname
 from dash import dash_table
 from dash.dependencies import Input, Output, State
@@ -15,7 +11,7 @@ from helpers import db_writer, graphs
 
 import pandas as pd
 from app import app, db
-from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, RaidType, RipStat, StabStat
+from models import FightSummary, RaidType
 
 dropdown_options = [{'label':s.name, 'value':s.id} for s in db.session.query(RaidType).all()]
 raids_dict = [s.to_dict() for s in db.session.query(FightSummary).all()]
