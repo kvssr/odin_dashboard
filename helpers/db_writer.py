@@ -658,8 +658,9 @@ def recreate_tables():
 
 def delete_raid(raid):
     try:
-        db.session.query(Raid).filter_by(Raid.id == raid).delete()
+        db.session.query(Raid).filter_by(id = raid).delete()
         db.session.commit()
+        print(f'Raid: {raid} deleted')
     except Exception as e:
         print('Couldnt delete raid')
         print(e)
@@ -671,3 +672,9 @@ def check_if_raid_exists(date, time):
         return raid
     return False
 
+
+def get_raid_by_summary(date, kills, deaths):
+    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary, aliased=True).filter_by(kills=kills, deaths=deaths).first()
+    if raid:
+        return raid
+    return False
