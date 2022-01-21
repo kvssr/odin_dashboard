@@ -84,8 +84,8 @@ def hide_dropdown_not_logged_in(data):
         Output('raids-dropdown', 'value'),
         Input('url', 'pathname'))
 def get_drop_down_options(url):
-    options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).order_by(Raid.raid_date).all()]
-    return options, options[-1]['value']
+    options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
+    return options, options[0]['value']
 
 
 @app.callback(Output('top-stats-layout', 'children'),

@@ -77,7 +77,7 @@ def get_summary_table(raid):
 @app.callback(Output('raids-dropdown', 'options'),
                 Input('raids-dropdown', 'value'))
 def get_dropdown_raids(value):
-    dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).order_by(Raid.raid_date).all()]
+    dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
     return dropdown_options
 
 
