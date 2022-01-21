@@ -58,12 +58,12 @@ def get_summary_table(raid):
 layout = html.Div(children=[
     dbc.Row(id='input-row-top',class_name='input-row', children=[
             dbc.Col([
-                "Select Raid",
+                html.Div("Select Raid", style={'text-align': 'center'}),
                 dcc.Dropdown(id='raids-dropdown',
                             placeholder='Select raid type',
                             options=[],
                             )
-                ],md=4),
+                ],width={'size': 4, 'offset': 4}),
         ]),
     dbc.Row(
         dcc.Loading(html.Div(id='top-stats-layout'), color='grey')
