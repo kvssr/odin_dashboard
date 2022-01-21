@@ -57,13 +57,18 @@ layout = [
                     'id': i,
                 } for i in raids_df.columns],
                 data=raids_dict,
-                editable=True,
+                editable=False,
                 row_selectable='multi',
                 style_as_list_view=True,
                 style_cell={
                     'border': '1px solid #444',
-                    'padding': '0.7rem',
-                    'textAlign': 'center'
+                    'padding': '0.5rem',
+                    'textAlign': 'center',
+                    'font-family': 'var(--bs-body-font-family)',
+                    'line-height': 'var(--bs-body-line-height)'
+                },
+                style_data={
+                    'backgroundColor': '#424242',
                 },
                 style_header={
                     'backgroundColor': '#212121',
@@ -72,12 +77,6 @@ layout = [
                     'border-top': '0px',
                     'border-bottom': '1px solid white'
                 },
-                style_data_conditional=[
-                    {
-                        'if': {'row_index': 'odd'},
-                        'backgroundColor': 'rgb(0,0,0)',
-                    }
-                ],
             ),
         )
     ]),
