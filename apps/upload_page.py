@@ -40,7 +40,7 @@ layout = [
         dbc.Col([
             dbc.Row(id='input-row', class_name='input-row', children=[
                 dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
-                dbc.Col(dbc.Input(placeholder='Raid title (optionel)')),
+                dbc.Col(dbc.Input(id='raid-name-input',placeholder='Raid title (optionel)')),
                 dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
                                     placeholder='Select raid type',
                                     options=dropdown_options)),
@@ -142,9 +142,12 @@ def show_fights_summary_table(content):
     [Output("temp-raid", "data"),
     Output('confirm-raid-exists', 'displayed')], 
     [Input("save-button", "n_clicks")],
-    [State('temp-data', 'data')]
+    [State('temp-data', 'data'),
+    State('raid-name-input', 'value'),
+    State('raid-type-dropdown', 'value'),
+    ]
 )
-def on_save_click(n, content):
+def on_save_click(n, content, name, t):
     db_msg = ''
     if n and content:
         decoded = base64.b64decode(content)
@@ -152,7 +155,7 @@ def on_save_click(n, content):
         raid = db_writer.check_if_raid_exists(df_fights['Date'].values[0], df_fights['Start Time'].values[0])
         if raid:
             return raid.id, True
-        db_msg = db_writer.write_xls_to_db(decoded)
+        db_msg = db_writer.write_xls_to_db(decoded, name, t)
         return db_msg, False
     return content, False
 
@@ -160,10 +163,12 @@ def on_save_click(n, content):
 @app.callback(Output('save-msg', 'children'),
               Input('confirm-raid-exists', 'submit_n_clicks'),
               State('temp-raid', 'data'),
-              State('temp-data', 'data'))
-def update_output(submit_n_clicks, raid, xls):
+              State('temp-data', 'data'),
+              State('raid-name-input', 'value'),
+              State('raid-type-dropdown', 'value'),)
+def update_output(submit_n_clicks, raid, xls, name, t):
     if submit_n_clicks:
         db_writer.delete_raid(raid)
         decoded = base64.b64decode(xls)
-        db_writer.write_xls_to_db(decoded)
+        db_writer.write_xls_to_db(decoded, name, t)
         return f'Overwriting raid {raid}'

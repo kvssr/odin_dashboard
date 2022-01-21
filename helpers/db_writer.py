@@ -10,7 +10,7 @@ from app import db, server
 from helpers import graphs
 
 
-def write_xls_to_db(xls):
+def write_xls_to_db(xls, name , t):
     df_fights = pd.read_excel(io.BytesIO(xls), sheet_name='fights overview')
     xls_fight_date = df_fights['Date'][0]
     xls_fight_time = df_fights['Start Time'][0]
@@ -31,7 +31,7 @@ def write_xls_to_db(xls):
         write_character_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'))      
         write_raid_type_to_db(graphs.raid_types)
 
-        raid_id = write_raid_to_db(xls_fight_date)
+        raid_id = write_raid_to_db(xls_fight_date, name, t)
         write_player_stat_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg'), raid_id)
         write_fights_to_db(df_fights, raid_id)
         write_fight_summary_to_db(df_fights.iloc[-1], raid_id)
@@ -76,13 +76,14 @@ def write_raid_type_to_db(types):
     print(f'Added {counter} new raid_types to the db')
 
 
-def write_raid_to_db(raid_date, raid_type='guild', name=''):
+def write_raid_to_db(raid_date, name='', raid_type='guild'):
     counter = 0
     try:
         raid = Raid()
         raid.name = name
         raid.raid_date = raid_date
-        raid.raid_type_id = db.session.query(RaidType.id).filter_by(name=raid_type).first()[0]
+        #raid.raid_type_id = db.session.query(RaidType.id).filter_by(name=raid_type).first()[0]
+        raid.raid_type_id = raid_type
         db.session.add(raid)
         db.session.commit()
         print(f'raid_id: {raid.id}')
