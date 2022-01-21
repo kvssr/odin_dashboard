@@ -15,10 +15,10 @@ app.layout = dbc.Container(id='container', children=[
     dcc.Store(id='login-status', storage_type='session'),
     dbc.Row(id='login-row', children=dbc.Col(html.Div(id='user-status-div'))),
     dbc.Row(id='header', children=[
-        html.Img(id='logo', className='col-sm-1', src='../assets/logo.png'),
+        dbc.Col(html.Img(id='logo', src='../assets/logo.png'), sm=1),
         dbc.Col(children=[
             html.H1('ODIN Carrot Awards', 'title'),
-            ])]),
+            ], sm=10)]),
     html.Hr(),
     dcc.Store(id='db-update-date'),
     html.Div(id='page-content')
