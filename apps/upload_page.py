@@ -109,7 +109,7 @@ def on_delete_click(n):
     Input("temp-raid", "data")
 )
 def update_raids_table(msg, save_msg, data):
-    raids_dict = [s.to_dict() for s in db.session.query(FightSummary).join(Raid).order_by(Raid.raid_date, FightSummary.start_time).all()]
+    raids_dict = [s.to_dict() for s in db.session.query(FightSummary).join(Raid).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
     return raids_dict
 
 
