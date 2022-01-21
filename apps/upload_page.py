@@ -44,7 +44,7 @@ layout = [
                 dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
                                     placeholder='Select raid type',
                                     options=dropdown_options,
-                                    value=dropdown_options[3]['value'])),
+                                    value=dropdown_options[1]['value'])),
                 dbc.Col(dbc.Button("Save", id='save-button')),
             ]),
         ])
