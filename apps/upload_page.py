@@ -50,7 +50,7 @@ layout = [
     ]),
     dbc.Row([
         html.Div(
-             dash_table.DataTable(
+            dash_table.DataTable(
                 id='raids-table',
                 columns=[{
                     'name': i,
@@ -58,7 +58,26 @@ layout = [
                 } for i in raids_df.columns],
                 data=raids_dict,
                 editable=True,
-                row_selectable='multi'
+                row_selectable='multi',
+                style_as_list_view=True,
+                style_cell={
+                    'border': '1px solid #444',
+                    'padding': '0.7rem',
+                    'textAlign': 'center'
+                },
+                style_header={
+                    'backgroundColor': '#212121',
+                    'textAlign': 'center',
+                    'fontWeight': 'bold',
+                    'border-top': '0px',
+                    'border-bottom': '1px solid white'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(0,0,0)',
+                    }
+                ],
             ),
         )
     ]),
@@ -117,7 +136,7 @@ def show_fights_summary_table(content):
     if content:
         decoded = base64.b64decode(content)
         df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
-        return ["File Summary",dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True, class_name='tableFixHead')]
+        return ["File Summary",dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True, class_name='tableFixHead table table-striped table-bordered table-hover')]
 
 
 @app.callback(
