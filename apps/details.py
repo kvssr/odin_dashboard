@@ -24,13 +24,14 @@ tab_style={'padding': '.5rem 0',
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
         html.Div(id='summary-table'),
-        dbc.Row(id='input-row', class_name='input-row', children=[
+        dbc.Row(id='input-row-top',class_name='input-row', children=[
             dbc.Col([
-                "Select Raid",
+                html.Div("Select Raid", style={'text-align': 'center'}),
                 dcc.Dropdown(id='raids-dropdown',
                             placeholder='Select raid type',
-                            options=[],)
-                ],md=4),
+                            options=[],
+                            )
+                ],width={'size': 4, 'offset': 4}),
         ]),
         html.Div([
             dbc.Tabs([
