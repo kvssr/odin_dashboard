@@ -19,7 +19,7 @@ app.layout = dbc.Container(id='container', children=[
         dbc.Col(children=[
             html.H1('ODIN Carrot Awards', 'title'),
             ], sm=10)]),
-    html.Hr(),
+    html.Hr(id='hr-header'),
     dcc.Store(id='db-update-date'),
     html.Div(id='page-content')
 ])

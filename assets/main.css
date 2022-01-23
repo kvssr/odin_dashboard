@@ -65,3 +65,7 @@ td {
 #input-row-top{
     display: none;
 }
+
+#hr-header{
+    margin-top: auto;
+}
