@@ -46,7 +46,7 @@ layout = html.Div(children=[
                 dbc.Tab(label='Protection', tab_id='prot-tab', label_style=tab_style),
                 dbc.Tab(label='Aegis', tab_id='aegis-tab', label_style=tab_style),
                 dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
-                dbc.Tab(label='Dmg taken', tab_id='dmg_taken-tab', label_style=tab_style),
+                dbc.Tab(label='Damage In', tab_id='dmg_taken-tab', label_style=tab_style),
                 dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
                 #dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
                 dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
