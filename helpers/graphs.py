@@ -38,7 +38,7 @@ profession_colours = {
 }
 
 profession_shorts = {
-    'Guardian': 'Gnd',
+    'Guardian': 'Gdn',
     'Dragonhunter': 'Dgh',
     'Firebrand': 'Fbd',
     'Revenant': 'Rev',
