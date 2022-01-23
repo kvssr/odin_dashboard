@@ -50,6 +50,10 @@ layout = [
         ])
     ]),
     dbc.Row([
+        dbc.Col(id='raids-update-output'),
+        dbc.Col(dbc.Button("Delete Raid(s)", id='delete-raid-btn'), width={}, style={'text-align':'end'})
+    ], justify='end'),
+    dbc.Row([
         html.Div(
             dash_table.DataTable(
                 id='raids-table',
@@ -81,10 +85,6 @@ layout = [
             ),
         )
     ]),
-    dbc.Row([
-        dbc.Col(id='raids-update-output'),
-        dbc.Col(dbc.Button("Delete Raid(s)", id='delete-raid-btn'), width={'size': 2, 'offset':10})
-    ])
 ]
 
 @app.callback(Output('temp-data', 'data'),
