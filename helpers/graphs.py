@@ -201,9 +201,9 @@ def get_summary_table(df):
         print(e)
         return None
 
-
+#Total dmg_taken
 def get_top_dmg_taken_chart(df, t, title, legend = True):
-    fig = px.bar(df, y=df["Name"], x=df["Total dmg_taken"], 
+    fig = px.bar(df, y=df["Name"], x=df["Average dmg_taken per s"], 
                  color=df["Name"],
                  hover_name="Name",
                  text=df['Profession'],
@@ -224,8 +224,17 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
     fig = add_times_top_annotation(fig, df)
 
     for name in df['Name']:
-        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total dmg_taken"].values[0]),
-                                text="{:,.0f}".format(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
+        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
+                                text="{:,.0f}".format(df[df["Name"] == name]["Total dmg_taken"].values[0]),
+                                showarrow=False,
+                                yshift=0,
+                                xshift=2,
+                                xanchor="left",
+                                font_size=13,
+        )
+    for name in df['Name']:
+        fig.add_annotation(y=name, x=int(df.iloc[0]["Average dmg_taken per s"]/2),
+                                text="{:,.0f}".format(df[df["Name"] == name]["Total deaths"].values[0]),
                                 showarrow=False,
                                 yshift=0,
                                 xshift=2,

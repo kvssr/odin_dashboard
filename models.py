@@ -440,7 +440,8 @@ class DmgTakenStat(db.Model):
             'Average dmg_taken per s': self.avg_dmg_taken_s,
             'Attendance (number of fights)': self.player_stat.attendance_count,
             'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
+            'Profession_color': self.player_stat.character.profession.color,
+            'Total deaths': self.player_stat.death_stat.total_deaths
         }
 
 class DeathStat(db.Model):
