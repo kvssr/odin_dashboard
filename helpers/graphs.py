@@ -90,7 +90,7 @@ general_layout = {
         'yaxis_tickfont_size': 15
 }
 
-def get_top_bar_chart(df, t, title, legend = True):
+def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig = px.bar(df, y="Name", x="Total " + t, 
                  color="Profession", 
                  text="Total "+ t,
@@ -106,9 +106,11 @@ def get_top_bar_chart(df, t, title, legend = True):
         showlegend=legend,
     )
     fig.update_layout(general_layout)
-    fig.update_traces(textangle=0)
+    fig.update_traces(textangle=0, width=0.8)
     fig = add_annotations_graph(fig, df, t)
     fig = add_times_top_annotation(fig, df)
+    if detailed:
+        fig = add_sorting_options(fig, df, t)
     return fig
 
 
@@ -266,5 +268,35 @@ def get_top_survivor_chart(df, t, title, legend = False):
     fig = add_times_top_annotation(fig, df)
     return fig
 
-
+def add_sorting_options(fig, df, t):
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                x=0.1,
+                y=1.06,
+                active=0,
+                bordercolor='black',
+                bgcolor='#303030',
+                showactive=False,
+                buttons=[
+                    dict(label="Total",
+                            method="relayout",
+                            args=["yaxis", {"categoryorder": "total ascending"}]),
+                    dict(label="Average",
+                            method="relayout",
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=f"Average {t} per s", ascending=True))["Name"],
+                                            "categoryorder": "array"}]),
+                    dict(label="Times Top",
+                            method="relayout",
+                            args=["yaxis", {"categoryarray": (df.sort_values(by="Times Top", ascending=True))["Name"],
+                                            "categoryorder": "array"}]),
+                    dict(label="Attendance",
+                            method="relayout",
+                            args=["yaxis", {"categoryarray": (df.sort_values(by="Attendance (number of fights)", ascending=True))["Name"],
+                                            "categoryorder": "array"}]),
+                ],
+            )
+        ]
+    )
+    return fig
 
