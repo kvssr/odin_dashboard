@@ -288,11 +288,11 @@ def add_sorting_options(fig, df, t):
                                             "categoryorder": "array"}]),
                     dict(label="Times Top",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by="Times Top", ascending=True))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Times Top", f"Total {t}"], ascending=[True, True]))["Name"],
                                             "categoryorder": "array"}]),
                     dict(label="Attendance",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by="Attendance (number of fights)", ascending=True))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Attendance (number of fights)", "Times Top", f"Total {t}"], ascending=[True, True, True]))["Name"],
                                             "categoryorder": "array"}]),
                 ],
             )
