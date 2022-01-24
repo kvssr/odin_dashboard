@@ -1,21 +1,42 @@
+from click import style
 from dash import html, dcc, Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 
 # Login screen
 from flask_login import login_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from app import app, User
+from app import app, db
+from models import User
 
-login = html.Div(id='login-div', children=[dcc.Location(id='url_login', refresh=True),
-                  html.H2('''Please log in to continue:''', id='h1'),
-                  dcc.Input(placeholder='Enter your username',
-                            type='text', id='uname-box'),
-                  dcc.Input(placeholder='Enter your password',
-                            type='password', id='pwd-box'),
-                  html.Button(children='Login', n_clicks=0,
-                              type='submit', id='login-button'),
-                  html.Div(children='', id='output-state')])
+
+login = dbc.Row([
+    dcc.Location(id='url_login', refresh=True),
+    dbc.Col([
+        html.H2('Login Form', style={'text-align': 'center'}),
+        dbc.Card([
+            dbc.CardImg(src="assets/logo.png", top=True, style={'width': 200, 'margin': 'auto'}),
+            dbc.CardBody([
+                html.Div(
+                    className='mb-3',
+                    children=[
+                        dbc.Input(type='text', id='uname-box', placeholder='Enter your username')
+                    ]
+                ),
+                html.Div(
+                    className='mb-3',
+                    children=[
+                        dbc.Input(type='password', id='pwd-box', placeholder='Enter your password')
+                    ]
+                ),
+                dbc.Button('Login', id='login-button', class_name='btn btn-color px-5 w-100', n_clicks=0)
+            ])
+        ]),
+        html.Div(children='', id='output-state')
+    ],
+    width={'size': 4, 'offset': 4})
+])
 
 
 # Successful login
@@ -59,8 +80,16 @@ loggin_menu = dbc.Nav(className='menu', children=[
               [State('uname-box', 'value'), State('pwd-box', 'value')])
 def login_button_click(n_clicks, username, password):
     if n_clicks > 0:
-        if username == 'Odin' and password == 'Wolves0fCov1d':
-            user = User(username)
+        user = db.session.query(User).filter_by(username = username).first()
+        if user is not None:
+            if check_password_hash(user.password, password):
+                login_user(user)
+                return '/success', ''
+            else:
+                return '/login', 'Incorrect username or password'
+        elif username == 'Odin' and password == 'Wolves0fCov1d':
+            print(f'User: {User(username=username)}')
+            user = User(username=username)
             login_user(user)
             return '/success', ''
         else:
@@ -74,6 +103,5 @@ def login_status(url):
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
         return logged_in_menu ,current_user.get_id()
-
     else:
         return loggin_menu, 'loggedout'
