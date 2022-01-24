@@ -215,7 +215,7 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                  color_discrete_sequence=df["Profession_color"].values
                  )
     fig.update_layout(
-        xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
+        xaxis_title="Times top / Times attended - (Deaths) - " + t + " per sec | Total " + t,
         title=title,
         showlegend=legend,
         legend_y=1,
