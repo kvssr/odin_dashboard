@@ -272,10 +272,11 @@ def add_sorting_options(fig, df, t):
     fig.update_layout(
         updatemenus=[
             dict(
-                x=0.1,
+                x=-0.1,
                 y=1.06,
                 active=0,
-                bordercolor='black',
+                bordercolor='#888',
+                borderwidth=2,
                 bgcolor='#303030',
                 showactive=False,
                 buttons=[
