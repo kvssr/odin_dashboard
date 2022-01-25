@@ -541,7 +541,7 @@ class FightSummary(db.Model):
 
 
 class User(UserMixin, db.Model):
-    __tablename__ = 'user'
+    __tablename__ = 'odin_user'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     username = db.Column(db.String(), unique= True)
