@@ -243,6 +243,29 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                                 xanchor="left",
                                 font_size=13,
         )
+    fig.update_layout(
+        updatemenus=[
+            dict(
+                x=-0.1,
+                y=1.06,
+                active=0,
+                bordercolor='#888',
+                borderwidth=2,
+                bgcolor='#303030',
+                showactive=False,
+                buttons=[
+                    dict(label="Total",
+                            method="relayout",
+                            args=["yaxis", {"categoryarray": (df.sort_values(by="Average dmg_taken per s", ascending=False))["Name"],
+                                            "categoryorder": "array"}]),
+                    dict(label="Deaths",
+                            method="relayout",
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Total deaths","Average dmg_taken per s"], ascending=[True, False]))["Name"],
+                                            "categoryorder": "array"}]),
+                ]
+            )
+        ]
+    )
     return fig
 
 
@@ -272,10 +295,11 @@ def add_sorting_options(fig, df, t):
     fig.update_layout(
         updatemenus=[
             dict(
-                x=0.1,
+                x=-0.1,
                 y=1.06,
                 active=0,
-                bordercolor='black',
+                bordercolor='#888',
+                borderwidth=2,
                 bgcolor='#303030',
                 showactive=False,
                 buttons=[
