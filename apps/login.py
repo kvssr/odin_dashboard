@@ -87,11 +87,6 @@ def login_button_click(n_clicks, username, password):
                 return '/success', ''
             else:
                 return '/login', 'Incorrect username or password'
-        elif username == 'Odin' and password == 'Wolves0fCov1d':
-            print(f'User: {User(username=username)}')
-            user = User(username=username)
-            login_user(user)
-            return '/success', ''
         else:
             return '/login', 'Incorrect username or password'
     return '/login', ''
