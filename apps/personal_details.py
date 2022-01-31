@@ -2,7 +2,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from dash import dcc
 from app import db, app
-from models import AegisStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, FuryStat, HealStat, KillsStat, MightStat, ProtStat, RipStat, StabStat
+from models import AegisStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, RipStat, StabStat
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from helpers import graphs
@@ -17,42 +17,54 @@ from models import DeathStat, DmgStat, FightSummary, PlayerStat, Raid
 tab_style={'padding': '.5rem 0',
             'cursor': 'pointer'}
 
+colum_models = {
+    'Damage': [DmgStat, 'total_dmg'],
+    'Rips': [RipStat, 'total_rips'],
+    'Cleanses': [CleanseStat, 'total_cleanses'],
+    'Stab': [StabStat, 'total_stab'],
+    'Healing': [HealStat, 'total_heal'],
+    'Sticky': [DistStat, 'percentage_top'],
+    'Prot': [ProtStat, 'total_prot'],
+    'Aegis': [AegisStat, 'total_aegis'],
+    'Might': [MightStat, 'total_might'],
+    'Fury': [FuryStat, 'total_fury'],
+    'Barrier': [BarrierStat, 'total_barrier'],
+    'Damage Taken': [DmgTakenStat, 'total_dmg_taken'],
+    'Deaths': [DeathStat, 'total_deaths']
+}
+
 
 def layout(name):
     name = name.split('(')[0].rstrip()
     character_id = db.session.query(Character.id).filter_by(name = name).first()
-    print(character_id[0])
     characters = db.session.query(Character).all()
     dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
     layout = [
-        dbc.Row([
+        dbc.Row(class_name='input-row', children=[
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader("Most Damage"),
-                    dbc.CardBody(id='most_dmg')
+                    dbc.CardHeader("Raids Attended"),
+                    dbc.CardBody(id='raids-attended')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader("Most Kills"),
-                    dbc.CardBody(id='most_kills')
+                    dbc.CardHeader("Fights Attended"),
+                    dbc.CardBody(id='fights-attended')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader("Least Deaths"),
-                    dbc.CardBody(id='least_deaths')
+                    dbc.CardHeader("Fights Missed"),
+                    dbc.CardBody(id='fights-missed')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader("Total Raids"),
-                    dbc.CardBody(id='total_raids')
+                    dbc.CardHeader("Times Top"),
+                    dbc.CardBody(id='times-top')
                 ])
             ]),
-        ]),
-        dbc.Row([
-            dbc.Col(name, width={'size': 4, 'offset': 4})
         ]),
         dbc.Row(class_name='input-row', children=[
             dbc.Col(dcc.Dropdown(
@@ -61,7 +73,11 @@ def layout(name):
                 value=character_id[0]
             ), width={'size': 4 , 'offset': 4})
         ]),
-        html.Div(id='test-col'),
+        dbc.Row(
+            dbc.Col(
+                dcc.Loading(html.Div(id='raids-graph'), color='grey'),
+            )
+        ),
         dbc.Row([
             dbc.Col(id='personal-raids-table'),
         ]),
@@ -83,14 +99,16 @@ def update_raids_table(character):
                 columns=[{
                     'name': i,
                     'id': i,
-                    'selectable': True
-                } for i in raids_df.columns if '_id' not in i],
+                    'selectable': True if i not in ['Date', 'Start Time', 'Name'] else False,
+                } for i in raids_df.columns if '_id' not in i and i not in ['Name']],
                 data=raids_dict,
                 editable=False,
                 row_selectable='multi',
                 column_selectable='single',
                 cell_selectable=False,
                 style_as_list_view=True,
+                selected_columns=['Damage'],
+                selected_rows=[s for s in range(len(raids_df))],
                 #sort_action='native',
                 style_cell={
                     'border': '1px solid #444',
@@ -114,62 +132,57 @@ def update_raids_table(character):
 
 
 @app.callback(
-    Output('most_dmg', 'children'),
-    Output('most_kills', 'children'),
-    Output('least_deaths', 'children'),
-    Output('total_raids', 'children'),
-    Input('name-dropdown', 'value')
+    Output('raids-attended', 'children'),
+    Output('fights-attended', 'children'),
+    Output('fights-missed', 'children'),
+    Output('times-top', 'children'),
+    Input('name-dropdown', 'value'),
+    Input('raids-table', 'selected_columns'),
 )
-def update_highest_stats(character):
-    most_dmg = f'{db.session.query(func.max(DmgStat.total_dmg)).join(PlayerStat).filter_by(character_id=character).first()[0]:,}'
-    most_kills = db.session.query(func.max(KillsStat.total_kills)).join(PlayerStat).filter_by(character_id=character).first()[0]
-    least_deaths = db.session.query(func.min(DeathStat.total_deaths)).join(PlayerStat).filter_by(character_id=character).first()[0]
-    total_raids = db.session.query(func.count(Raid.id)).join(PlayerStat).filter_by(character_id=character).first()[0]
-    return (most_dmg, most_kills, least_deaths, total_raids)
+def update_highest_stats(character, col):
+    raids_attended = db.session.query(func.count(PlayerStat.id)).filter_by(character_id=character).first()[0]
+    fights_attended = db.session.query(func.sum(PlayerStat.attendance_count)).filter_by(character_id=character).first()[0]
 
+    raids = db.session.query(PlayerStat.raid_id).filter_by(character_id=character).subquery()
+    total_fights = db.session.query(func.count(Fight.id)).filter(Fight.raid_id.in_(raids)).filter_by(skipped=False).first()[0]
+    fights_missed = total_fights - fights_attended
 
-colum_models = {
-    'Damage': [DmgStat, 'total_dmg'],
-    'Rips': [RipStat, 'total_rips'],
-    'Cleanses': [CleanseStat, 'total_cleanses'],
-    'Stab': [StabStat, 'total_stab'],
-    'Healing': [HealStat, 'total_heal'],
-    'Sticky': [DistStat, 'percentage_top'],
-    'Prot': [ProtStat, 'total_prot'],
-    'Aegis': [AegisStat, 'total_aegis'],
-    'Might': [MightStat, 'total_might'],
-    'Fury': [FuryStat, 'total_fury'],
-    'Barrier': [BarrierStat, 'total_barrier'],
-    'Damage Taken': [DmgTakenStat, 'total_dmg_taken'],
-    'Deaths': [DeathStat, 'total_deaths']
-}
+    if col:
+        model = colum_models[col[0]][0]
+        times_top = db.session.query(func.sum(model.times_top)).join(PlayerStat).filter_by(character_id=character).first()[0]
+    return (raids_attended, fights_attended, fights_missed, times_top)
+
 
 @app.callback(
-    Output('test-col', 'children'),
+    Output('raids-graph', 'children'),
     Input('raids-table', 'selected_columns'),
     Input('raids-table', 'selected_rows'),
     State('raids-table', 'data'),
-    State('name-dropdown', 'placeholder')
 )
-def show_selected_column(col, rows, data, name):
+def show_selected_column(col, rows, data):
     print(f'col: {col}'),
-    print(f'vcol: {rows}')
+    print(f'rows: {rows}')
     print(f'data: {data}')
     if col is not None and col[0] in colum_models:
+        selected_raids = [data[s]['raid_id'] for s in rows]
+        print(f'selected raids: {selected_raids}')
         model = colum_models[col[0]][0]
         model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][1])
+
         df_p = pd.DataFrame(data)
+        df_p = df_p[df_p['raid_id'].isin(selected_raids)]
+        min_max = func.min(model_attr) if col[0] in ['Damage Taken', 'Deaths'] else func.max(model_attr)
         df_top = pd.DataFrame(
-            db.session.query(func.max(model_attr), Raid.raid_date, FightSummary.start_time)
+            db.session.query(Raid.id, min_max, Raid.raid_date, FightSummary.start_time)
                 .join(PlayerStat, model.player_stat_id == PlayerStat.id)
                 .join(Raid, Raid.id == PlayerStat.raid_id)
                 .join(FightSummary, FightSummary.raid_id == Raid.id)
-                .group_by(Raid.raid_date, FightSummary.start_time)
+                .group_by(Raid.id, Raid.raid_date, FightSummary.start_time)
                 .order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all(),
-            columns=[col[0], 'Date', 'Time']
+            columns=['raid_id', col[0], 'Date', 'Time']
             )
-        df_top['Name'] = 'Top'
+        df_top['Name'] = '#1 Person'
         for i, row in df_p.iterrows():
-            df_p = df_p.append(df_top.loc[df_top['Date'].astype(str) == row['Date']])
+            df_p = df_p.append(df_top.loc[df_top['raid_id'] == row['raid_id']])
         fig = graphs.get_personal_chart(df_p, col[0])
         return dcc.Graph(figure=fig, style={'height': 300})
