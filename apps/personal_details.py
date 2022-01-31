@@ -141,7 +141,8 @@ def update_raids_table(character):
 )
 def update_highest_stats(character, col):
     raids_attended = db.session.query(func.count(PlayerStat.id)).filter_by(character_id=character).first()[0]
-    fights_attended = db.session.query(func.sum(PlayerStat.attendance_count)).filter_by(character_id=character).first()[0]
+    fights_attended = db.session.query(func.sum(PlayerStat.attendance_count)).filter_by(character_id=character).first()[0] 
+    fights_attended = 0 if fights_attended is None else fights_attended 
 
     raids = db.session.query(PlayerStat.raid_id).filter_by(character_id=character).subquery()
     total_fights = db.session.query(func.count(Fight.id)).filter(Fight.raid_id.in_(raids)).filter_by(skipped=False).first()[0]
