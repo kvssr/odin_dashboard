@@ -1,11 +1,14 @@
 import pandas as pd
 from pandas.core.frame import DataFrame
 import plotly.express as px
+import plotly.graph_objects as go
 
 from app import db
 from models import Fight, FightSummary, Profession
 import dash_bootstrap_components as dbc
 from dash import html
+from plotly.subplots import make_subplots
+
 
 profession_colours = {
     'Guardian': '#186885',
@@ -79,7 +82,7 @@ general_layout = {
         'title_x':0.5,
         'legend_y':0,
         'legend_x':0.9,
-        'margin':dict(l=220),
+        'margin':dict(l=200),
         'font_size':13,
         'yaxis_title':'',
         'paper_bgcolor':'rgba(0,0,0,0)',
@@ -87,7 +90,21 @@ general_layout = {
         'font_color':'#EEE',
         'yaxis_automargin': False,
         'yaxis_ticksuffix': ' ',
-        'yaxis_tickfont_size': 15
+        'yaxis_tickfont_size': 15,
+        'yaxis_showticklabels': False,
+        'xaxis_rangemode': 'tozero', 
+}
+
+general_layout_line = {
+        'title_xanchor':'center',
+        'title_x':0.5,
+        'legend_y':1,
+        'legend_x':1,
+        'font_size':13,
+        'paper_bgcolor':'rgba(0,0,0,0)',
+        'plot_bgcolor':'rgba(0,0,0,0)',
+        'font_color':'#EEE',
+        'xaxis_showline': True
 }
 
 def get_top_bar_chart(df, t, title, legend = True, detailed = False):
@@ -109,6 +126,7 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig.update_traces(textangle=0, width=0.8)
     fig = add_annotations_graph(fig, df, t)
     fig = add_times_top_annotation(fig, df)
+    fig= add_clickable_names(fig, df)
     if detailed:
         fig = add_sorting_options(fig, df, t)
     return fig
@@ -125,6 +143,19 @@ def add_annotations_graph(fig, df, t):
                                xanchor="left",
                                font_size=13,
             )
+    return fig
+
+
+def add_clickable_names(fig, df):
+    for name in df["Name"]:
+        fig.add_annotation(y=name, x=0,
+                            text=f"""<a href="/details/{name}" target='_self'>{name}</a>""",
+                            showarrow=False,
+                            yshift=0,
+                            xshift=2,
+                            xanchor="right",
+                            font_size=13,
+        )
     return fig
 
 
@@ -145,7 +176,7 @@ def get_top_dist_bar_chart(df, legend=True):
     )
     fig.update_layout(general_layout)
     fig = add_times_top_annotation(fig, df)
-
+    fig = add_clickable_names(fig, df)
 
     for name in df["Name"]:
         fig.add_annotation(y=name, x=df[df["Name"] == name]["Percentage Top"].values[0],
@@ -224,6 +255,7 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0)
     fig = add_times_top_annotation(fig, df)
+    fig = add_clickable_names(fig, df)
 
     for name in df['Name']:
         fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
@@ -289,6 +321,7 @@ def get_top_survivor_chart(df, t, title, legend = False):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0)
     fig = add_times_top_annotation(fig, df)
+    fig = add_clickable_names(fig, df)
     return fig
 
 def add_sorting_options(fig, df, t):
@@ -324,3 +357,17 @@ def add_sorting_options(fig, df, t):
     )
     return fig
 
+
+def get_personal_chart(df, y):
+    fig = px.line(df, y=y, x=df['Date'], color='Name')
+    fig.update_layout(
+        title="Raid History",
+        showlegend=True,
+        legend_y=1,
+        legend_x=0.9,
+        xaxis_tickformat='%d-%m-%y',
+        yaxis_showline=True,
+        yaxis_rangemode='tozero'
+    )
+    fig.update_layout(general_layout_line)
+    return fig
