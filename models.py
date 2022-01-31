@@ -84,7 +84,7 @@ class PlayerStat(db.Model):
             'Cleanses': self.cleanse_stat.total_cleanses,
             'Stab': self.stab_stat.total_stab,
             'Healing': self.heal_stat.total_heal,
-            'Sticky': self.dist_stat.percentage_top,
+            'Sticky': self.dist_stat.percentage_top if self.dist_stat else 0,
             'Prot': self.prot_stat.total_prot,
             'Aegis': self.aegis_stat.total_aegis,
             'Might': self.might_stat.total_might,
