@@ -69,3 +69,17 @@ td {
 #hr-header{
     margin-top: auto;
 }
+
+.js-plotly-plot .plotly svg a{
+    fill: white !important;
+    text-decoration: none;
+}
+
+.js-plotly-plot .plotly a:hover{
+    text-decoration: none;
+    fill: rgb(116, 0, 0) !important;
+}
+
+#personal-raids-table{
+    padding: 12px;
+}
