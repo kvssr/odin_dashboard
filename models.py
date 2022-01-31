@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy.orm import relationship
 from app import db
 from flask_login import UserMixin
@@ -70,6 +71,28 @@ class PlayerStat(db.Model):
     dmg_taken_stat = relationship("DmgTakenStat", back_populates="player_stat", uselist=False, lazy='select')
     death_stat = relationship("DeathStat", back_populates="player_stat", uselist=False, lazy='select')
     kills_stat = relationship("KillsStat", back_populates="player_stat", uselist=False, lazy='select')
+
+    def to_dict(self):
+        return {
+            'raid_id': self.raid_id,
+            'Date': self.raid.raid_date,
+            'Start Time': self.raid.fightsummary[0].start_time,
+            'character_id': self.character_id,
+            'Name': self.character.name,
+            'Damage': self.dmg_stat.total_dmg,
+            'Rips': self.rip_stat.total_rips,
+            'Cleanses': self.cleanse_stat.total_cleanses,
+            'Stab': self.stab_stat.total_stab,
+            'Healing': self.heal_stat.total_heal,
+            'Sticky': self.dist_stat.percentage_top,
+            'Prot': self.prot_stat.total_prot,
+            'Aegis': self.aegis_stat.total_aegis,
+            'Might': self.might_stat.total_might,
+            'Fury': self.fury_stat.total_fury,
+            'Barrier': self.barrier_stat.total_barrier,
+            'Damage Taken': self.dmg_taken_stat.total_dmg_taken,
+            'Deaths': self.death_stat.total_deaths,
+        }
 
 
 class Raid(db.Model):
