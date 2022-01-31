@@ -37,7 +37,8 @@ colum_models = {
 def layout(name):
     name = name.split('(')[0].rstrip()
     character_id = db.session.query(Character.id).filter_by(name = name).first()
-    characters = db.session.query(Character).all()
+    characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
+                            .join(Profession).order_by(Profession.name, Character.name).all()
     dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
     layout = [
         dbc.Row(class_name='input-row', children=[
@@ -144,7 +145,7 @@ def update_highest_stats(character, col):
     fights_attended = db.session.query(func.sum(PlayerStat.attendance_count)).filter_by(character_id=character).first()[0] 
     fights_attended = 0 if fights_attended is None else fights_attended 
 
-    raids = db.session.query(PlayerStat.raid_id).filter_by(character_id=character).subquery()
+    raids = db.session.query(PlayerStat.raid_id).filter_by(character_id=character).subquery().select()
     total_fights = db.session.query(func.count(Fight.id)).filter(Fight.raid_id.in_(raids)).filter_by(skipped=False).first()[0]
     fights_missed = total_fights - fights_attended
 
