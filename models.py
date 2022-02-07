@@ -549,9 +549,10 @@ class FightSummary(db.Model):
     def to_dict(self):
         return {
             'Date': self.raid.raid_date,
+            'Title': self.raid.name,
+            'Type': self.raid.raid_type.name,
             'Kills': self.kills,
             'Deaths': self.deaths,
-            'Duration in s': self.duration,
             '⌀ Allies': self.avg_allies,
             '⌀ Enemies': self.avg_enemies,
             'Damage': f'{self.damage:,}',
