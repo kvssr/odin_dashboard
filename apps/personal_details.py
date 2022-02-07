@@ -167,24 +167,31 @@ def show_selected_column(col, rows, data):
     print(f'data: {data}')
     if col is not None and col[0] in colum_models:
         selected_raids = [data[s]['raid_id'] for s in rows]
-        print(f'selected raids: {selected_raids}')
+        #print(f'selected raids: {selected_raids}')
         model = colum_models[col[0]][0]
         model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][1])
 
         df_p = pd.DataFrame(data)
+        df_p['Profession_color'] = db.session.query(Character).filter_by(id = str(df_p['character_id'][0])).join(Profession).first().profession.color
+
         df_p = df_p[df_p['raid_id'].isin(selected_raids)]
         min_max = func.min(model_attr) if col[0] in ['Damage Taken', 'Deaths'] else func.max(model_attr)
-        df_top = pd.DataFrame(
-            db.session.query(Raid.id, min_max, Raid.raid_date, FightSummary.start_time)
-                .join(PlayerStat, model.player_stat_id == PlayerStat.id)
-                .join(Raid, Raid.id == PlayerStat.raid_id)
-                .join(FightSummary, FightSummary.raid_id == Raid.id)
-                .group_by(Raid.id, Raid.raid_date, FightSummary.start_time)
-                .order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all(),
-            columns=['raid_id', col[0], 'Date', 'Time']
-            )
+
+        df_top = pd.DataFrame(db.session.query(PlayerStat.raid_id, min_max.label('Damage')).join(PlayerStat).filter(PlayerStat.raid_id.in_(df_p['raid_id'])).group_by(PlayerStat.raid_id).all(),
+        columns=['raid_id', col[0]])
+        for i, s in df_top.iterrows():
+            test = db.session.query(PlayerStat).filter(PlayerStat.raid_id==str(s[0])).join(model).filter(model_attr==str(s[1])).first()
+            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession_color'] = test.character.profession.color
+            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession'] = test.character.profession.name
+            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Date'] = db.session.query(Raid.raid_date).filter(Raid.id == str(s['raid_id'])).first()[0]
+            print(f"row: {df_top.loc[df_top['raid_id'] == s['raid_id']]}")
+            print(f"Date: {db.session.query(Raid.raid_date).filter(Raid.id == str(s[0])).first()[0]}")
+            print(test)
+        print(df_top)
         df_top['Name'] = '#1 Person'
+
         for i, row in df_p.iterrows():
             df_p = df_p.append(df_top.loc[df_top['raid_id'] == row['raid_id']])
+        print(f'Color df_p: {df_p}')
         fig = graphs.get_personal_chart(df_p, col[0])
         return dcc.Graph(figure=fig, style={'height': 300})
