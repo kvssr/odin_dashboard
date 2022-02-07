@@ -1,3 +1,4 @@
+from __future__ import annotations
 import pandas as pd
 from pandas.core.frame import DataFrame
 import plotly.express as px
@@ -92,7 +93,8 @@ general_layout = {
         'yaxis_ticksuffix': ' ',
         'yaxis_tickfont_size': 15,
         'yaxis_showticklabels': False,
-        'xaxis_rangemode': 'tozero', 
+        'xaxis_rangemode': 'tozero',
+        'xaxis_gridcolor':'grey',
 }
 
 general_layout_line = {
@@ -226,7 +228,7 @@ def get_pie_chart(df, title, colors):
 def get_summary_table(df):
     try:
         if df is not None:
-            table = dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, size='sm', id='summary')
+            table = dbc.Table.from_dataframe(df.drop('Title', axis=1), striped=True, bordered=True, hover=True, size='sm', id='summary')
             return [table, html.Hr()]
         return None
     except Exception as e:
@@ -359,15 +361,52 @@ def add_sorting_options(fig, df, t):
 
 
 def get_personal_chart(df, y):
-    fig = px.line(df, y=y, x=df['Date'], color='Name')
+    fig = px.line(df, y=y, x=df['Date'],
+                color='Name', 
+                color_discrete_sequence=[df['Profession_color'].values[0],'white'],
+                )
+
+    groups = []
+    for i , row in df.iterrows():
+        fig.add_trace(go.Scatter(
+            x=[row['Date']],
+            y=[row[y]],
+            mode='markers',
+            name=row['Profession'] if str(row['Profession']) != 'nan' else row['Name'],
+            text=row['Profession'],
+            legendgroup=row['Profession'],
+            marker=(dict(
+                color=row['Profession_color'],
+                size=12,
+                symbol='triangle-up' if str(row['Profession']) != 'nan' else 'circle',
+                line=dict(
+                    width=1.5,
+                    color='white',
+                )
+            )),
+            showlegend=True if row['Profession'] not in groups else False,
+            hovertemplate=''
+        ))
+        if row['Profession'] not in groups:
+            groups.append(row['Profession']) 
+
     fig.update_layout(
         title="Raid History",
         showlegend=True,
-        legend_y=1,
-        legend_x=0.9,
+        legend=dict(
+            title='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
         xaxis_tickformat='%d-%m-%y',
         yaxis_showline=True,
-        yaxis_rangemode='tozero'
+        yaxis_rangemode='tozero',
+        xaxis_gridcolor='grey',
+        yaxis_gridcolor='grey'
     )
     fig.update_layout(general_layout_line)
     return fig
+
