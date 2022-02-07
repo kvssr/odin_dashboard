@@ -15,7 +15,8 @@ from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat
 config = {
     'displayModeBar': False,
     'displaylogo': False,
-    'scrollZoom': False
+    'scrollZoom': False,
+    'staticPlot': True
 }
 
 
