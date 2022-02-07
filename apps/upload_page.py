@@ -54,7 +54,7 @@ layout = [
         dbc.Col(dbc.Button("Delete Raid(s)", id='delete-raid-btn'), width={}, style={'text-align':'end'})
     ], justify='end'),
     dbc.Row([
-        html.Div(
+        dcc.Loading(html.Div(
             dash_table.DataTable(
                 id='raids-table',
                 columns=[{
@@ -64,6 +64,7 @@ layout = [
                 data=raids_dict,
                 editable=False,
                 row_selectable='multi',
+                cell_selectable=False,
                 style_as_list_view=True,
                 style_cell={
                     'border': '1px solid #444',
@@ -83,7 +84,7 @@ layout = [
                     'border-bottom': '1px solid white'
                 },
             ),
-        )
+        ))
     ]),
 ]
 
