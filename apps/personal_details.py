@@ -29,8 +29,8 @@ colum_models = {
     'Might': [MightStat, 'total_might'],
     'Fury': [FuryStat, 'total_fury'],
     'Barrier': [BarrierStat, 'total_barrier'],
-    'Damage Taken': [DmgTakenStat, 'total_dmg_taken'],
-    'Deaths': [DeathStat, 'total_deaths']
+    'Damage Taken': [DmgTakenStat, 'times_top'],
+    'Deaths': [DeathStat, 'times_top']
 }
 
 
@@ -175,18 +175,18 @@ def show_selected_column(col, rows, data):
         df_p['Profession_color'] = db.session.query(Character).filter_by(id = str(df_p['character_id'][0])).join(Profession).first().profession.color
 
         df_p = df_p[df_p['raid_id'].isin(selected_raids)]
-        min_max = func.min(model_attr) if col[0] in ['Damage Taken', 'Deaths'] else func.max(model_attr)
+        min_max = func.max(model_attr)
 
         df_top = pd.DataFrame(db.session.query(PlayerStat.raid_id, min_max.label('Damage')).join(PlayerStat).filter(PlayerStat.raid_id.in_(df_p['raid_id'])).group_by(PlayerStat.raid_id).all(),
         columns=['raid_id', col[0]])
         for i, s in df_top.iterrows():
-            test = db.session.query(PlayerStat).filter(PlayerStat.raid_id==str(s[0])).join(model).filter(model_attr==str(s[1])).first()
-            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession_color'] = test.character.profession.color
-            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession'] = test.character.profession.name
+            top_char = db.session.query(PlayerStat).filter(PlayerStat.raid_id==str(s[0])).join(model).filter(model_attr==str(s[1])).first()
+            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession_color'] = top_char.character.profession.color
+            df_top.loc[df_top['raid_id'] == s['raid_id'], 'Profession'] = top_char.character.profession.name
             df_top.loc[df_top['raid_id'] == s['raid_id'], 'Date'] = db.session.query(Raid.raid_date).filter(Raid.id == str(s['raid_id'])).first()[0]
             print(f"row: {df_top.loc[df_top['raid_id'] == s['raid_id']]}")
             print(f"Date: {db.session.query(Raid.raid_date).filter(Raid.id == str(s[0])).first()[0]}")
-            print(test)
+            print(top_char)
         print(df_top)
         df_top['Name'] = '#1 Person'
 

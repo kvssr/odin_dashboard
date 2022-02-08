@@ -90,8 +90,8 @@ class PlayerStat(db.Model):
             'Might': self.might_stat.total_might,
             'Fury': self.fury_stat.total_fury,
             'Barrier': self.barrier_stat.total_barrier,
-            'Damage Taken': self.dmg_taken_stat.total_dmg_taken if self.dmg_taken_stat else None,
-            'Deaths': self.death_stat.total_deaths,
+            'Damage Taken': self.dmg_taken_stat.times_top if self.dmg_taken_stat else None,
+            'Deaths': self.death_stat.times_top,
         }
 
 
