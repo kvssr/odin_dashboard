@@ -29,3 +29,7 @@
 #login-div{
   text-align: center;
 }
+
+.column-header--select{
+  float: unset !important;
+}
