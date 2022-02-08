@@ -333,9 +333,9 @@ def add_sorting_options(fig, df, t):
                 x=-0.1,
                 y=1.06,
                 active=0,
-                bordercolor='#888',
-                borderwidth=2,
-                bgcolor='#303030',
+                bordercolor='#EEE',
+                borderwidth=1,
+                bgcolor='#212121',
                 showactive=False,
                 buttons=[
                     dict(label="Total",
