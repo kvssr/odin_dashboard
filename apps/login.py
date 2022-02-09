@@ -128,7 +128,7 @@ def login_status(url):
 )
 def toggle_api_input(n, s):
     if n:
-        key = session['API-KEY'] if session['API-KEY'] else ''
+        key = session['API-KEY'] if 'API-KEY' in session else ''
         print(f'key: {key}')
         if s['display'] == 'none':
             return {'display': 'inherit'}, key
@@ -161,4 +161,4 @@ def save_api_key(n, key):
         session.permanent = True
         session.modified = True
     print('saving............')
-    return 'API key saved', f'API Key({session["ACCOUNT"]})' if session["ACCOUNT"] else 'API Key'
+    return 'API key saved', f'API Key({session["ACCOUNT"]})' if "ACCOUNT" in session else 'API Key'
