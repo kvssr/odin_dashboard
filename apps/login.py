@@ -2,6 +2,9 @@ from click import style
 from dash import html, dcc, Output, Input, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
+from flask import request, session
+import requests
+from requests.auth import HTTPBasicAuth
 
 # Login screen
 from flask_login import login_user, current_user
@@ -61,17 +64,32 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    ])
 
 
+api_input = html.Div(id='api-container', children=[
+    dbc.Row(id='api-row', children=[
+        dbc.Col(id='api-col', children=[
+            dbc.Input(id='api-input'),
+            dbc.Button("Save", id='api-btn'),
+            html.Div(id='api-msg', style={'display': 'none'})
+        ])
+    ])
+])
+
+
 logged_in_menu = dbc.Nav(className='menu', children=[
+    dbc.NavItem(dbc.NavLink("API Key", id='api-link')),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
     dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
 ],
-)
+), api_input
 
 loggin_menu = dbc.Nav(className='menu', children=[
-    dbc.NavItem(dbc.NavLink("Login", href='/login'))
-])
+    dbc.NavItem(dbc.NavLink("API Key", id='api-link')),
+    dbc.NavItem(dbc.NavLink("Home", href='/')),
+    dbc.NavItem(dbc.NavLink("Details", href='/details')),
+    dbc.NavItem(dbc.NavLink("Login", href='/login')),
+]), api_input
 
 
 @app.callback(Output('url_login', 'pathname'),
@@ -100,3 +118,47 @@ def login_status(url):
         return logged_in_menu ,current_user.get_id()
     else:
         return loggin_menu, 'loggedout'
+
+
+@app.callback(
+    Output('api-container', 'style'),
+    Output('api-input', 'value'),
+    Input('api-link', 'n_clicks'),
+    State('api-container', 'style')
+)
+def toggle_api_input(n, s):
+    if n:
+        key = session['API-KEY'] if session['API-KEY'] else ''
+        print(f'key: {key}')
+        if s['display'] == 'none':
+            return {'display': 'inherit'}, key
+        else:
+            return {'display': 'none'}, key
+    return {'display': 'none'}, ''
+
+
+@app.callback(
+    Output('api-msg', 'children'),
+    Output('api-link', 'children'),
+    Input('api-btn', 'n_clicks'),
+    State('api-input', 'value')
+)
+def save_api_key(n, key):
+    if n:
+        print(f'save: {n} - {key}')
+        session['API-KEY'] = key
+
+        headers = {'Authorization': f'Bearer {key}'}
+        request = requests.get('https://api.guildwars2.com/v2/characters/', headers=headers)
+        if request.status_code == 200:
+            print(request.json())
+            session['CHARACTERS'] = request.json()
+
+        request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
+        if request.status_code == 200:
+            print(request.json())
+            session['ACCOUNT'] = request.json()['name']
+        session.permanent = True
+        session.modified = True
+    print('saving............')
+    return 'API key saved', f'API Key({session["ACCOUNT"]})' if session["ACCOUNT"] else 'API Key'

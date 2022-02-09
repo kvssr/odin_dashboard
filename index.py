@@ -1,6 +1,7 @@
 from dash import dcc, dash
 from dash import html
 from dash.dependencies import Input, Output
+from flask import session
 from flask_login import current_user, logout_user
 import dash_bootstrap_components as dbc
 from urllib.parse import unquote
@@ -51,14 +52,15 @@ def display_page(pathname):
     elif pathname == '/':
         view = top_stats.layout
     elif pathname.startswith('/details/'):     
-        if current_user.is_authenticated:
-            name = pathname.split('/')[-1]
+        name = pathname.split('/')[-1]
+        char = unquote(name.split('(')[0]).rstrip()
+        if current_user.is_authenticated or char in session['CHARACTERS']:
             view = personal_details.layout(unquote(name))
         else:
             view = 'Redirecting to login...'
             url = '/login'
     elif pathname == '/details':
-        if current_user.is_authenticated:
+        if current_user.is_authenticated  or session['CHARACTERS']:
             view = details.layout
         else:
             view = 'Redirecting to login...'

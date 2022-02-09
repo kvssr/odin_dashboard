@@ -1,6 +1,8 @@
 from dash import html
 import dash_bootstrap_components as dbc
 from dash import dcc
+from flask import session
+from flask_login import current_user
 from app import db, app
 from models import AegisStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, RipStat, StabStat
 from dash.dependencies import Input, Output, State
@@ -39,7 +41,10 @@ def layout(name):
     character_id = db.session.query(Character.id).filter_by(name = name).first()
     characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
                             .join(Profession).order_by(Profession.name, Character.name).all()
-    dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
+    if current_user.is_authenticated:
+        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
+    else:
+        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters if s.name in session['CHARACTERS']]
     layout = [
         dbc.Row(class_name='input-row', children=[
             dbc.Col([

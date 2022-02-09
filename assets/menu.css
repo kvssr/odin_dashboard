@@ -33,3 +33,20 @@
 .column-header--select{
   float: unset !important;
 }
+
+#api-row{
+  position: absolute;
+  margin-top: 10px;
+}
+
+#api-col{
+  display: flex;
+}
+
+#api-container{
+  display: none;
+}
+
+#api-link{
+  cursor: pointer;
+}

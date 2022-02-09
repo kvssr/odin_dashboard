@@ -150,13 +150,19 @@ def add_annotations_graph(fig, df, t):
 
 def add_clickable_names(fig, df):
     for name in df["Name"]:
+        text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
+        color='#EEE'
+        if name[0].isdigit():
+            text = name
+            color = 'grey'
         fig.add_annotation(y=name, x=0,
-                            text=f"""<a href="/details/{name}" target='_self'>{name}</a>""",
+                            text=text,
                             showarrow=False,
                             yshift=0,
                             xshift=2,
                             xanchor="right",
                             font_size=13,
+                            font_color=color
         )
     return fig
 
