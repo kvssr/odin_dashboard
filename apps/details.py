@@ -92,12 +92,8 @@ def switch_tabs(tab, raid, datasets):
     if current_user.is_authenticated:
         masked = False
     if tab == 'dmg-tab':
-        try:
-            query = db.session.query(DmgStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-            df = pd.DataFrame([s.to_dict(masked) for s in query])
-        except Exception as e:
-            db.session.rollback()
-            print(e)
+        query = db.session.query(DmgStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-DmgStat.total_dmg).all()
+        df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'dmg', "Top Damage", True, True)
         fig.update_layout(
             height=1000,
@@ -107,8 +103,8 @@ def switch_tabs(tab, raid, datasets):
                 figure=fig,
             )
     elif tab == 'rips-tab':
-        query = db.session.query(RipStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(RipStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-RipStat.total_rips).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'rips', "Top Boons Removal", True, True)
         fig.update_layout(
             height=1000,
@@ -120,11 +116,9 @@ def switch_tabs(tab, raid, datasets):
     elif tab == 'might-tab':
         graph = dcc.Graph()
         fig= {}
-        query = db.session.query(MightStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
-        #print(df)
+        query = db.session.query(MightStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-MightStat.total_might).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'might', "Top Might Output", True, True)
-        #print(fig)
         fig.update_layout(          
             height=1000,
         )
@@ -133,8 +127,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'fury-tab':
-        query = db.session.query(FuryStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(FuryStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-FuryStat.total_fury).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'fury', "Top Fury Output", True, True)
         fig.update_layout(
             height=1000,
@@ -144,8 +138,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'cleanses-tab':
-        query = db.session.query(CleanseStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(CleanseStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-CleanseStat.total_cleanses).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'cleanses', "Top Conditions Cleansed", True, True)
         fig.update_layout(
             height=1000,
@@ -155,8 +149,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'stab-tab':
-        query = db.session.query(StabStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(StabStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-StabStat.total_stab).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'stab', "Top Stability Output", True, True)
         fig.update_layout(
             height=1000,
@@ -166,8 +160,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'heal-tab':
-        query = db.session.query(HealStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(HealStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-HealStat.total_heal).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'heal', "Top Healing Output", True, True)
         fig.update_layout(
             height=1000,
@@ -177,8 +171,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'barrier-tab':
-        query = db.session.query(BarrierStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(BarrierStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-BarrierStat.total_barrier).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'barrier', "Top Barrier Output", True, True)
         fig.update_layout(
             height=1000,
@@ -188,8 +182,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'dist-tab':
-        query = db.session.query(DistStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(DistStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-DistStat.percentage_top).all()
+        df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_dist_bar_chart(df, True)
         fig.update_layout(
             height=1000,
@@ -199,8 +193,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'prot-tab':
-        query = db.session.query(ProtStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(ProtStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-ProtStat.total_prot).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'prot', "Top Protection Output", True, True)
         fig.update_layout(
             height=1000,
@@ -210,8 +204,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'aegis-tab':
-        query = db.session.query(AegisStat).join(PlayerStat).join(Raid).filter_by(id=raid).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        query = db.session.query(AegisStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-AegisStat.total_aegis).all()
+        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'aegis', "Top Aegis Output", True, True)
         fig.update_layout(
             height=1000,
@@ -222,7 +216,7 @@ def switch_tabs(tab, raid, datasets):
         )
     elif tab == 'dmg_taken-tab':
         query = db.session.query(DmgTakenStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(DmgTakenStat.avg_dmg_taken_s.asc()).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_dmg_taken_chart(df, 'dmg_taken', "Least Damage Taken", False)
         fig.update_layout(
             height=1000,
@@ -233,7 +227,7 @@ def switch_tabs(tab, raid, datasets):
         )
     elif tab == 'deaths-tab':
         query = db.session.query(DeathStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total_deaths.asc()).all()
-        df = pd.DataFrame([s.to_dict(masked) for s in query])
+        df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
         fig.update_layout(
             height=1000,
