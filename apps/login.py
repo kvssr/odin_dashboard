@@ -88,7 +88,7 @@ loggin_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("API Key", id='api-link')),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
-    dbc.NavItem(dbc.NavLink("Login", href='/login')),
+    dbc.NavItem(dbc.NavLink("Admin", href='/login')),
 ]), api_input
 
 
