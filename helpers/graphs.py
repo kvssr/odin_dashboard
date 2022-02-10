@@ -128,7 +128,7 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig.update_traces(textangle=0, width=0.8)
     fig = add_annotations_graph(fig, df, t)
     fig = add_times_top_annotation(fig, df)
-    fig= add_clickable_names(fig, df)
+    fig = add_clickable_names(fig, df)
     if detailed:
         fig = add_sorting_options(fig, df, t)
     return fig
@@ -346,19 +346,22 @@ def add_sorting_options(fig, df, t):
                 buttons=[
                     dict(label="Total",
                             method="relayout",
-                            args=["yaxis", {"categoryorder": "total ascending"}]),
+                            args=["yaxis", {"categoryorder": "total ascending", 'showticklabels': False}]),
                     dict(label="Average",
                             method="relayout",
                             args=["yaxis", {"categoryarray": (df.sort_values(by=f"Average {t} per s", ascending=True))["Name"],
-                                            "categoryorder": "array"}]),
+                                            "categoryorder": "array",
+                                            'showticklabels': False}]),
                     dict(label="Times Top",
                             method="relayout",
                             args=["yaxis", {"categoryarray": (df.sort_values(by=["Times Top", f"Total {t}"], ascending=[True, True]))["Name"],
-                                            "categoryorder": "array"}]),
+                                            "categoryorder": "array",
+                                            'showticklabels': False}]),
                     dict(label="Attendance",
                             method="relayout",
                             args=["yaxis", {"categoryarray": (df.sort_values(by=["Attendance (number of fights)", "Times Top", f"Total {t}"], ascending=[True, True, True]))["Name"],
-                                            "categoryorder": "array"}]),
+                                            "categoryorder": "array",
+                                            'showticklabels': False}]),
                 ],
             )
         ]
