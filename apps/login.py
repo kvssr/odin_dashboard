@@ -76,7 +76,14 @@ api_input = html.Div(id='api-container', children=[
 
 
 logged_in_menu = dbc.Nav(className='menu', children=[
-    dbc.NavItem(dbc.NavLink("API Key", id='api-link')),
+    dbc.DropdownMenu(
+            [dbc.DropdownMenuItem("API Key", href='/api'), 
+            dbc.DropdownMenuItem("Profile")],
+            label="Account",
+            caret=False,
+            nav=True,
+            id='account-dpn',
+        ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
@@ -85,7 +92,14 @@ logged_in_menu = dbc.Nav(className='menu', children=[
 ), api_input
 
 loggin_menu = dbc.Nav(className='menu', children=[
-    dbc.NavItem(dbc.NavLink("API Key", id='api-link')),
+    dbc.DropdownMenu(
+            [dbc.DropdownMenuItem("API Key", href='/api'), 
+            dbc.DropdownMenuItem("Profile")],
+            label="Account",
+            caret=False,
+            nav=True,
+            id='account-dpn',
+        ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.NavItem(dbc.NavLink("Admin", href='/login')),
@@ -118,47 +132,3 @@ def login_status(url):
         return logged_in_menu ,current_user.get_id()
     else:
         return loggin_menu, 'loggedout'
-
-
-@app.callback(
-    Output('api-container', 'style'),
-    Output('api-input', 'value'),
-    Input('api-link', 'n_clicks'),
-    State('api-container', 'style')
-)
-def toggle_api_input(n, s):
-    if n:
-        key = session['API-KEY'] if 'API-KEY' in session else ''
-        print(f'key: {key}')
-        if s['display'] == 'none':
-            return {'display': 'inherit'}, key
-        else:
-            return {'display': 'none'}, key
-    return {'display': 'none'}, ''
-
-
-@app.callback(
-    Output('api-msg', 'children'),
-    Output('api-link', 'children'),
-    Input('api-btn', 'n_clicks'),
-    State('api-input', 'value')
-)
-def save_api_key(n, key):
-    if n:
-        print(f'save: {n} - {key}')
-        session['API-KEY'] = key
-
-        headers = {'Authorization': f'Bearer {key}'}
-        request = requests.get('https://api.guildwars2.com/v2/characters/', headers=headers)
-        if request.status_code == 200:
-            print(request.json())
-            session['CHARACTERS'] = request.json()
-
-        request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
-        if request.status_code == 200:
-            print(request.json())
-            session['ACCOUNT'] = request.json()['name']
-        session.permanent = True
-        session.modified = True
-    print('saving............')
-    return 'API key saved', f'API Key({session["ACCOUNT"]})' if "ACCOUNT" in session else 'API Key'
