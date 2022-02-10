@@ -10,7 +10,6 @@ import pandas as pd
 from app import app, db
 from models import CleanseStat, DistStat, DmgStat, Fight, FightSummary, HealStat, PlayerStat, Raid, RipStat, StabStat
 
-#dropdown_options = [{'label':f'{s.id}: {s.raid_date} {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} - {s.raid_type.name}', 'value':s.id} for s in db.session.query(Raid).all()]
 
 config = {
     'displayModeBar': False,
