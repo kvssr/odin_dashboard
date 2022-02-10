@@ -67,7 +67,7 @@ def layout(name):
             ]),
             dbc.Col([
                 dbc.Card([
-                    dbc.CardHeader("Times Top"),
+                    dbc.CardHeader("Times Top", id='times-top-header'),
                     dbc.CardBody(id='times-top')
                 ])
             ]),
@@ -142,6 +142,7 @@ def update_raids_table(character):
     Output('fights-attended', 'children'),
     Output('fights-missed', 'children'),
     Output('times-top', 'children'),
+    Output('times-top-header', 'children'),
     Input('name-dropdown', 'value'),
     Input('raids-table', 'selected_columns'),
 )
@@ -157,7 +158,7 @@ def update_highest_stats(character, col):
     if col:
         model = colum_models[col[0]][0]
         times_top = db.session.query(func.sum(model.times_top)).join(PlayerStat).filter_by(character_id=character).first()[0]
-    return (raids_attended, fights_attended, fights_missed, times_top)
+    return (raids_attended, fights_attended, fights_missed, times_top, f'Times Top: {col[0]}')
 
 
 @app.callback(
