@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 from urllib.parse import unquote
 
 from app import app
-from apps import personal_details, top_stats, details, login, upload_page
+from apps import api_page, personal_details, top_stats, details, login, upload_page
 
 server = app.server
 
@@ -35,6 +35,8 @@ def display_page(pathname):
     url = dash.no_update
     if pathname == '/login':
         view = login.login
+    elif pathname == '/api':
+        view = api_page.layout
     elif pathname == '/success':
         if current_user.is_authenticated:
             view = login.success

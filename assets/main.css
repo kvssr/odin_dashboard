@@ -7,6 +7,11 @@ table#summary{
     width: 100%;
     text-align: center;
 }
+#raids-table table{
+    table-layout: fixed;
+    width: 100%;
+    text-align: center;
+}
 th {
     background-color: #212121 !important;
     text-align: center;
@@ -82,4 +87,17 @@ td {
 
 #personal-raids-table{
     padding: 12px;
+}
+
+#api-explain-row{
+    text-align: center;
+}
+
+#api-add-col{
+    display: flex;
+}
+
+#api-characters-row{
+    text-align: center;
+    padding-top: 20px;
 }
