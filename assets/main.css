@@ -68,7 +68,7 @@ td {
 }
 
 #input-row-top{
-    display: none;
+    display: flex;
 }
 
 #hr-header{

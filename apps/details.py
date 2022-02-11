@@ -9,11 +9,9 @@ from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
 from flask_login import current_user
-import plotly.express as px
-from sqlalchemy.log import echo_property
 from app import app, db
 import pandas as pd
-from helpers import db_writer, graphs
+from helpers import graphs
 from sqlalchemy.orm.session import close_all_sessions
 
 from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
@@ -114,10 +112,8 @@ def switch_tabs(tab, raid, datasets):
             figure=fig
         )
     elif tab == 'might-tab':
-        graph = dcc.Graph()
-        fig= {}
         query = db.session.query(MightStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-MightStat.total_might).all()
-        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
+        df = pd.DataFrame([s.to_dict() if i < 2 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'might', "Top Might Output", True, True)
         fig.update_layout(          
             height=1000,
@@ -128,7 +124,7 @@ def switch_tabs(tab, raid, datasets):
         )
     elif tab == 'fury-tab':
         query = db.session.query(FuryStat).join(PlayerStat).join(Raid).filter_by(id=raid).order_by(-FuryStat.total_fury).all()
-        df = pd.DataFrame([s.to_dict() if i < 3 else s.to_dict(masked) for i, s in enumerate(query)])
+        df = pd.DataFrame([s.to_dict() if i < 2 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_bar_chart(df, 'fury', "Top Fury Output", True, True)
         fig.update_layout(
             height=1000,

@@ -57,22 +57,11 @@ failed = html.Div([html.Div([html.H2('Log in Failed. Please try again.'),
                    ])
 
 
-# logout
+# Logout
 logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    html.Br(),
                    dcc.Link('Home', href='/')
                    ])
-
-
-api_input = html.Div(id='api-container', children=[
-    dbc.Row(id='api-row', children=[
-        dbc.Col(id='api-col', children=[
-            dbc.Input(id='api-input'),
-            dbc.Button("Save", id='api-btn'),
-            html.Div(id='api-msg', style={'display': 'none'})
-        ])
-    ])
-])
 
 
 logged_in_menu = dbc.Nav(className='menu', children=[
@@ -89,7 +78,7 @@ logged_in_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
     dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
 ],
-), api_input
+)
 
 loggin_menu = dbc.Nav(className='menu', children=[
     dbc.DropdownMenu(
@@ -103,7 +92,7 @@ loggin_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.NavItem(dbc.NavLink("Admin", href='/login')),
-]), api_input
+])
 
 
 @app.callback(Output('url_login', 'pathname'),

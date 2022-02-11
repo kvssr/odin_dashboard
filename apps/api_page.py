@@ -115,7 +115,6 @@ def show_character_info(msg, del_msg):
     if session and 'CHARACTERS' in session:       
         info = {}
         info['# Raids'] = []
-        #info['Name'] = session['CHARACTERS']
         info['Name'] = []
         info['Profession'] = session['PROFESSION']
         for name in session['CHARACTERS']:
@@ -126,7 +125,6 @@ def show_character_info(msg, del_msg):
                 print(count)
                 info['# Raids'].append(count)
                 info['Name'].append(f'[{name}](/details/{urllib.parse.quote(name)})')
-                #info['Name'].append(html.A(name, href=f'/details/{urllib.parse.quote(name)}'))
             else:
                 info['# Raids'].append(0)
                 info['Name'].append(name)
@@ -150,8 +148,17 @@ def show_api_info(msg):
 
 
 @app.callback(
-    Output('api-msg', 'children'),
     Output('account-dpn', 'label'),
+    Input('url', 'pathname')
+)
+def show_account_name(url):
+    if session and 'ACCOUNT' in session:
+        return session['ACCOUNT']
+    raise PreventUpdate
+
+
+@app.callback(
+    Output('api-msg', 'children'),
     Output('api-input', 'value'),
     Input('api-btn', 'n_clicks'),
     State('api-input', 'value')
@@ -160,7 +167,6 @@ def save_api_key(n, key):
     if n:
         print(f'save: {n} - {key}')
         professions = []
-        links = []
         characters = []
         try:
             headers = {'Authorization': f'Bearer {key}'}
@@ -184,17 +190,18 @@ def save_api_key(n, key):
                 session['ACCOUNT'] = request.json()['name']
             else:
                 raise Exception
+
             session['API-KEY'] = key
             session['CHARACTERS'] = characters
             session['PROFESSION'] = professions
             session.permanent = True
             session.modified = True
             print('Saving API Key')
-            return f'API-Key Saved', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', ''
+            return f'API-Key Saved', ''
         except Exception as e:
             print(e)
-            return f'Invalid API-KEY', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', 'Invalid Key'
-    return f'Invalid API-KEY', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', None
+            return f'Invalid API-KEY', 'Invalid Key'
+    return f'Invalid API-KEY', None
 
 
 @app.callback(
@@ -207,5 +214,3 @@ def delete_api_key(data, prev):
         print('session cleared')
         session.clear()
         return 'Session Cleared'
-
-
