@@ -53,8 +53,6 @@ def display_page(pathname):
         else:
             view = login
             url = '/login'
-    elif pathname == '/':
-        view = top_stats.layout
     elif pathname.startswith('/details/'):     
         name = pathname.split('/')[-1]
         char = unquote(name.split('(')[0]).rstrip()
@@ -75,6 +73,8 @@ def display_page(pathname):
         else:
             view = 'Redirecting to login...'
             url = '/login'
+    elif pathname == '/':
+        view = top_stats.layout
     else:
         view = top_stats.layout
     # You could also return a 404 "URL not found" page here
