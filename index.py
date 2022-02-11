@@ -1,3 +1,4 @@
+import time
 from dash import dcc, dash
 from dash import html
 from dash.dependencies import Input, Output
@@ -46,7 +47,8 @@ def display_page(pathname):
     elif pathname == '/logout':
         if current_user.is_authenticated:
             logout_user()
-            view = login.logout
+            #view = login.logout
+            time.sleep(1)
             url = '/'
         else:
             view = login

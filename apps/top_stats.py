@@ -70,15 +70,6 @@ layout = html.Div(children=[
     )       
 ])
 
-@app.callback(Output('input-row-top', 'style'),
-            Input('login-status', 'data'))
-def hide_dropdown_not_logged_in(data):
-    print(data)
-    if data == 'loggedout':
-        return {'display': 'block'}
-    else:
-        return {'display': 'block'}
-
 
 @app.callback(Output('raids-dropdown', 'option'),
         Output('raids-dropdown', 'value'),
