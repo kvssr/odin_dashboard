@@ -1,3 +1,4 @@
+from email.quoprimime import quote
 import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html
@@ -9,6 +10,7 @@ import requests
 from dash import dash_table
 from sqlalchemy import distinct, func
 from dash.exceptions import PreventUpdate
+import urllib
 
 from app import app, db
 from models import Character, PlayerStat
@@ -78,6 +80,9 @@ layout = dbc.Row([
                 editable=False,
                 cell_selectable=False,
                 style_as_list_view=True,
+                markdown_options={
+                    'link_target':'_self'
+                },
                 style_cell={
                     'border': '1px solid #444',
                     'padding': '0.5rem',
@@ -107,20 +112,24 @@ layout = dbc.Row([
     Input('api-delete-msg', 'children')
 )
 def show_character_info(msg, del_msg):
-    info = {}
-    info['# Raids'] = []
     if session and 'CHARACTERS' in session:       
-        info['Name'] = session['CHARACTERS']
+        info = {}
+        info['# Raids'] = []
+        #info['Name'] = session['CHARACTERS']
+        info['Name'] = []
         info['Profession'] = session['PROFESSION']
-        for name in info['Name']:
+        for name in session['CHARACTERS']:
             char_id = db.session.query(Character.id).filter_by(name = name).first()
             print(char_id)
             if(char_id):
                 count = db.session.query(func.count(distinct(PlayerStat.raid_id))).filter_by(character_id = char_id[0]).scalar()
                 print(count)
                 info['# Raids'].append(count)
+                info['Name'].append(f'[{name}](/details/{urllib.parse.quote(name)})')
+                #info['Name'].append(html.A(name, href=f'/details/{urllib.parse.quote(name)}'))
             else:
                 info['# Raids'].append(0)
+                info['Name'].append(name)
         print(f'info:{info}')
         df = pd.DataFrame(info).to_dict('records')
         return df
@@ -150,26 +159,34 @@ def show_api_info(msg):
 def save_api_key(n, key):
     if n:
         print(f'save: {n} - {key}')
-        session['PROFESSION'] = []
+        professions = []
+        links = []
+        characters = []
         try:
             headers = {'Authorization': f'Bearer {key}'}
             request = requests.get('https://api.guildwars2.com/v2/characters/', headers=headers)
             if request.status_code == 200:
-                session['API-KEY'] = key
-                print(request.json())
-                session['CHARACTERS'] = request.json()
+                characters = request.json()
+            else:
+                raise Exception
             
-            for name in session['CHARACTERS']:
-                headers = {'Authorization': f'Bearer {key}'}
+            for name in characters:
                 request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
                 if request.status_code == 200:
-                    print(request.json()['profession'])
-                    session['PROFESSION'].append(request.json()['profession'])
+                    prof = request.json()['profession']
+                    icon = requests.get(f'https://api.guildwars2.com/v2/professions/{prof}').json()['icon_big']
+                    professions.append(f"![{prof}]({icon}){prof}")
+                else:
+                    raise Exception
 
             request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
             if request.status_code == 200:
-                print(request.json())
                 session['ACCOUNT'] = request.json()['name']
+            else:
+                raise Exception
+            session['API-KEY'] = key
+            session['CHARACTERS'] = characters
+            session['PROFESSION'] = professions
             session.permanent = True
             session.modified = True
             print('Saving API Key')
@@ -177,7 +194,7 @@ def save_api_key(n, key):
         except Exception as e:
             print(e)
             return f'Invalid API-KEY', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', 'Invalid Key'
-    raise PreventUpdate
+    return f'Invalid API-KEY', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', None
 
 
 @app.callback(

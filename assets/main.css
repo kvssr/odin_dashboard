@@ -101,3 +101,24 @@ td {
     text-align: center;
     padding-top: 20px;
 }
+
+.cell-markdown{
+    text-align: center !important;
+}
+
+.cell-markdown p{
+    margin: auto !important;
+}
+
+.cell-markdown img{
+    width: 35px !important;
+}
+
+.cell-markdown a{
+    text-decoration: none;
+    color: white;
+}
+
+.cell-markdown a:hover{
+    color: rgb(116, 0, 0);
+}
