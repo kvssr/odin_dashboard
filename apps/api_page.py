@@ -24,11 +24,11 @@ layout = dbc.Row([
         ])
     ]),
     dbc.Row(id='api-add-row', class_name='input-row',children=[
-        dbc.Col(id='api-add-col', children=[
+        dcc.Loading(dbc.Col(id='api-add-col', children=[
             dbc.Input(id='api-input', placeholder='Put your API Key here'),
             dbc.Button("Add", id='api-btn'),
             html.Div(id='api-msg', style={'display': 'none'})
-        ], width={'size': 4, 'offset': 4})
+        ], width={'size': 4, 'offset': 4}), color='grey')
     ]),
     dbc.Row(id='api-overview-row', children=[
         dbc.Col(id='api-overview-col', children=(
@@ -100,9 +100,10 @@ layout = dbc.Row([
 
 @app.callback(
     Output('character-table', 'data'),
-    Input('api-msg', 'children')
+    Input('api-msg', 'children'),
+    Input('api-delete-msg', 'children')
 )
-def show_character_info(msg):
+def show_character_info(msg, del_msg):
     info = {}
     info['# Raids'] = []
     if session and session['CHARACTERS']:       
@@ -180,3 +181,5 @@ def delete_api_key(data, prev):
         print('session cleared')
         session.clear()
         return 'Session Cleared'
+
+

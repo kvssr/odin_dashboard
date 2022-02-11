@@ -50,3 +50,7 @@
 #api-link{
   cursor: pointer;
 }
+
+#character-table table{
+  table-layout: fixed;
+}
