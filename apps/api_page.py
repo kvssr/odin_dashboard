@@ -8,6 +8,7 @@ import pandas as pd
 import requests
 from dash import dash_table
 from sqlalchemy import distinct, func
+from dash.exceptions import PreventUpdate
 
 from app import app, db
 from models import Character, PlayerStat
@@ -71,6 +72,8 @@ layout = dbc.Row([
                 columns=[{
                     'name': i,
                     'id': i,
+                    'type': 'text',
+                    'presentation': 'markdown'
                 } for i in ['Name', 'Profession', '# Raids']],
                 editable=False,
                 cell_selectable=False,
@@ -106,7 +109,7 @@ layout = dbc.Row([
 def show_character_info(msg, del_msg):
     info = {}
     info['# Raids'] = []
-    if session and session['CHARACTERS']:       
+    if session and 'CHARACTERS' in session:       
         info['Name'] = session['CHARACTERS']
         info['Profession'] = session['PROFESSION']
         for name in info['Name']:
@@ -129,7 +132,7 @@ def show_character_info(msg, del_msg):
 )
 def show_api_info(msg):
     info = {}
-    if session and session['ACCOUNT']:
+    if session and 'ACCOUNT' in session:
         info['Account'] = session['ACCOUNT']
         info['Key'] = session['API-KEY']
         info['Characters'] = len(session['CHARACTERS'])
@@ -140,35 +143,41 @@ def show_api_info(msg):
 @app.callback(
     Output('api-msg', 'children'),
     Output('account-dpn', 'label'),
+    Output('api-input', 'value'),
     Input('api-btn', 'n_clicks'),
     State('api-input', 'value')
 )
 def save_api_key(n, key):
     if n:
         print(f'save: {n} - {key}')
-        session['API-KEY'] = key
         session['PROFESSION'] = []
-        headers = {'Authorization': f'Bearer {key}'}
-        request = requests.get('https://api.guildwars2.com/v2/characters/', headers=headers)
-        if request.status_code == 200:
-            print(request.json())
-            session['CHARACTERS'] = request.json()
-        
-        for name in session['CHARACTERS']:
+        try:
             headers = {'Authorization': f'Bearer {key}'}
-            request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
+            request = requests.get('https://api.guildwars2.com/v2/characters/', headers=headers)
             if request.status_code == 200:
-                print(request.json()['profession'])
-                session['PROFESSION'].append(request.json()['profession'])
+                session['API-KEY'] = key
+                print(request.json())
+                session['CHARACTERS'] = request.json()
+            
+            for name in session['CHARACTERS']:
+                headers = {'Authorization': f'Bearer {key}'}
+                request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
+                if request.status_code == 200:
+                    print(request.json()['profession'])
+                    session['PROFESSION'].append(request.json()['profession'])
 
-        request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
-        if request.status_code == 200:
-            print(request.json())
-            session['ACCOUNT'] = request.json()['name']
-        session.permanent = True
-        session.modified = True
-    print('saving............')
-    return f'API key saved {n}', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account',
+            request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
+            if request.status_code == 200:
+                print(request.json())
+                session['ACCOUNT'] = request.json()['name']
+            session.permanent = True
+            session.modified = True
+            print('Saving API Key')
+            return f'API-Key Saved', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', ''
+        except Exception as e:
+            print(e)
+            return f'Invalid API-KEY', f'{session["ACCOUNT"]}' if "ACCOUNT" in session else 'Account', 'Invalid Key'
+    raise PreventUpdate
 
 
 @app.callback(
