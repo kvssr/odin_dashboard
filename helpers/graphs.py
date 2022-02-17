@@ -373,6 +373,7 @@ def get_personal_chart(df, y):
     fig = px.line(df, y=y, x=df['Date'],
                 color='Name', 
                 color_discrete_sequence=[df['Profession_color'].values[0],'white'],
+                hover_data=[]
                 )
 
     groups = []
@@ -394,7 +395,7 @@ def get_personal_chart(df, y):
                 )
             )),
             showlegend=True if row['Profession'] not in groups else False,
-            hovertemplate=''
+            hovertemplate=f'{row[y]:,}',
         ))
         if row['Profession'] not in groups:
             groups.append(row['Profession']) 
@@ -414,7 +415,7 @@ def get_personal_chart(df, y):
         yaxis_showline=True,
         yaxis_rangemode='tozero',
         xaxis_gridcolor='grey',
-        yaxis_gridcolor='grey'
+        yaxis_gridcolor='grey',
     )
     fig.update_layout(general_layout_line)
     return fig
