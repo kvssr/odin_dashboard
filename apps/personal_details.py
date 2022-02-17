@@ -202,4 +202,4 @@ def show_selected_column(col, rows, data):
             df_p = df_p.append(df_top.loc[df_top['raid_id'] == row['raid_id']])
         print(f'Color df_p: {df_p}')
         fig = graphs.get_personal_chart(df_p, col[0])
-        return dcc.Graph(figure=fig, style={'height': 300})
+        return dcc.Graph(figure=fig, style={'height': 600})
