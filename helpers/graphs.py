@@ -370,35 +370,51 @@ def add_sorting_options(fig, df, t):
 
 
 def get_personal_chart(df, y):
-    fig = px.line(df, y=y, x=df['Date'],
-                color='Name', 
-                color_discrete_sequence=[df['Profession_color'].values[0],'white'],
-                hover_data=[]
-                )
+    fig = go.Figure()
+    for name in df['Name'].unique():
+        print(df[df['Name']==name]['Date'])
+        print(df[df['Name']==name][y])
+        fig.add_trace(go.Scatter(
+            x=df[df['Name']==name]['Date'],
+            y=df[df['Name']==name][y],
+            mode=df[df['Name']==name]['mode'].iloc[0],
+            fill=df[df['Name']==name]['fill'].iloc[0],
+            fillcolor='rgba(174, 174, 174, 0.3)',
+            name=name,
+            line=dict(
+                    width=4 if name == df.iloc[0]['Name'] else 1,
+                    color=df[df['Name']==name]['Profession_color'].iloc[0] if name == df.iloc[0]['Name'] else 'grey',
+                ),
+            showlegend=False if name in ['Last Prof', 'First Prof'] else True,
+            hoverinfo='skip'
+        ))
+    
 
     groups = []
     for i , row in df.iterrows():
-        fig.add_trace(go.Scatter(
-            x=[row['Date']],
-            y=[row[y]],
-            mode='markers',
-            name=row['Profession'] if str(row['Profession']) != 'nan' else row['Name'],
-            text=row['Profession'],
-            legendgroup=row['Profession'],
-            marker=(dict(
-                color=row['Profession_color'],
-                size=12,
-                symbol='triangle-up' if str(row['Profession']) != 'nan' else 'circle',
-                line=dict(
-                    width=1.5,
-                    color='white',
-                )
-            )),
-            showlegend=True if row['Profession'] not in groups else False,
-            hovertemplate=f'{row[y]:,}',
-        ))
-        if row['Profession'] not in groups:
-            groups.append(row['Profession']) 
+        if row['Name'] not in ['Last Prof', 'First Prof']:
+            fig.add_trace(go.Scatter(
+                x=[row['Date']],
+                y=[row[y]],
+                mode='markers',
+                name=row['Profession'] if str(row['Profession']) != 'nan' else row['Name'],
+                text=row['raid_id'],
+                legendgroup=row['Profession'],
+                marker=(dict(
+                    color=row['Profession_color'],
+                    size=12,
+                    symbol='triangle-up' if str(row['Profession']) != 'nan' else 'circle',
+                    line=dict(
+                        width=1.5,
+                        color='white',
+                    )
+                )),
+                showlegend=True if row['Profession'] not in groups else False,
+                hovertemplate=f'{row[y]:,}',
+                customdata=[row['raid_id']],
+            ))
+            if row['Profession'] not in groups:
+                groups.append(row['Profession']) 
 
     fig.update_layout(
         title="Raid History",
@@ -416,7 +432,32 @@ def get_personal_chart(df, y):
         yaxis_rangemode='tozero',
         xaxis_gridcolor='grey',
         yaxis_gridcolor='grey',
+        hovermode='x'
     )
     fig.update_layout(general_layout_line)
+    fig.update_layout(dict(margin=dict(r=10)))
+    return fig
+
+
+def get_top_bar_chart_p(df, x, date):
+    fig = px.bar(df, y="Name", x=f'{x}', 
+                 color="Profession", 
+                 text=f'{x}',
+                 text_auto=',',
+                 title=f'Top 10 - {date}',
+                 barmode="relative",
+                 orientation='h',
+                 color_discrete_map=profession_colours
+                 )
+    fig.update_layout(
+        yaxis_categoryorder='total ascending',
+        showlegend=False,
+    )
+    fig.update_layout(general_layout)
+    fig.update_layout(dict(margin=dict(l=180, r=10)))
+    fig.update_traces(textangle=0, width=0.8)
+    #fig = add_annotations_graph(fig, df, t)
+    fig = add_times_top_annotation(fig, df)
+    fig = add_clickable_names(fig, df)
     return fig
 

@@ -92,7 +92,7 @@ class PlayerStat(db.Model):
             'Fury': self.fury_stat.avg_fury_s,
             'Barrier': self.barrier_stat.avg_barrier_s,
             'Damage Taken': self.dmg_taken_stat.times_top if self.dmg_taken_stat else None,
-            'Deaths': self.death_stat.total_deaths,
+            'Deaths': self.death_stat.times_top,
         }
 
 

@@ -6,6 +6,7 @@ table#summary{
     table-layout: fixed;
     width: 100%;
     text-align: center;
+    background-color: #424242;
 }
 #raids-table table{
     table-layout: fixed;
@@ -17,7 +18,7 @@ th {
     text-align: center;
 }
 td {
-    background-color: #424242 !important;
+    background-color: #424242;
     text-align: center;
 }
 
@@ -121,4 +122,8 @@ td {
 
 .cell-markdown a:hover{
     color: rgb(116, 0, 0);
+}
+
+#raids-top10-col{
+    margin: auto;
 }
