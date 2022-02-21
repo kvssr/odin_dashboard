@@ -206,6 +206,10 @@ def show_selected_column(col, rows, data):
             print(f'raid: {raid}')
             print(f'column: {col[0]}')
             raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
+            raid_time = df_p.loc[df_p['raid_id']==raid, 'Start Time'].item()
+            raid_date = f'{raid_date} {raid_time}'
+            
+            df_p.loc[df_p['raid_id']==raid, 'Date'] = raid_date
 
             ### Get Lowest Profession
             bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
