@@ -60,7 +60,7 @@ def layout(name):
     if name != '':
         name = name.split('(')[0].rstrip()
         character_id = db.session.query(Character.id).filter_by(name = name).first()[0]
-    elif 'CHARACTERS' in session:
+    elif 'CHARACTERS' in session and len(session['CHARACTERS']) > 0:
         character_id = db.session.query(Character.id).filter_by(name = session['CHARACTERS'][0]).first()[0]
     else:
         character_id = dropdown_options[0]['value']

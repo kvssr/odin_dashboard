@@ -142,3 +142,13 @@ td {
 #footnote-heal-barrier A:hover{
 	color: rgb(116, 0, 0);
 }
+
+#api-explain-row A{
+	text-decoration: none;
+	font-weight: bold;
+	color: white;
+}
+
+#api-explain-row A:hover{
+	color: rgb(116, 0, 0);
+}
