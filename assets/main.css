@@ -127,3 +127,18 @@ td {
 #raids-top10-col{
     margin: auto;
 }
+
+#footnote-heal-barrier{
+    font-size: small;
+    color: #939393;
+}
+
+#footnote-heal-barrier A{
+	text-decoration: none;
+	font-weight: bold;
+	color: white;
+}
+
+#footnote-heal-barrier A:hover{
+	color: rgb(116, 0, 0);
+}
