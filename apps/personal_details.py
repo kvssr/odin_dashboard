@@ -14,13 +14,20 @@ import plotly.express as px
 from dash import dash_table
 from sqlalchemy import func
 from dash.exceptions import PreventUpdate
+import dash
+from dash.dash_table.Format import Format, Scheme, Sign
 
 from models import DeathStat, DmgStat, FightSummary, PlayerStat, Raid
 
 
-
 tab_style={'padding': '.5rem 0',
             'cursor': 'pointer'}
+
+config = {
+    'displayModeBar': False,
+    'displaylogo': False,
+    'scrollZoom': False,
+}
 
 colum_models = {
     'Damage': [DmgStat, 'total_dmg', 'avg_dmg_s', 'Average dmg per s'],
@@ -40,14 +47,33 @@ colum_models = {
 
 
 def layout(name):
-    name = name.split('(')[0].rstrip()
-    character_id = db.session.query(Character.id).filter_by(name = name).first()
-    characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
-                            .join(Profession).order_by(Profession.name, Character.name).all()
     if current_user.is_authenticated:
+        characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
+                                .join(Profession).order_by(Profession.name, Character.name).all()
         dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
     else:
+        characters = db.session.query(Character).filter(Character.name.in_(session['CHARACTERS'])).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
+                                .join(Profession).order_by(Profession.name, Character.name).all()
         dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters if s.name in session['CHARACTERS']]
+
+    character_id = 0
+    if name != '':
+        name = name.split('(')[0].rstrip()
+        character_id = db.session.query(Character.id).filter_by(name = name).first()[0]
+    else:
+        character_id = dropdown_options[0]['value']
+        print(dropdown_options[0]['value'])
+
+    raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character_id).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
+    #print(f'raids_dict: {raids_dict}')
+    raids_df = pd.DataFrame(raids_dict)
+    #print(f'raids_df: {raids_df}')
+
+    enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
+    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
+        enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
+
+
     layout = [
         dbc.Row(class_name='input-row', children=[
             dbc.Col([
@@ -79,7 +105,7 @@ def layout(name):
             dbc.Col(dcc.Dropdown(
                 id='name-dropdown',
                 options=dropdown_options,
-                value=character_id[0]
+                value=character_id
             ), width={'size': 4 , 'offset': 4})
         ]),
         dbc.Row([
@@ -94,30 +120,11 @@ def layout(name):
             )
         ]),
         dbc.Row([
-            dbc.Col(id='personal-raids-table'),
-        ]),
-    ]
-    return layout
-
-
-@app.callback(
-    Output('personal-raids-table', 'children'),
-    Input('name-dropdown', 'value'),
-)
-def update_raids_table(character):
-    raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
-    print(f'raids_dict: {raids_dict}')
-    raids_df = pd.DataFrame(raids_dict)
-    print(f'raids_df: {raids_df}')
-
-    enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
-    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
-        enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
-
-    table = dash_table.DataTable(
-                id='raids-table',
+            dbc.Col(id='personal-raids-table', children=[
+                dash_table.DataTable(
+                id='pers-raids-table',
                 columns=[{
-                    'name': i,
+                    'name': f'{i}*' if i in ['Healing', 'Barrier'] else i,
                     'id': i,
                     'selectable': True if i not in ['Date', 'Start Time', 'Name'] else False,
                 } for i in enabled_columns],
@@ -148,7 +155,25 @@ def update_raids_table(character):
                     'border-bottom': '1px solid white',
                 },
             )
-    return table
+            ]),
+        ]),
+        dbc.Row(
+            dbc.Col([
+                html.P(children=([f'*The healing and barrier stat will only show values for people that run ', html.A("the healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases", target='_blank')]), id='footnote-heal-barrier', className='text-center sm'),
+                
+            ])
+        )
+    ]
+    return layout
+
+
+@app.callback(
+    Output('pers-raids-table', 'data'),
+    Input('name-dropdown', 'value'),
+)
+def update_raids_table(character):
+    raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
+    return raids_dict
 
 
 @app.callback(
@@ -158,7 +183,7 @@ def update_raids_table(character):
     Output('times-top', 'children'),
     Output('times-top-header', 'children'),
     Input('name-dropdown', 'value'),
-    Input('raids-table', 'selected_columns'),
+    Input('pers-raids-table', 'selected_columns'),
 )
 def update_highest_stats(character, col):
     raids_attended = db.session.query(func.count(PlayerStat.id)).filter_by(character_id=character).first()[0]
@@ -177,9 +202,9 @@ def update_highest_stats(character, col):
 
 @app.callback(
     Output('raids-graph', 'children'),
-    Input('raids-table', 'selected_columns'),
-    Input('raids-table', 'selected_rows'),
-    State('raids-table', 'data'),
+    Input('pers-raids-table', 'selected_columns'),
+    Input('pers-raids-table', 'derived_virtual_selected_rows'),
+    Input('pers-raids-table', 'data'),
 )
 def show_selected_column(col, rows, data):
     print(f'col: {col}'),
@@ -203,13 +228,13 @@ def show_selected_column(col, rows, data):
         min_max = func.max(model_attr)
    
         for raid in df_p['raid_id']:
-            print(f'raid: {raid}')
-            print(f'column: {col[0]}')
             raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
             raid_time = df_p.loc[df_p['raid_id']==raid, 'Start Time'].item()
             raid_date = f'{raid_date} {raid_time}'
             
             df_p.loc[df_p['raid_id']==raid, 'Date'] = raid_date
+            if col[0] == 'Sticky':
+                df_p.loc[df_p['raid_id']==raid, col[0]] = int(df_p.loc[df_p['raid_id']==raid, col[0]].item().split('%')[0])
 
             ### Get Lowest Profession
             bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
@@ -221,7 +246,6 @@ def show_selected_column(col, rows, data):
 
             ### Get Top Profession
             top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
-            print(f'top_prof: {top_prof_value}')
             df_top_prof = pd.DataFrame(
                 [[raid, raid_date, 'First Prof', top_prof_value, profession.color, profession.name, 'none', 'tonextx']],
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
@@ -237,22 +261,19 @@ def show_selected_column(col, rows, data):
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill'])
             df_p = df_p.append(df_top_n.head())
 
-        print(f'Color df_p: {df_p}')
         fig = graphs.get_personal_chart(df_p, col[0])
-        return dcc.Graph(id='personal-graph',figure=fig, style={'height': 500})
+        return dcc.Graph(id='personal-graph',figure=fig, style={'height': 500}, config=config)
 
 
 @app.callback(
     Output('raids-top10', 'children'),
-    Output("raids-table", "style_data_conditional"),
+    Output("pers-raids-table", "style_data_conditional"),
     Input('personal-graph', 'hoverData'),
-    State('raids-table', 'selected_columns'),
-    State('raids-table', 'selected_rows'),
-    State('raids-table', 'data'),)
+    State('pers-raids-table', 'selected_columns'),
+    State('pers-raids-table', 'selected_rows'),
+    State('pers-raids-table', 'data'),)
 def display_hover_data(hoverData, col, rows, data):
-    if hoverData:
-        print(f'col: {col}')
-        
+    if hoverData:        
         masked = True
         if current_user.is_authenticated:
             masked = False
@@ -260,15 +281,24 @@ def display_hover_data(hoverData, col, rows, data):
         raid = hoverData['points'][0]['customdata']
         raid_date = hoverData['points'][0]['x']
         selected_raid = [s for s in rows if data[s]['raid_id']==raid]
-        print(f'selected_RAID: {selected_raid}')
         model = colum_models[col[0]][0]
         model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
         stat_list = db.session.query(model).order_by(-model_attr).join(PlayerStat).join(Raid).filter_by(id = raid).limit(10).all()
         df = pd.DataFrame([s.to_dict(masked) if i > 4 else s.to_dict() for i, s in enumerate(stat_list)])
-        print(df)
         fig = graphs.get_top_bar_chart_p(df, colum_models[col[0]][3], raid_date)
-
         highlight = [{"if": {"row_index":selected_raid[0]}, "backgroundColor": "grey"},]
 
         return dcc.Graph(figure=fig, style=dict(height='500px')), highlight
     raise PreventUpdate
+
+
+@app.callback(
+    Output('pers-raids-table', 'selected_rows'),
+    Input('pers-raids-table', 'data'),
+)
+def select_all_rows(data):
+    if data:
+        rows = [s for s in range(len(data))]
+        print(f'DATA::::{rows}')
+        return rows
+
