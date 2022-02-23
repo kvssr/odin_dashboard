@@ -54,12 +54,14 @@ def layout(name):
     else:
         characters = db.session.query(Character).filter(Character.name.in_(session['CHARACTERS'])).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
                                 .join(Profession).order_by(Profession.name, Character.name).all()
-        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters if s.name in session['CHARACTERS']]
+        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
 
     character_id = 0
     if name != '':
         name = name.split('(')[0].rstrip()
         character_id = db.session.query(Character.id).filter_by(name = name).first()[0]
+    elif 'CHARACTERS' in session:
+        character_id = db.session.query(Character.id).filter_by(name = session['CHARACTERS'][0]).first()[0]
     else:
         character_id = dropdown_options[0]['value']
         print(dropdown_options[0]['value'])
