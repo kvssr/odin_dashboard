@@ -47,7 +47,6 @@ def display_page(pathname):
     elif pathname == '/logout':
         if current_user.is_authenticated:
             logout_user()
-            #view = login.logout
             time.sleep(1)
             url = '/'
         else:
@@ -56,13 +55,15 @@ def display_page(pathname):
     elif pathname.startswith('/details/'):     
         name = pathname.split('/')[-1]
         char = unquote(name.split('(')[0]).rstrip()
-        if current_user.is_authenticated or char in session['CHARACTERS']:
+        if current_user.is_authenticated or ('CHARACTERS' in session and char in session['CHARACTERS']):
             view = personal_details.layout(unquote(name))
+        elif 'CHARACTERS' in session:
+            view = personal_details.layout('')
         else:
             view = 'Redirecting to login...'
             url = '/login'
     elif pathname == '/details':
-        if current_user.is_authenticated  or session['CHARACTERS']:
+        if current_user.is_authenticated or ('CHARACTERS' in session and char in session['CHARACTERS']):
             view = details.layout
         else:
             view = 'Redirecting to login...'
