@@ -67,7 +67,7 @@ logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
 logged_in_menu = dbc.Nav(className='menu', children=[
     dbc.DropdownMenu(
             [dbc.DropdownMenuItem("API Key", href='/api'), 
-            dbc.DropdownMenuItem("Profile")],
+            dbc.DropdownMenuItem("Profile", href='/details/')],
             label="Account",
             caret=False,
             nav=True,
@@ -83,7 +83,7 @@ logged_in_menu = dbc.Nav(className='menu', children=[
 loggin_menu = dbc.Nav(className='menu', children=[
     dbc.DropdownMenu(
             [dbc.DropdownMenuItem("API Key", href='/api'), 
-            dbc.DropdownMenuItem("Profile")],
+            dbc.DropdownMenuItem("Profile", href='/details/')],
             label="Account",
             caret=False,
             nav=True,
@@ -113,11 +113,15 @@ def login_button_click(n_clicks, username, password):
     return '/login', ''
 
 
-@app.callback(Output('user-status-div', 'children'), Output('login-status', 'data'), [Input('url', 'pathname')])
+@app.callback(
+    Output('user-status-div', 'children'), 
+    Output('login-status', 'data'), 
+    [Input('url', 'pathname')]
+    )
 def login_status(url):
     ''' callback to display login/logout link in the header '''
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
-        return logged_in_menu ,current_user.get_id()
+        return logged_in_menu, current_user.get_id()
     else:
         return loggin_menu, 'loggedout'
