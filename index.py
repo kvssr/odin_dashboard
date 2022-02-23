@@ -63,7 +63,7 @@ def display_page(pathname):
             view = 'Redirecting to login...'
             url = '/login'
     elif pathname == '/details':
-        if current_user.is_authenticated or ('CHARACTERS' in session and char in session['CHARACTERS']):
+        if current_user.is_authenticated or 'CHARACTERS' in session:
             view = details.layout
         else:
             view = 'Redirecting to login...'
