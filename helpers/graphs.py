@@ -128,8 +128,8 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0, width=0.8)
     fig = add_annotations_graph(fig, df, t)
-    fig = add_times_top_annotation(fig, df)
-    fig = add_clickable_names(fig, df)
+    #fig = add_times_top_annotation(fig, df)
+    #fig = add_clickable_names(fig, df)
     if detailed:
         fig = add_sorting_options(fig, df, t)
     return fig
@@ -145,6 +145,30 @@ def add_annotations_graph(fig, df, t):
                                xshift=2,
                                xanchor="left",
                                font_size=13,
+            ),
+            text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
+            color='#EEE'
+            if name[0].isdigit():
+                text = name
+                color = 'grey'
+            fig.add_annotation(y=name, x=0,
+                                text=text,
+                                showarrow=False,
+                                yshift=0,
+                                xshift=2,
+                                xanchor="right",
+                                font_size=13,
+                                font_color=color
+            ),
+            fig.add_annotation(y=name, x=0,
+                    text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
+                        + " / " +
+                        str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
+                    showarrow=False,
+                    yshift=0,
+                    xshift=0,
+                    xanchor="left",
+                    font_size=13,
             )
     return fig
 
