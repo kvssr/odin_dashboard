@@ -75,7 +75,8 @@ raid_types = {
     'morning',
     'afternoon',
     'guild',
-    'unknown'
+    'unknown',
+    'reset'
 }
 
 general_layout = {
@@ -372,8 +373,6 @@ def add_sorting_options(fig, df, t):
 def get_personal_chart(df, y):
     fig = go.Figure()
     for name in df['Name'].unique():
-        print(df[df['Name']==name]['Date'])
-        print(df[df['Name']==name][y])
         fig.add_trace(go.Scatter(
             x=df[df['Name']==name]['Date'],
             y=df[df['Name']==name][y],
@@ -410,14 +409,14 @@ def get_personal_chart(df, y):
                     )
                 )),
                 showlegend=True if row['Profession'] not in groups else False,
-                hovertemplate=f'{row[y]:,}',
+                hovertemplate=f'{row[y]:,}' if y != 'Sticky' else f'{row[y]}',
                 customdata=[row['raid_id']],
             ))
             if row['Profession'] not in groups:
                 groups.append(row['Profession']) 
 
     fig.update_layout(
-        title="Raid History",
+        title=f"Raid History - {y}",
         showlegend=True,
         legend=dict(
             title='',
@@ -432,6 +431,7 @@ def get_personal_chart(df, y):
         yaxis_rangemode='tozero',
         xaxis_gridcolor='grey',
         yaxis_gridcolor='grey',
+        yaxis_ticksuffix='%' if y == 'Sticky' else '',
         hovermode='x'
     )
     fig.update_layout(general_layout_line)
