@@ -19,6 +19,12 @@ from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, Dmg
 
 tab_style={'padding': '.5rem 0',
             'cursor': 'pointer'}
+            
+tab_style_admin={'padding': '.5rem 0',
+            'cursor': 'pointer',
+            'display':'block' if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated else 'none'}
+
+
 
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
@@ -38,24 +44,29 @@ layout = html.Div(children=[
                 dbc.Tab(label='Rips', tab_id='rips-tab', label_style=tab_style),
                 dbc.Tab(label='Might', tab_id='might-tab', label_style=tab_style),
                 dbc.Tab(label='Fury', tab_id='fury-tab', label_style=tab_style),
-                dbc.Tab(label='Healing', tab_id='heal-tab', label_style=tab_style),
-                dbc.Tab(label='Barrier', tab_id='barrier-tab', label_style=tab_style),
+                dbc.Tab(label='Healing*', tab_id='heal-tab', label_style=tab_style),
+                dbc.Tab(label='Barrier*', tab_id='barrier-tab', label_style=tab_style),
                 dbc.Tab(label='Cleanses', tab_id='cleanses-tab', label_style=tab_style),
                 dbc.Tab(label='Stability', tab_id='stab-tab', label_style=tab_style),
                 dbc.Tab(label='Protection', tab_id='prot-tab', label_style=tab_style),
                 dbc.Tab(label='Aegis', tab_id='aegis-tab', label_style=tab_style),
                 dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
-                dbc.Tab(label='Damage In', tab_id='dmg_taken-tab', label_style=tab_style),
-                dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style),
+                dbc.Tab(label='Damage In', tab_id='dmg_taken-tab', label_style=tab_style_admin),
+                dbc.Tab(label='Deaths', tab_id='deaths-tab', label_style=tab_style_admin),
                 #dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
-                dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style),
+                dbc.Tab(label='Summary', tab_id='summary-tab', label_style=tab_style_admin),
             ],
                 id='tabs',
                 #active_tab='dmg-tab'
                 class_name='nav-justified flex-nowrap'
                 ),
             dcc.Loading(html.Div(id="tab-content"), color='grey'),
-        ])
+        ]),
+        dbc.Row(
+            dbc.Col(
+                html.P(children=(['*The healing and barrier stat will only show people that run ', html.A("the healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases", target='_blank')]), id='footnote-heal-barrier', className='text-center sm'),
+            )
+        )
     ]),   
     dcc.Store(id='intermediate-value')
 ])
