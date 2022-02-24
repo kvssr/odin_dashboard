@@ -239,7 +239,7 @@ def show_selected_column(col, rows, data):
                 df_p.loc[df_p['raid_id']==raid, col[0]] = int(df_p.loc[df_p['raid_id']==raid, col[0]].item().split('%')[0])
 
             ### Get Lowest Profession
-            bot_prof_value = db.session.query(func.min(model_attr)).filter(model_attr>0).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+            bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
             df_bot_prof = pd.DataFrame(
                 [[raid, raid_date, 'Last Prof', bot_prof_value, profession.color, profession.name, 'lines', 'none']],
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
@@ -247,7 +247,7 @@ def show_selected_column(col, rows, data):
             df_p = df_p.append(df_bot_prof)
 
             ### Get Top Profession
-            top_prof_value = db.session.query(min_max).filter(model_attr>0).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+            top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
             df_top_prof = pd.DataFrame(
                 [[raid, raid_date, 'First Prof', top_prof_value, profession.color, profession.name, 'none', 'tonextx']],
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
