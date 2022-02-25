@@ -2,55 +2,61 @@
     list-style-type: none;
     margin: 0;
     padding: 0;
-  }
-  
+}
+
 .menu .nav-link {
     color: rgb(255, 255, 255);
     padding: 0px 5px;
     text-decoration: none;
-  }
-  
-  /* Change the link color on hover */
+}
+
+
+/* Change the link color on hover */
+
 .menu .nav-link:hover {
     color: rgb(116, 0, 0);
-  }
-
-#login-row{
-  background-color: #212121;
-  border-bottom: rgb(255, 255, 255) solid 1px;
 }
 
-#user-status-div{
-  float: right;
-  padding: 5px;
-  text-align: center;
+#login-row {
+    background-color: #212121;
+    border-bottom: rgb(255, 255, 255) solid 1px;
 }
 
-#login-div{
-  text-align: center;
+#user-status-div {
+    float: right;
+    padding: 5px;
+    text-align: center;
 }
 
-.column-header--select{
-  float: unset !important;
+#login-div {
+    text-align: center;
 }
 
-#api-row{
-  position: absolute;
-  margin-top: 10px;
+.column-header--select {
+    float: unset !important;
 }
 
-#api-col{
-  display: flex;
+#api-row {
+    position: absolute;
+    margin-top: 10px;
 }
 
-#api-container{
-  display: none;
+#api-col {
+    display: flex;
 }
 
-#api-link{
-  cursor: pointer;
+#api-container {
+    display: none;
 }
 
-#character-table table{
-  table-layout: fixed;
+#api-link {
+    cursor: pointer;
+}
+
+#character-table table {
+    table-layout: fixed;
+}
+
+.updatemenu-item-text {
+    pointer-events: none;
 }
