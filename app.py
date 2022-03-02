@@ -13,7 +13,7 @@ external_stylesheets = [dbc.themes.DARKLY]
 
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
-app.title = 'Carrot Awards'
+app.title = 'Records of Valhalla'
 env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
 server.config.from_object(env_config)
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
