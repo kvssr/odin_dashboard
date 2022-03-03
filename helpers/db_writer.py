@@ -1,11 +1,10 @@
 import io
 from threading import Barrier
 from flask_sqlalchemy.model import Model
-from numpy import character, e
 import pandas as pd
 from sqlalchemy.orm import session
 
-from models import AegisStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, KillsStat, MightStat, PlayerStat, Profession, ProtStat, Raid, RaidType, RipStat, StabStat
+from models import Account, AegisStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, KillsStat, MightStat, PlayerStat, Profession, ProtStat, Raid, RaidType, RipStat, StabStat
 from app import db, server
 from helpers import graphs
 
@@ -50,7 +49,7 @@ def write_xls_to_db(xls, name , t):
         write_barrier_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='barrier'), raid_id)
         write_dmg_taken_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='dmg_taken'), raid_id)
         write_deaths_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='deaths'), raid_id)
-        write_kills_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='kills'), raid_id)
+        #write_kills_to_db(pd.read_excel(io.BytesIO(xls), sheet_name='kills'), raid_id)
 
         return "Updated database successfully"
     except Exception as e:
@@ -62,6 +61,9 @@ def write_raid_type_to_db(types):
     counter = 0
     for t in types:
         try:
+            if db.session.query(RaidType).filter_by(name=t).first() is not None:
+                print(f'Character {t} is already in the database')
+                continue            
             raid_type = RaidType()
             raid_type.name = t
             db.session.add(raid_type)
@@ -102,6 +104,9 @@ def write_professions_to_db(profs, colors):
     counter = 0
     for prof, abr in profs.items():
         try:
+            if db.session.query(Profession).filter_by(name=prof).first() is not None:
+                print(f'Character {prof} is already in the database')
+                continue            
             profession = Profession()
             profession.name = prof
             profession.abbreviation = abr
@@ -122,9 +127,23 @@ def write_character_to_db(df):
     counter = 0
     for index, row in df.iterrows():
         try:
+            char = db.session.query(Character).filter_by(name=row['Name']).join(Profession).filter_by(name = row['Profession']).first()
+            account = db.session.query(Account).filter_by(name=row['Account']).first()
+
+            if account is None:
+                account = write_account_to_db(row['Account'])
+
+            if char is not None:
+                print(f'Character {row["Name"]} - {row["Profession"]} is already in the database')
+                if char.account == None:
+                    char.account = account
+                    db.session.commit()
+                    print(f'{char.name} has been linked to {account.name}')
+                continue
             character = Character()
             character.name = row['Name']
             character.profession_id = db.session.query(Profession.id).filter_by(name=row['Profession']).first()[0]
+            character.account = account
             db.session.add(character)
             db.session.commit()
             counter += 1
@@ -135,6 +154,17 @@ def write_character_to_db(df):
         finally:
             db.session.close()
     print(f'Added {counter} new characters to the db')
+
+
+def write_account_to_db(name):
+    try:
+        account = Account()
+        account.name = name
+        db.session.add(account)
+        db.session.commit()
+        return account
+    except Exception as e:
+        print(e)
 
 
 def write_player_stat_to_db(df, raid_id):

@@ -15,8 +15,10 @@ class Character(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String())
     profession_id = db.Column(db.Integer(), db.ForeignKey('profession.id', ondelete="CASCADE"))
+    account_id = db.Column(db.Integer(), db.ForeignKey('account.id', ondelete="CASCADE"))
     
     profession = relationship("Profession", back_populates="characters")
+    account = relationship("Account", back_populates='characters')
     playerstats = relationship("PlayerStat", back_populates="character")
 
 
@@ -673,3 +675,12 @@ class User(UserMixin, db.Model):
 
     def __init__(self, username):
         self.username = username
+
+
+class Account(db.Model):
+    __tablename__ = 'account'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    name = db.Column(db.String(), unique= True)
+
+    characters = relationship("Character", back_populates="account")
