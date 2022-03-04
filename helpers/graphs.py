@@ -66,7 +66,7 @@ profession_shorts = {
     'Engineer': 'Eng',
     'Scrapper': 'Scr',
     'Holosmith': 'Hls',
-    'Mechanist': 'Mch',
+    'Mechanist': 'Mec',
     'Ranger': 'Rgr',
     'Druid': 'Dru',
     'Soulbeast': 'Slb',
