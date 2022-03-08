@@ -164,7 +164,8 @@ def layout(name):
                 html.P(children=([f'*The healing and barrier stat will only show values for people that run ', html.A("the healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases", target='_blank')]), id='footnote-heal-barrier', className='text-center sm'),
                 
             ])
-        )
+        ),
+        dcc.Store(id='hover-store')
     ]
     return layout
 
@@ -263,6 +264,7 @@ def show_selected_column(col, rows, data):
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill'])
             df_p = df_p.append(df_top_n.head())
 
+        
         fig = graphs.get_personal_chart(df_p, col[0])
         return dcc.Graph(id='personal-graph',figure=fig, style={'height': 500}, config=config)
 
@@ -270,19 +272,37 @@ def show_selected_column(col, rows, data):
 @app.callback(
     Output('raids-top10', 'children'),
     Output("pers-raids-table", "style_data_conditional"),
+    Output('hover-store', 'data'),
     Input('personal-graph', 'hoverData'),
-    State('pers-raids-table', 'selected_columns'),
+    Input('pers-raids-table', 'selected_columns'),
+    Input('name-dropdown', 'value'),
     State('pers-raids-table', 'selected_rows'),
-    State('pers-raids-table', 'data'),)
-def display_hover_data(hoverData, col, rows, data):
-    if hoverData:        
+    State('pers-raids-table', 'data'),
+    State('hover-store', 'data'),
+    prevent_initial_call=True)
+def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
+    print(hoverData)
+    print(f'HOVERSTORE: {hoverstore}')
+
+    ctx = dash.callback_context
+
+    if ctx.triggered:
+        if ctx.triggered[0]['prop_id'].split('.')[0] == 'name-dropdown':
+            return None, None, None
+
+    if hoverData or hoverstore:        
         masked = True
         if current_user.is_authenticated:
             masked = False
-
-        raid = hoverData['points'][0]['customdata']
-        raid_date = hoverData['points'][0]['x']
-        selected_raid = [s for s in rows if data[s]['raid_id']==raid]
+        if hoverData:
+            raid = hoverData['points'][0]['customdata']
+            raid_date = hoverData['points'][0]['x']
+            selected_raid = [s for s in rows if data[s]['raid_id']==raid]
+        else:
+            hoverstore = json.loads(hoverstore)
+            raid = hoverstore[0]
+            raid_date = hoverstore[1]
+            selected_raid = hoverstore[2]
         model = colum_models[col[0]][0]
         model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
         show_limit = colum_models[col[0]][4]
@@ -291,7 +311,7 @@ def display_hover_data(hoverData, col, rows, data):
         fig = graphs.get_top_bar_chart_p(df, colum_models[col[0]][3], raid_date)
         highlight = [{"if": {"row_index":selected_raid[0]}, "backgroundColor": "grey"},]
 
-        return dcc.Graph(figure=fig, style=dict(height='500px')), highlight
+        return dcc.Graph(figure=fig, style=dict(height='500px')), highlight, json.dumps([raid, raid_date, selected_raid])
     raise PreventUpdate
 
 
