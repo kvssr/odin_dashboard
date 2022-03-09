@@ -1,11 +1,13 @@
+from datetime import date
 import time
 from dash import dcc, dash
 from dash import html
 from dash.dependencies import Input, Output
-from flask import session
+from flask import request, session
 from flask_login import current_user, logout_user
 import dash_bootstrap_components as dbc
 from urllib.parse import unquote
+import requests
 
 from app import app
 from apps import api_page, personal_details, top_stats, details, login, upload_page
@@ -55,19 +57,19 @@ def display_page(pathname):
     elif pathname.startswith('/details/'):     
         name = pathname.split('/')[-1]
         char = unquote(name.split('(')[0]).rstrip()
-        if current_user.is_authenticated or ('CHARACTERS' in session and char in session['CHARACTERS']):
+        if current_user.is_authenticated or check_valid_guild() and ('CHARACTERS' in session and char in session['CHARACTERS']):
             view = personal_details.layout(unquote(name))
-        elif 'CHARACTERS' in session:
+        elif 'CHARACTERS' in session and check_valid_guild():
             view = personal_details.layout('')
         else:
-            view = 'Redirecting to login...'
-            url = '/login'
+            view = 'Redirecting to api...'
+            url = '/api'
     elif pathname == '/details':
-        if current_user.is_authenticated or 'CHARACTERS' in session:
+        if check_valid_guild() and (current_user.is_authenticated or 'CHARACTERS' in session):
             view = details.layout
         else:
-            view = 'Redirecting to login...'
-            url = '/login'
+            view = 'Redirecting to api...'
+            url = '/api'
     elif pathname == '/upload':
         if current_user.is_authenticated:
             view = upload_page.layout
@@ -75,11 +77,43 @@ def display_page(pathname):
             view = 'Redirecting to login...'
             url = '/login'
     elif pathname == '/':
-        view = top_stats.layout
+        if check_valid_guild():
+            view = top_stats.layout
+        else:
+            view = 'Redirecting to api...'
+            url = '/api'
     else:
         view = top_stats.layout
     # You could also return a 404 "URL not found" page here
     return view, url
+
+
+
+def check_valid_guild():
+    odin = '48B067A2-21A7-4858-8007-4ECA99798EBF'
+    if session:
+        if 'LAST-CHECKED' in session:
+            print(f'dat compare: {date.today()} - {session["LAST-CHECKED"]}')
+            if str(date.today()) == session['LAST-CHECKED']:
+                print('API still valid')
+                return True
+        if 'API-KEY' in session:
+            key = session['API-KEY']
+            headers = {'Authorization': f'Bearer {key}'}
+            request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
+            if request.status_code == 200 or request.status_code == 206:
+                guilds = request.json()['guilds']
+                if odin in guilds:
+                    print('Odin is in guilds. Refreshing api..')
+                    session['LAST-CHECKED'] = str(date.today())
+                    session.permanent = True
+                    return True
+
+    today = date.today()
+    print(f'Today: {today}')
+    print('No account in Odin')
+    return False
+
 
 
 if __name__ == '__main__':
