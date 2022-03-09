@@ -178,7 +178,7 @@ def save_api_key(n, key):
             
             for name in characters:
                 request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
-                if request.status_code == 200:
+                if request.status_code == 200 or request.status_code == 206:
                     prof = request.json()['profession']
                     icon = requests.get(f'https://api.guildwars2.com/v2/professions/{prof}').json()['icon_big']
                     professions.append(f"![{prof}]({icon}){prof}")
