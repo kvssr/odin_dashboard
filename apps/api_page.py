@@ -129,7 +129,7 @@ def show_character_info(msg, del_msg):
                 info['# Raids'].append(0)
                 info['Name'].append(name)
         print(f'info:{info}')
-        df = pd.DataFrame(info).to_dict('records')
+        df = pd.DataFrame(info).sort_values(by=['# Raids'], ascending=False).to_dict('records')
         return df
 
 
