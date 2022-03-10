@@ -27,7 +27,6 @@ tab_style_admin={'padding': '.5rem 0',
 
 layout = html.Div(children=[
     html.Div(id='details-output-data-upload', children=[
-        html.Div(id='summary-table'),
         dbc.Row(id='input-row-top',class_name='input-row', children=[
             dbc.Col([
                 html.Div("Select Raid", style={'text-align': 'center'}),
@@ -37,6 +36,7 @@ layout = html.Div(children=[
                             )
                 ],width={'size': 4, 'offset': 4}),
         ]),
+        html.Div(id='summary-table'),
         html.Div([
             dbc.Tabs([
                 dbc.Tab(label='Damage', tab_id='dmg-tab', label_style=tab_style),
