@@ -65,7 +65,7 @@ def display_page(pathname):
             view = 'Redirecting to api...'
             url = '/api'
     elif pathname == '/details':
-        if check_valid_guild() and (current_user.is_authenticated or 'CHARACTERS' in session):
+        if  current_user.is_authenticated or (check_valid_guild() and 'CHARACTERS' in session):
             view = details.layout
         else:
             view = 'Redirecting to api...'
@@ -77,7 +77,7 @@ def display_page(pathname):
             view = 'Redirecting to login...'
             url = '/login'
     elif pathname == '/':
-        if check_valid_guild():
+        if current_user.is_authenticated or check_valid_guild():
             view = top_stats.layout
         else:
             view = 'Redirecting to api...'
