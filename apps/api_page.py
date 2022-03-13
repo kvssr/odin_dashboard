@@ -20,7 +20,7 @@ layout = dbc.Row([
     dbc.Row(id='api-explain-row', children=[
         dbc.Col([
             html.H1('Add your API Key'),
-            html.P([f'You can create and API Key at https://account.arena.net/applications.',
+            html.P([f'You can create an API Key at ', html.A('https://account.arena.net/applications.',href='https://account.arena.net/applications'),
                 html.Br(),
                 'Make sure you select the characters permission.']
                 ),
