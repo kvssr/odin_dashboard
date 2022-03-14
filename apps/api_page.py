@@ -121,7 +121,7 @@ def show_character_info(msg, del_msg):
             char_id = db.session.query(Character.id).filter_by(name = name).first()
             print(char_id)
             if(char_id):
-                count = db.session.query(func.count(distinct(PlayerStat.raid_id))).filter_by(character_id = char_id[0]).scalar()
+                count = db.session.query(func.count(distinct(PlayerStat.raid_id))).join(Character).filter_by(name = name).scalar()
                 print(count)
                 info['# Raids'].append(count)
                 info['Name'].append(f'[{name}](/details/{urllib.parse.quote(name)})')
