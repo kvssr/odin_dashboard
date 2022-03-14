@@ -61,7 +61,7 @@ def layout(name):
         fullname = name
         name = name.split('(')[0].rstrip()
         if len(fullname.split('(')) > 1:
-            abbr = name.split("(")[1][0:-1]
+            abbr = fullname.split("(")[1][0:-1]
             character_id = db.session.query(Character.id).filter_by(name = name).join(Profession).filter_by(abbreviation=abbr).first()[0]
         else:
             character_id = db.session.query(Character.id).filter_by(name = name).first()[0]
