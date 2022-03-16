@@ -171,3 +171,15 @@ td {
     left: 10%;
     top: 10%;
 }
+
+.centered-col {
+    align: center;
+    text-align: center;
+}
+
+.bordered-img {
+    margin: 10px;
+    border-style: solid;
+    border-color: white;
+    border-width: thin;
+}
