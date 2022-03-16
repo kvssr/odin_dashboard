@@ -1,7 +1,8 @@
 from click import style
-from dash import html, dcc, Output, Input, State
+from dash import html, dcc, Output, Input, State, MATCH, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
+
 
 
 from app import app
@@ -17,14 +18,16 @@ layout = [
                 html.Br(),
                 html.Br(),
                 dbc.Row([
+                    html.Div(id={'type':'larger-img', 'index':1}, style={'z-index': 1}, children='HALLO'),
                     dbc.Col([
                         "First of all, the website will ask you to add an API key with character permissions, so go to your ",
-                        dbc.CardLink("arenanet account", href="https://account.arena.net/applications/create"),
+                        html.A("arenanet account", href="https://account.arena.net/applications/create"),
                         " and create a new API key with account and character permissions. We need those to check your character names and show you your own data. Copy the API key and ",
-                        dbc.CardLink("add it", href="https://records-of-valhalla-staging.herokuapp.com/api"),
+                        html.A("add it", href="https://records-of-valhalla-staging.herokuapp.com/api"),
                         " to the Records of Valhalla. You will then see your account name and a list of your characters. Next to each character, their class and the number of raids they attended is shown. The characters that attended at least one raid are clickable. We will come to that later. You will only need to add your API key once, unless you start playing with a new character. ",
                     ]),
                     dbc.Col(dbc.CardLink(dbc.CardImg(src="assets/API_permissions.png", style={'width': 400, 'margin': 'auto'}), href="assets/API_permissions.png")),
+                    dbc.Col(html.Img(id={'type': 'image', 'index': 1},src="assets/API_permissions.png", style={'width': 400, 'margin': 'auto'})),
                 ],
 #                        justify = "end",
                 align="center",
@@ -128,12 +131,30 @@ layout = [
 
 ]
 
-
-
-
-
-
-
+@app.callback(
+    Output({'type': 'image', 'index': MATCH}, 'style'),
+    Input({'type': 'image', 'index': MATCH}, 'n_clicks'),
+    State({'type': 'image', 'index': MATCH}, 'style'),
+    prevent_initial_call=True
+)
+def enlarge_image_on_click(n, style):
+    newstyle = {
+        'z-index': 1,
+        'position': 'fixed',
+        'left': '25%',
+        'top': '25%',
+        'width': '50%'
+    }
+    oldstyle = {
+        'width': '400',
+        'margin': 'auto'
+    }
+    print(style)
+    if n:
+        if style == oldstyle:
+            return newstyle
+        else:
+            return oldstyle
 
 
 #login = dbc.Row([
