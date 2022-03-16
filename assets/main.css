@@ -152,3 +152,8 @@ td {
 #api-explain-row A:hover{
 	color: rgb(116, 0, 0);
 }
+
+.centered-col{
+    align: center;
+    text-align: center;
+}
