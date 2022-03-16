@@ -10,7 +10,7 @@ from urllib.parse import unquote
 import requests
 
 from app import app
-from apps import api_page, personal_details, top_stats, details, login, upload_page
+from apps import api_page, personal_details, top_stats, details, login, upload_page, howto_page
 
 server = app.server
 
@@ -76,6 +76,8 @@ def display_page(pathname):
         else:
             view = 'Redirecting to login...'
             url = '/login'
+    elif pathname == '/howto':
+        view = howto_page.layout
     elif pathname == '/':
         if current_user.is_authenticated or check_valid_guild():
             view = top_stats.layout
