@@ -157,3 +157,10 @@ td {
     align: center;
     text-align: center;
 }
+
+.bordered-img{
+    margin: 10px;
+    border-style: solid;
+    border-color: white;
+    border-width: thin;
+}
