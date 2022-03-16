@@ -19,7 +19,6 @@ layout = [
                 html.Br(),
                 html.Br(),
                 dbc.Row([
-                    html.Div(id={'type':'larger-img', 'index':1}, style={'z-index': 1}, children='HALLO'),
                     dbc.Col([
                         "First of all, the website will ask you to add an API key with character permissions, so go to your ",
                         html.A("arenanet account", href="https://account.arena.net/applications/create"),
@@ -27,8 +26,7 @@ layout = [
                         html.A("add it", href="https://records-of-valhalla-staging.herokuapp.com/api"),
                         " to the Records of Valhalla. You will then see your account name and a list of your characters. Next to each character, their class and the number of raids they attended is shown. The characters that attended at least one raid are clickable. We will come to that later. You will only need to add your API key once, unless you start playing with a new character. ",
                     ]),
-                    dbc.Col(dbc.CardLink(dbc.CardImg(src="assets/API_permissions.png", style={'width': 400, 'margin': 'auto'}), href="assets/API_permissions.png")),
-                    dbc.Col(html.Img(id={'type': 'image', 'index': 1},src="assets/API_permissions.png", style={'width': 400, 'margin': 'auto'}, className='bordered-img')),
+                    dbc.Col(html.Img(id={'type': 'image', 'index': 1},src="assets/API_permissions.png", style={'width': 400, 'margin': 'auto'}, className='bordered-img'), className="centered-col"),
                 ],
 #                        justify = "end",
                 align="center",
@@ -142,9 +140,9 @@ def enlarge_image_on_click(n, style):
     newstyle = {
         'z-index': 1,
         'position': 'fixed',
-        'left': '25%',
-        'top': '25%',
-        'width': '50%'
+        'left': '20%',
+        'top': '15%',
+        'width': '60%'
     }
     oldstyle = {
         'width': '400',
