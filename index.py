@@ -10,7 +10,7 @@ from urllib.parse import unquote
 import requests
 
 from app import app
-from apps import api_page, personal_details, top_stats, details, login, upload_page
+from apps import api_page, json_page, personal_details, top_stats, details, login, upload_page
 
 server = app.server
 
@@ -40,6 +40,8 @@ def display_page(pathname):
         view = login.login
     elif pathname == '/api':
         view = api_page.layout
+    #elif pathname == '/json':
+        #view = json_page.retrieve_data()
     elif pathname == '/success':
         if current_user.is_authenticated:
             view = login.success
