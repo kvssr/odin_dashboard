@@ -15,9 +15,9 @@ img_size[4] = "60%"
 img_size[5] = "60%"
 img_size[6] = 400
 img_size[7] = "70%"
-img_size[8] = 600
-img_size[9] = 600
-img_size[10] = 200
+img_size[8] = "100%"
+img_size[9] = "100%"
+img_size[10] = "80%"
 img_size[11] = "100%"
 img_size[12] = "80%"
 img_size[13] = "80%"
@@ -52,6 +52,7 @@ layout = [
                 html.Br(),
                 dbc.Row([
                     dbc.Col([
+                        html.H3("API Key"),
                         "First of all, the website will ask you to add an API key with character permissions, so go to your ",
                         html.A("arenanet account", href="https://account.arena.net/applications/create"),
                         " and create a new API key with account and character permissions. We need those to check your character names and show you your own data. Copy the API key and ",
@@ -65,7 +66,7 @@ layout = [
                 ),
 
             dbc.Row([
-                dbc.Col("Next in the menu is the Home page. "),
+                dbc.Col(html.H3("Home page")),
                 dbc.Col(html.Img(id={'type': 'image', 'index': 2}, src="assets/home.png", style={'width': img_size[2]}, className="bordered-img"), className="centered-col"),
             ],
             align="center",),
@@ -89,7 +90,7 @@ layout = [
                     align="center"),
 
             dbc.Row([
-                dbc.Col("Next up are Details. "),
+                dbc.Col(html.H3("Details")),
                 dbc.Col(html.Img(id={'type': 'image', 'index': 6}, src="assets/details.png", style={'width': img_size[6]}, className="bordered-img"), className="centered-col")
             ],
                     align="center"),
@@ -109,19 +110,19 @@ layout = [
                 dbc.Col(html.Img(id={'type': 'image', 'index': 7}, src="assets/sorting_order.png", style={'width': img_size[7]}, className="bordered-img"), className="centered-col")
             ],
                     align="center"),
-
+            dbc.Row(dbc.Col(html.H3("Personal Profile"))),
             dbc.Row(
-                dbc.Col("Now we get to your personal profile. You can get to it either by")
+                dbc.Col("Now we get to your personal profile. You can get to it either by:")
                 ),
             dbc.Row([
-                dbc.Col("clicking on one of your character names on the API page ", className="centered-col"),
-                dbc.Col("or clicking one of your character names in any of the graphs ", className="centered-col"),
-                dbc.Col("or by clicking on your account name and then Profile. ", className="centered-col")
+                dbc.Col("clicking on one of your character names on the API page ", className="centered-col", width={'size': 4}),
+                dbc.Col("or clicking one of your character names in any of the graphs ", className="centered-col", width={'size': 4}),
+                dbc.Col("or by clicking on your account name and then Profile. ", className="centered-col", width={'size': 4})
             ]),
             dbc.Row([
-                dbc.Col(html.Img(id={'type': 'image', 'index': 8}, src="assets/profile_from_api.png", style={'width': img_size[8]}, className="bordered-img"), className="centered-col"),
-                dbc.Col(html.Img(id={'type': 'image', 'index': 9}, src="assets/profile_from_graph.png", style={'width': img_size[9]}, className="bordered-img"), className="centered-col"),
-                dbc.Col(html.Img(id={'type': 'image', 'index': 10}, src="assets/profile_from_prof.png", style={'width': img_size[10]}, className="bordered-img"), className="centered-col"),
+                dbc.Col(html.Img(id={'type': 'image', 'index': 8}, src="assets/profile_from_api.png", style={'width': img_size[8]}, className="bordered-img"), className="centered-col", width={'size': 4}),
+                dbc.Col(html.Img(id={'type': 'image', 'index': 9}, src="assets/profile_from_graph.png", style={'width': img_size[9]}, className="bordered-img"), className="centered-col", width={'size': 4}),
+                dbc.Col(html.Img(id={'type': 'image', 'index': 10}, src="assets/profile_from_prof.png", style={'width': img_size[10]}, className="bordered-img"), className="centered-col", width={'size': 4}),
             ]),
 
             dbc.Row([
@@ -175,7 +176,8 @@ def enlarge_image_on_click(n, style, img_id):
         'position': 'fixed',
         'left': '2.5%',
         'top': img_top_offset[img_id['index']],
-        'width': '95%'
+        'width': '95%',
+        'max-height': '95%'
     }
     oldstyle = {
         'width': img_size[img_id['index']],
