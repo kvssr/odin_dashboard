@@ -97,6 +97,8 @@ loggin_menu = dbc.Nav(className='menu', children=[
             nav=True,
             id='account-dpn',
         ),
+    dbc.NavItem(dbc.NavLink("Home", href='/')),
+    dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.DropdownMenu(
         [dbc.DropdownMenuItem("Howto", href='/howto'),
          ],
@@ -105,8 +107,6 @@ loggin_menu = dbc.Nav(className='menu', children=[
         nav=True,
         id='help',
     ),
-    dbc.NavItem(dbc.NavLink("Home", href='/')),
-    dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.NavItem(dbc.NavLink("Admin", href='/login')),
 ])
 
