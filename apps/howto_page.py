@@ -55,7 +55,7 @@ layout = [
                         "First of all, the website will ask you to add an API key with character permissions, so go to your ",
                         html.A("arenanet account", href="https://account.arena.net/applications/create"),
                         " and create a new API key with account and character permissions. We need those to check your character names and show you your own data. Copy the API key and ",
-                        html.A("add it", href="https://records-of-valhalla-staging.herokuapp.com/api"),
+                        html.A("add it", href="/api"),
                         " to the Records of Valhalla. You will then see your account name and a list of your characters. Next to each character, their class and the number of raids they attended is shown. The characters that attended at least one raid are clickable. We will come to that later. You will only need to add your API key once, unless you start playing with a new character. ",
                     ]),
                     dbc.Col(
