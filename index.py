@@ -40,8 +40,8 @@ def display_page(pathname):
         view = login.login
     elif pathname == '/api':
         view = api_page.layout
-    #elif pathname == '/json':
-        #view = json_page.retrieve_data()
+    elif pathname == '/json':
+        view = json_page.layout
     elif pathname == '/success':
         if current_user.is_authenticated:
             view = login.success

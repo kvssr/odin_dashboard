@@ -22,7 +22,7 @@ td {
     text-align: center;
 }
 
-#upload-data {
+.upload-data {
     width: 100%;
     height: 60px;
     line-height: 60px;
@@ -151,4 +151,25 @@ td {
 
 #api-explain-row A:hover{
 	color: rgb(116, 0, 0);
+}
+
+.logs-table-col-header{
+    background: #212121;
+    border-bottom: #EEE solid 1px;
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+#logs-table{
+    margin: auto;
+}
+
+.logs-table-cell{
+    background-color: #424242;
+    padding: 8px;
+}
+
+#logs-table-header{
+    margin: auto;
 }
