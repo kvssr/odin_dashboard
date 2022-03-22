@@ -1,10 +1,13 @@
 import json
+from typing import final
 import dash_bootstrap_components as dbc
 from flask import request
 from app import app
-from dash import html, dcc, Output, Input, State, MATCH
+from dash import html, dcc, Output, Input, State, MATCH, ALL
 import base64
 import requests
+
+from helpers import db_writer_json
 
 layout = dbc.Row([
     dbc.Row(dbc.Col(id='json-header', children=[html.H1("Add logs")], width={'size': 12}), style={'text-align': 'center'}),
@@ -20,8 +23,10 @@ layout = dbc.Row([
         dbc.Col('Filename', class_name='logs-table-col-header', width={'size': 3}),
         dbc.Col('Size', class_name='logs-table-col-header', width={'size': 1}),
         dbc.Col('Link', class_name='logs-table-col-header', width={'size': 5}),
+        dbc.Col(dbc.Button(id='btn-parse-logs', children='Parse Logs'), width={'size': 3})
     ])),
     dbc.Row(id='logs-table', children=[]),
+    dbc.Row(id='parse-msg', children=[]),
 ])
 
 
@@ -87,15 +92,35 @@ def upload_to_dps_report(filename, id, contents):
     if request.status_code == 200:
         print('Request success!')
         link = request.json()['permalink']
-        # id = request.json()['id']
-        # url = 'http://192.168.2.12:5678/json'
-        # data = {'links': [
-        #     {'href': f'https://dps.report/getJson?id={id}'}
-        # ]}
-        # request = requests.post(url, data=json.dumps(data), headers={'Content-Type': 'application/json'})
-        # if request.status_code == 200:
-        #     print(request.json())
-        # print(request.status_code)
         return html.A(href=link,children=link)
     else:
         return ''
+
+
+@app.callback(
+    Output('parse-msg', 'children'),
+    Input('btn-parse-logs', 'n_clicks'),
+    State({'type': 'link-col', 'index': ALL}, 'children'),
+    prevent_initial_call=True
+)
+def parse_logs(n, rows):
+    print(rows)
+    url = 'http://192.168.2.12:5678/json'
+    links = []
+    for row in rows:
+        link = row['props']['children'].split('/')[-1]
+        links.append({'href': f'https://dps.report/getJson?permalink={link}'})
+
+
+    data = {'links': links}
+
+    r = requests.post(url, data=json.dumps(data), headers={'Content-Type': 'application/json'}, verify=False)
+    
+    print(r.json())
+
+    try:
+        db_writer_json.write_xls_to_db(r.json())
+    except Exception as e:
+        print(e)
+    
+    return 'Added to the database!'
