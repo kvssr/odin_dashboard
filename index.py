@@ -3,7 +3,7 @@ import time
 from dash import dcc, dash
 from dash import html
 from dash.dependencies import Input, Output
-from flask import request, session
+from flask import session
 from flask_login import current_user, logout_user
 import dash_bootstrap_components as dbc
 from urllib.parse import unquote
@@ -14,6 +14,7 @@ from apps import api_page, personal_details, top_stats, details, login, upload_p
 
 server = app.server
 
+# General layout of the website
 app.layout = dbc.Container(id='container', children=[
     dcc.Location(id='url', refresh=False),
     dcc.Location(id='redirect', refresh=True),
@@ -29,7 +30,7 @@ app.layout = dbc.Container(id='container', children=[
     html.Div(id='page-content')
 ])
 
-
+# All the routes from the app
 @app.callback(Output('page-content', 'children'),
               Output('redirect', 'pathname'),
               Input('url', 'pathname'))
@@ -54,7 +55,7 @@ def display_page(pathname):
         else:
             view = login
             url = '/login'
-    elif pathname.startswith('/details/'):     
+    elif pathname.startswith('/details/'):    
         name = pathname.split('/')[-1]
         char = unquote(name.split('(')[0]).rstrip()
         if current_user.is_authenticated or check_valid_guild() and ('CHARACTERS' in session and char in session['CHARACTERS']):
@@ -90,9 +91,9 @@ def display_page(pathname):
     return view, url
 
 
-
+# Checks if the user is in the guild. In this case Odin.
 def check_valid_guild():
-    odin = '48B067A2-21A7-4858-8007-4ECA99798EBF'
+    guild = '48B067A2-21A7-4858-8007-4ECA99798EBF' # Odin
     if session:
         if 'LAST-CHECKED' in session:
             print(f'dat compare: {date.today()} - {session["LAST-CHECKED"]}')
@@ -105,7 +106,7 @@ def check_valid_guild():
             request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
             if request.status_code == 200 or request.status_code == 206:
                 guilds = request.json()['guilds']
-                if odin in guilds:
+                if guild in guilds:
                     print('Odin is in guilds. Refreshing api..')
                     session['LAST-CHECKED'] = str(date.today())
                     session.permanent = True
@@ -117,6 +118,5 @@ def check_valid_guild():
     return False
 
 
-
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=app.server.config['DEBUG'])
