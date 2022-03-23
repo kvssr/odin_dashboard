@@ -19,14 +19,29 @@ layout = dbc.Row([
             multiple=True
         )
         ))),
-    dbc.Row(dbc.Row(id='logs-table-header', children=[
-        dbc.Col('Filename', class_name='logs-table-col-header', width={'size': 3}),
-        dbc.Col('Size', class_name='logs-table-col-header', width={'size': 1}),
-        dbc.Col('Link', class_name='logs-table-col-header', width={'size': 5}),
-        dbc.Col(dbc.Button(id='btn-parse-logs', children='Parse Logs'), width={'size': 3})
-    ])),
-    dbc.Row(id='logs-table', children=[]),
-    dbc.Row(id='parse-msg', children=[]),
+    dbc.Row(id='logs-button-row', children=[
+        dbc.Col(dbc.Button(id='btn-download-log', children='Download-logs'), width={'size': 2, 'offset': 3}),
+        dbc.Col(dbc.Button(id='btn-copy-link', children='Copy links'), width={'size': 2}),
+        dbc.Col(dbc.Button(id='btn-parse-logs', children='Parse Logs'), width={'size': 2}),
+        dcc.Download(id='log-download-json')
+    ]),
+    dbc.Row(children=[
+        dbc.Col(id='logs-table-container', children=[
+            dbc.Row(dbc.Row(id='logs-table-header', children=[
+                dbc.Col('Filename', class_name='logs-table-col-header', width={'size': 4, 'offset': 1}),
+                dbc.Col('Size', class_name='logs-table-col-header', width={'size': 1}),
+                dbc.Col([
+                    'Link', 
+                    dcc.Clipboard(id='clp-links',
+                            style={
+                                'margin-left': '10px'
+                            })
+                    ], class_name='logs-table-col-header', width={'size': 5}, style={'display': 'flex'}),
+            ])),
+            dbc.Row(id='logs-table', children=[]),
+            dbc.Row(id='parse-msg', children=[]),
+        ]),
+    ]),
 ])
 
 
@@ -53,7 +68,7 @@ def show_logs_in_table(filenames, contents):
             size = len(content_bytes)/(1024*1024)   
 
             row = dbc.Row([
-                dbc.Col(id={'type': 'filename-col', 'index': counter}, children=filename, class_name='logs-table-cell', width={'size': 3}),
+                dbc.Col(id={'type': 'filename-col', 'index': counter}, children=filename, class_name='logs-table-cell', width={'size': 4, 'offset': 1}),
                 dbc.Col(id={'type': 'size-col', 'index': counter}, children=[f'{size:.2f} MB'], class_name='logs-table-cell', width={'size': 1}),
                 dbc.Col(dcc.Loading(html.Div(id={'type': 'link-col', 'index': counter}, children=['']), color='grey'), class_name='logs-table-cell', width={'size': 5}),
             ], class_name='logs-table-row')
@@ -124,3 +139,16 @@ def parse_logs(n, rows):
         print(e)
     
     return 'Added to the database!'
+
+
+@app.callback(
+    Output('clp-links', 'content'),
+    Input('clp-links', 'n_clicks'),
+    State({'type': 'link-col', 'index': ALL}, 'children'),
+    prevent_initial_call=True
+)
+def copy_links_to_clipboard(n, links):
+    result = ''
+    for link in links:
+        result += f'{link} \n'
+    return links

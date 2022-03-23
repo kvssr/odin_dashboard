@@ -203,3 +203,8 @@ td {
     border-color: white;
     border-width: thin;
 }
+
+#logs-button-row {
+    text-align: center;
+    padding-bottom: 10px;
+}
