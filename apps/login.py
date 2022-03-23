@@ -1,19 +1,12 @@
-from click import style
 from dash import html, dcc, Output, Input, State
-from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
-from flask import request, session
-import requests
-from requests.auth import HTTPBasicAuth
-
-# Login screen
 from flask_login import login_user, current_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash
 
 from app import app, db
 from models import User
 
-
+# login screen
 login = dbc.Row([
     dcc.Location(id='url_login', refresh=True),
     dbc.Col([
@@ -56,7 +49,6 @@ failed = html.Div([html.Div([html.H2('Log in Failed. Please try again.'),
                              ])
                    ])
 
-
 # Logout
 logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    html.Br(),
@@ -75,22 +67,39 @@ logged_in_menu = dbc.Nav(className='menu', children=[
         ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
+     dbc.DropdownMenu(
+         [dbc.DropdownMenuItem("Howto", href='/howto'),
+          ],
+         label="Help",
+         caret=False,
+         nav=True,
+         id='help',
+     ),
     dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
     dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
 ],
 )
 
-loggin_menu = dbc.Nav(className='menu', children=[
-    dbc.DropdownMenu(
-            [dbc.DropdownMenuItem("API Key", href='/api'), 
-            dbc.DropdownMenuItem("Profile", href='/details/')],
-            label="Account",
-            caret=False,
-            nav=True,
-            id='account-dpn',
-        ),
+login_menu = dbc.Nav(className='menu', children=[
+    dbc.DropdownMenu([
+        dbc.DropdownMenuItem("API Key", href='/api'), 
+        dbc.DropdownMenuItem("Profile", href='/details/')
+        ],
+        label="Account",
+        caret=False,
+        nav=True,
+        id='account-dpn',
+    ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
+    dbc.DropdownMenu([
+        dbc.DropdownMenuItem("Howto", href='/howto'),
+        ],
+        label="Help",
+        caret=False,
+        nav=True,
+        id='help',
+    ),
     dbc.NavItem(dbc.NavLink("Admin", href='/login')),
 ])
 
@@ -124,4 +133,4 @@ def login_status(url):
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
         return logged_in_menu, current_user.get_id()
     else:
-        return loggin_menu, 'loggedout'
+        return login_menu, 'loggedout'
