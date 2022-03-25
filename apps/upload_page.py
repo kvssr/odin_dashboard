@@ -1,5 +1,6 @@
 import base64
 import io
+import json
 from pydoc import classname
 from dash import dash_table
 from dash.dependencies import Input, Output, State
@@ -7,7 +8,7 @@ from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
 from sqlalchemy.sql.elements import Null
-from helpers import db_writer, graphs
+from helpers import db_writer, db_writer_json, graphs
 
 import pandas as pd
 from app import app, db
@@ -132,12 +133,20 @@ def confirm_delete_row(submit_n_clicks, rows, data):
 
 
 @app.callback(Output('raid-summary', 'children'),
-            Input('temp-data', 'data'))
-def show_fights_summary_table(content):
+            Input('temp-data', 'data'),
+            State('upload-file', 'filename')
+            )
+def show_fights_summary_table(content, filename):
     if content:
         decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
-        return ["File Summary",dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True, class_name='tableFixHead table table-striped table-bordered table-hover')]
+        print(filename)
+        if filename.split('.')[1] == 'json':
+            file = json.loads(decoded.decode('utf8').replace("'", '"'))
+            df = pd.DataFrame(file['overall_raid_stats'], index=[0])
+            return ["File Summary",dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, class_name='tableFixHead table table-striped table-bordered table-hover')]
+        elif filename.split('.')[1] in ['xls', 'csv', 'xlsx']:
+            df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
+            return ["File Summary",dbc.Table.from_dataframe(df_fights, striped=True, bordered=True, hover=True, class_name='tableFixHead table table-striped table-bordered table-hover')]
 
 
 @app.callback(
@@ -147,18 +156,27 @@ def show_fights_summary_table(content):
     [State('temp-data', 'data'),
     State('raid-name-input', 'value'),
     State('raid-type-dropdown', 'value'),
+    State('upload-file', 'filename')
     ]
 )
-def on_save_click(n, content, name, t):
+def on_save_click(n, content, name, t, filename):
     db_msg = ''
     if n and content:
         decoded = base64.b64decode(content)
-        df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
-        raid = db_writer.check_if_raid_exists(df_fights['Date'].values[0], df_fights['Start Time'].values[0])
-        if raid:
-            return raid.id, True
-        db_msg = db_writer.write_xls_to_db(decoded, name, t)
-        return db_msg, False
+        if filename.split('.')[1] == 'json':
+            file = json.loads(decoded.decode('utf8').replace("'", '"'))
+            raid = db_writer_json.check_if_raid_exists(file['overall_raid_stats']['date'], file['overall_raid_stats']['start_time'])
+            if raid:
+                return raid.id, True
+            db_msg = db_writer_json.write_xls_to_db(file, name, t)
+            return db_msg, False
+        elif filename.split('.')[1] in ['xls', 'csv', 'xlsx']:
+            df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
+            raid = db_writer.check_if_raid_exists(df_fights['Date'].values[0], df_fights['Start Time'].values[0])
+            if raid:
+                return raid.id, True
+            db_msg = db_writer.write_xls_to_db(decoded, name, t)
+            return db_msg, False
     return content, False
 
 
@@ -167,10 +185,16 @@ def on_save_click(n, content, name, t):
               State('temp-raid', 'data'),
               State('temp-data', 'data'),
               State('raid-name-input', 'value'),
-              State('raid-type-dropdown', 'value'),)
-def update_output(submit_n_clicks, raid, xls, name, t):
+              State('raid-type-dropdown', 'value'),
+              State('upload-file', 'filename')
+              )
+def update_output(submit_n_clicks, raid, data, name, t, filename):
     if submit_n_clicks:
         db_writer.delete_raid(raid)
-        decoded = base64.b64decode(xls)
-        db_writer.write_xls_to_db(decoded, name, t)
+        decoded = base64.b64decode(data)
+        if filename.split('.')[1] == 'json':
+            file = json.loads(decoded.decode('utf8').replace("'", '"'))
+            db_writer_json.write_xls_to_db(file, name, t)
+        elif filename.split('.')[1] in ['xls', 'csv', 'xlsx']:
+            db_writer.write_xls_to_db(decoded, name, t)
         return f'Overwriting raid {raid}'

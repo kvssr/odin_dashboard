@@ -37,7 +37,7 @@ def write_xls_to_db(json_file, name = '' , t = 1):
         print(raid_exists)
         if raid_exists:
             print('The Database is up-to-date')
-            return "The Database is up-to-date"
+            #return "The Database is up-to-date"
     except Exception as e:
         print('Cant check date')
         print(e)
@@ -288,7 +288,6 @@ def write_stats_to_db(json_file, player_id, stat_model, json_stat):
     try:
         stat = stat_model()
         total_stat = setattr(stat, f'total_{json_stat}', json_file['total_stats'][json_stat])
-        print(f'stat: {total_stat}')
         if json_stat != 'deaths':
             setattr(stat, f'avg_{json_stat}_s', json_file['average_stats'][json_stat])
         else:
