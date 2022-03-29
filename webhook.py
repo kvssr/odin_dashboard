@@ -4,7 +4,9 @@ import json
 from helpers import db_writer_json
 
 def post_data():
-    url = 'http://192.168.2.12:5678/json'
+    #url = 'http://192.168.2.12:5678/json'
+    #url = 'http://192.168.2.12:5321/json'
+    url = 'http://cards2d.ddns.net:5321/json'
 
     data = {'links': [
         {'href': 'https://dps.report/getJson?permalink=mJPQ-20220317-212153_wvw'},
@@ -29,5 +31,5 @@ def send_json_to_writer():
         db_writer_json.write_xls_to_db(json.load(file))
 
 
-#post_data()
-send_json_to_writer()
+post_data()
+#send_json_to_writer()
