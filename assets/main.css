@@ -208,3 +208,16 @@ td {
     text-align: center;
     padding-bottom: 10px;
 }
+
+#log-output-bk {
+	white-space: pre-wrap;
+	height: 100px;
+	overflow: auto;
+	font-size: small;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+#log-output {
+    text-align: center;
+}

@@ -26,9 +26,23 @@ stats = {
 
 def write_xls_to_db(json_file, name = '' , t = 1):
     json_fights = json_file['fights']
+
+    start_time_utc = datetime.strptime(json_file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
+    start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
+
+    end_time_utc = datetime.strptime(json_file['overall_raid_stats']['end_time'], '%H:%M:%S %z')
+    end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
+
+    #json_fight_date = date_time_cet.date()
+    json_raid_start_time = start_time_cet.timetz()
+    json_raid_end_time = end_time_cet.timetz()
+
+    print(f'start time: {json_raid_start_time}')
+    print(f'end time: {json_raid_end_time}')
+
     json_fight_date = json_file['overall_raid_stats']['date']
-    json_raid_start_time = json_file['overall_raid_stats']['start_time']
-    json_raid_end_time = json_file['overall_raid_stats']['end_time']
+    #json_raid_start_time = json_file['overall_raid_stats']['start_time']
+    #json_raid_end_time = json_file['overall_raid_stats']['end_time']
 
     try:
         raids = db.session.query(Raid.id).filter_by(raid_date=json_fight_date)
@@ -36,8 +50,8 @@ def write_xls_to_db(json_file, name = '' , t = 1):
         raid_exists = db.session.query(FightSummary).filter(FightSummary.raid_id.in_(raids)).filter_by(start_time=json_raid_start_time).first()
         print(raid_exists)
         if raid_exists:
-            print('The Database is up-to-date')
-            #return "The Database is up-to-date"
+            print('Raid is already in the database')
+            return "Raid is already in the database"
     except Exception as e:
         print('Cant check date')
         print(e)
@@ -58,7 +72,7 @@ def write_xls_to_db(json_file, name = '' , t = 1):
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid_id).first()[0]
             for stat in stats:
                 write_stats_to_db(player, player_id, stats[stat], stat)
-
+        print('Updated database succesfully')
         return "Updated database successfully"
     except Exception as e:
         print(e)
@@ -204,13 +218,13 @@ def write_fights_to_db(fights, raid_id):
     for fight_row in fights:
         try:
             date_time_utc = datetime.strptime(fight_row['start_time'], '%Y-%m-%d %H:%M:%S %z')
-            date_time_cet = date_time_utc.astimezone(pytz.timezone("Europe/Amsterdam"))
+            date_time_cet = date_time_utc.astimezone(pytz.timezone("CET"))
 
             json_fight_date = date_time_cet.date()
             json_fight_start_time = date_time_cet.timetz()
 
             date_time_utc = datetime.strptime(fight_row['end_time'], '%Y-%m-%d %H:%M:%S %z')
-            date_time_end_cet = date_time_utc.astimezone(pytz.timezone("Europe/Amsterdam"))
+            date_time_end_cet = date_time_utc.astimezone(pytz.timezone("CET"))
             json_fight_end_time = date_time_end_cet.timetz()
 
             fight = Fight()

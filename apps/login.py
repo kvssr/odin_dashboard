@@ -75,7 +75,15 @@ logged_in_menu = dbc.Nav(className='menu', children=[
          nav=True,
          id='help',
      ),
-    dbc.NavItem(dbc.NavLink("Upload", href='/upload')),
+    dbc.DropdownMenu([
+        dbc.DropdownMenuItem("Overview", href='/upload'), 
+        dbc.DropdownMenuItem("Logs", href='/json')
+        ],
+        label="Upload",
+        caret=False,
+        nav=True,
+        id='upload-dpn',
+    ),
     dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
 ],
 )

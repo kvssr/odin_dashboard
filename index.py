@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 import time
 from dash import dcc, dash
 from dash import html

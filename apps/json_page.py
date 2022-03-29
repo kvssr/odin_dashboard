@@ -1,13 +1,13 @@
 import json
-from typing import final
 import dash_bootstrap_components as dbc
-from flask import request
+import pandas as pd
 from app import app
 from dash import html, dcc, Output, Input, State, MATCH, ALL
 import base64
 import requests
 
 from helpers import db_writer_json
+from dash.exceptions import PreventUpdate
 
 layout = dbc.Row([
     dbc.Row(dbc.Col(id='json-header', children=[html.H1("Add logs")], width={'size': 12}), style={'text-align': 'center'}),
@@ -20,10 +20,20 @@ layout = dbc.Row([
         )
         ))),
     dbc.Row(id='logs-button-row', children=[
-        dbc.Col(dbc.Button(id='btn-download-log', children='Download-logs'), width={'size': 2, 'offset': 3}),
-        dbc.Col(dbc.Button(id='btn-copy-link', children='Copy links'), width={'size': 2}),
-        dbc.Col(dbc.Button(id='btn-parse-logs', children='Parse Logs'), width={'size': 2}),
-        dcc.Download(id='log-download-json')
+        dbc.Col(dbc.Button(id='btn-parse-logs', children='Parse Logs'), width={'size': 2, 'offset': 3}),
+        dbc.Col(dbc.Button(id='btn-download-log', children='Download Logs', disabled=True), width={'size': 2}),
+        dbc.Col(dbc.Button(id='btn-save-db-log', children='Save to db', disabled=True), width={'size': 2}),
+        dcc.Download(id='log-download-json'),
+        dcc.Loading(dcc.Store(id='log-store'), color='grey')
+    ]),
+        dbc.Row(id='logs-button-row-2', children=[
+        dbc.Col(id='log-output'),
+        dcc.Interval(id='logs-interval', interval=1000, n_intervals=0, disabled=True),
+        dcc.Store(id='task-id-store'),
+        dcc.Store(id='task-status-store'),
+    ]),
+    dbc.Row(id='logs_summary-row', children=[
+        dbc.Col(dcc.Loading(id='logs-summary-col', color='grey'))
     ]),
     dbc.Row(children=[
         dbc.Col(id='logs-table-container', children=[
@@ -40,9 +50,47 @@ layout = dbc.Row([
             ])),
             dbc.Row(id='logs-table', children=[]),
             dbc.Row(id='parse-msg', children=[]),
+            dbc.Row(id='save-log-msg', children=[]),
         ]),
     ]),
 ])
+
+
+@app.callback(
+    Output('log-output', 'children'),
+    Input('task-status-store', 'data'),
+    prevent_initial_call=True
+)
+def show_task_status(data):
+    data = json.loads(data)
+    if data:
+        return f'Status: {data["status"]} || {data["current"]}/{data["total"]}'
+
+
+@app.callback(
+    Output('task-status-store', 'data'),
+    Input('logs-interval', 'n_intervals'),
+    State('task-id-store', 'data'),
+    prevent_initial_call=True
+)
+def get_task_status(n, task_url):
+    request = requests.get(task_url)
+    return json.dumps(request.json())
+
+
+@app.callback(
+    Output('logs-interval', 'disabled'),
+    Input('btn-parse-logs', 'n_clicks'),
+    Input('task-status-store', 'data'),
+    prevent_initial_call=True
+)
+def toggle_interval(n, data):
+    if data == None:
+        return False
+    output = json.loads(data)
+    print(output)
+    if 'result' in output:
+        return True
 
 
 @app.callback(
@@ -57,7 +105,7 @@ def show_logs_in_table(filenames, contents):
         if extension not in ['zevtc', 'evtc']:
             print('No .zevtc file')
             return
-
+        filenames.sort()
         table = []
 
         counter = 0
@@ -113,14 +161,15 @@ def upload_to_dps_report(filename, id, contents):
 
 
 @app.callback(
-    Output('parse-msg', 'children'),
+    Output('task-id-store', 'data'),
     Input('btn-parse-logs', 'n_clicks'),
     State({'type': 'link-col', 'index': ALL}, 'children'),
     prevent_initial_call=True
 )
 def parse_logs(n, rows):
     print(rows)
-    url = 'http://192.168.2.12:5678/json'
+    url = 'http://cards2d.ddns.net:5321/json'
+    #url = 'http://127.0.0.1:5000/json'
     links = []
     for row in rows:
         link = row['props']['children'].split('/')[-1]
@@ -128,17 +177,14 @@ def parse_logs(n, rows):
 
 
     data = {'links': links}
+    print(data)
 
     r = requests.post(url, data=json.dumps(data), headers={'Content-Type': 'application/json'}, verify=False)
     
     print(r.json())
+    print(r.headers['Location'])
+    return r.headers['Location']
 
-    try:
-        db_writer_json.write_xls_to_db(r.json())
-    except Exception as e:
-        print(e)
-    
-    return 'Added to the database!'
 
 
 @app.callback(
@@ -150,5 +196,47 @@ def parse_logs(n, rows):
 def copy_links_to_clipboard(n, links):
     result = ''
     for link in links:
-        result += f'{link} \n'
-    return links
+        result += f'{link["props"]["href"]} \n'
+    return result
+
+
+@app.callback(
+    Output('log-download-json', 'data'),
+    Input('btn-download-log', 'n_clicks'),
+    State('task-status-store', 'data'),
+    prevent_initial_call=True
+)
+def download_log_as_json(n, data):
+    data = json.loads(data)['result']
+    return dict(content=json.dumps(data, indent=4), filename=f'raid_log_{data["overall_raid_stats"]["date"]}_{data["overall_raid_stats"]["start_time"]}.json')
+
+
+@app.callback(
+    Output('logs-summary-col', 'children'),
+    Output('btn-download-log', 'disabled'),
+    Output('btn-save-db-log', 'disabled'),
+    Input('task-status-store', 'data'),
+    prevent_initial_call=True    
+)
+def show_logs_summary(data):
+    data = json.loads(data)
+    if 'result' in data:
+        data = data['result']
+        df = pd.DataFrame(data['overall_raid_stats'], index=[0])
+        return dbc.Table.from_dataframe(df, striped=True, bordered=True, hover=True, class_name='tableFixHead table table-striped table-bordered table-hover'), False, False
+    raise PreventUpdate
+
+
+@app.callback(
+    Output('save-log-msg', 'children'),
+    Input('btn-save-db-log', 'n_clicks'),
+    State('task-status-store', 'data'),
+    prevent_initial_call=True 
+)
+def save_logs_to_db(n, data):
+    try:
+        data = json.loads(data)['result']
+        db_writer_json.write_xls_to_db(data)
+    except Exception as e:
+        print(e)  
+    return 'Added to the database!'
