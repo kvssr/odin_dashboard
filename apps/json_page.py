@@ -37,6 +37,7 @@ layout = dbc.Row([
     ]),
     dbc.Row(children=[
         dbc.Col(id='logs-table-container', children=[
+            dbc.Row(dcc.Loading(dbc.Col(id='save-log-msg', children=[]), color='grey')),
             dbc.Row(dbc.Row(id='logs-table-header', children=[
                 dbc.Col('Filename', class_name='logs-table-col-header', width={'size': 4, 'offset': 1}),
                 dbc.Col('Size', class_name='logs-table-col-header', width={'size': 1}),
@@ -50,7 +51,6 @@ layout = dbc.Row([
             ])),
             dbc.Row(id='logs-table', children=[]),
             dbc.Row(id='parse-msg', children=[]),
-            dbc.Row(id='save-log-msg', children=[]),
         ]),
     ]),
 ])
