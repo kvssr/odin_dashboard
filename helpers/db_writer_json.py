@@ -34,8 +34,8 @@ def write_xls_to_db(json_file, name = '' , t = 1):
     end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
 
     #json_fight_date = date_time_cet.date()
-    json_raid_start_time = start_time_cet.timetz()
-    json_raid_end_time = end_time_cet.timetz()
+    json_raid_start_time = str(start_time_cet.timetz())
+    json_raid_end_time = str(end_time_cet.timetz())
 
     print(f'start time: {json_raid_start_time}')
     print(f'end time: {json_raid_end_time}')
@@ -221,11 +221,11 @@ def write_fights_to_db(fights, raid_id):
             date_time_cet = date_time_utc.astimezone(pytz.timezone("CET"))
 
             json_fight_date = date_time_cet.date()
-            json_fight_start_time = date_time_cet.timetz()
+            json_fight_start_time = str(date_time_cet.timetz())
 
             date_time_utc = datetime.strptime(fight_row['end_time'], '%Y-%m-%d %H:%M:%S %z')
             date_time_end_cet = date_time_utc.astimezone(pytz.timezone("CET"))
-            json_fight_end_time = date_time_end_cet.timetz()
+            json_fight_end_time = str(date_time_end_cet.timetz())
 
             fight = Fight()
             fight.raid_id = raid_id

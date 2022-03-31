@@ -1,4 +1,5 @@
 import base64
+from datetime import datetime
 import io
 import json
 from pydoc import classname
@@ -7,6 +8,7 @@ from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
+import pytz
 from sqlalchemy.sql.elements import Null
 from helpers import db_writer, db_writer_json, graphs
 
@@ -165,7 +167,11 @@ def on_save_click(n, content, name, t, filename):
         decoded = base64.b64decode(content)
         if filename.split('.')[1] == 'json':
             file = json.loads(decoded.decode('utf8').replace("'", '"'))
-            raid = db_writer_json.check_if_raid_exists(file['overall_raid_stats']['date'], file['overall_raid_stats']['start_time'])
+
+            start_time_utc = datetime.strptime(file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
+            start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
+            str_raid_start_time = str(start_time_cet.timetz())
+            raid = db_writer_json.check_if_raid_exists(file['overall_raid_stats']['date'], str_raid_start_time)
             if raid:
                 return raid.id, True
             db_msg = db_writer_json.write_xls_to_db(file, name, t)
