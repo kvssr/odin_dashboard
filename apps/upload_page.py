@@ -168,9 +168,10 @@ def on_save_click(n, content, name, t, filename):
         if filename.split('.')[1] == 'json':
             file = json.loads(decoded.decode('utf8').replace("'", '"'))
 
-            start_time_utc = datetime.strptime(file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
-            start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
-            str_raid_start_time = str(start_time_cet.timetz())
+            #start_time_utc = datetime.strptime(file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
+            #start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
+            #str_raid_start_time = str(start_time_cet.timetz())
+            str_raid_start_time = file['overall_raid_stats']['start_time']
             raid = db_writer_json.check_if_raid_exists(file['overall_raid_stats']['date'], str_raid_start_time)
             if raid:
                 return raid.id, True

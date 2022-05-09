@@ -27,15 +27,17 @@ stats = {
 def write_xls_to_db(json_file, name = '' , t = 1):
     json_fights = json_file['fights']
 
-    start_time_utc = datetime.strptime(json_file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
-    start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
+    #start_time_utc = datetime.strptime(json_file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
+    #start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
 
-    end_time_utc = datetime.strptime(json_file['overall_raid_stats']['end_time'], '%H:%M:%S %z')
-    end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
+    #end_time_utc = datetime.strptime(json_file['overall_raid_stats']['end_time'], '%H:%M:%S %z')
+    #end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
 
     #json_fight_date = date_time_cet.date()
-    json_raid_start_time = str(start_time_cet.timetz())
-    json_raid_end_time = str(end_time_cet.timetz())
+    #json_raid_start_time = str(start_time_cet.timetz())
+    json_raid_start_time = json_file['overall_raid_stats']['start_time']
+    #json_raid_end_time = str(end_time_cet.timetz())
+    json_raid_end_time = json_file['overall_raid_stats']['end_time']
 
     print(f'start time: {json_raid_start_time}')
     print(f'end time: {json_raid_end_time}')
@@ -196,6 +198,11 @@ def write_player_stat_to_db(players, raid_id):
         try:
             player_stat = PlayerStat()
             player_stat.raid_id = raid_id
+
+            for fight in player['stats_per_fight']:
+                if 'group' in fight:
+                    player_stat.party = fight['group']
+                    break
             professionId = db.session.query(Profession.id).filter_by(name=player['profession']).first()[0]
             player_stat.character_id = db.session.query(Character.id).filter_by(name=player['name'], profession_id=professionId).first()[0]
             player_stat.attendance_count = player['num_fights_present']

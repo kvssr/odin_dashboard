@@ -6,7 +6,6 @@ from flask_login import UserMixin, current_user
 
 
 class Character(db.Model):
-
     __tablename__ = 'character'
     __table_args__ = (
         db.UniqueConstraint('name', 'profession_id', name='name_profession_idx'),
@@ -56,6 +55,7 @@ class PlayerStat(db.Model):
     character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete="CASCADE"))
     attendance_count = db.Column(db.Integer())
     attendance_duration = db.Column(db.Integer())
+    party = db.Column(db.Integer())
 
     raid = relationship("Raid", back_populates="playerstats")
     character = relationship("Character", back_populates="playerstats")
