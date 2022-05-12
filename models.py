@@ -1,5 +1,6 @@
 from datetime import datetime
 from flask import session
+from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from app import db
 from flask_login import UserMixin, current_user
@@ -684,3 +685,16 @@ class Account(db.Model):
     name = db.Column(db.String(), unique= True)
 
     characters = relationship("Character", back_populates="account")
+    logs = relationship("Log", back_populates="account")
+
+
+class Log(db.Model):
+
+    __tablename__ = 'log'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    log_date = db.Column(db.Date())
+    account_id = db.Column(db.Integer(), db.ForeignKey("account.id", ondelete="SET NULL"))
+
+    account = relationship("Account", back_populates="logs")
+
