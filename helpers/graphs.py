@@ -1,4 +1,6 @@
 from __future__ import annotations
+from pydoc import classname
+from turtle import bgcolor
 import pandas as pd
 from pandas.core.frame import DataFrame
 import plotly.express as px
@@ -503,3 +505,36 @@ def get_top_bar_chart_p(df, x, date):
     fig = add_clickable_names(fig, df)
     return fig
 
+def get_logs_line_chart(df):
+    fig = px.line(df, x='Date', y='Number', title='Number of unique visits per day')
+    fig.update_layout(general_layout_line)
+    fig.update_xaxes(
+        rangeslider_visible=True,
+        rangeselector=dict(
+            buttons=list([
+                dict(count=7, label="1w", step="day", stepmode="backward"),
+                dict(count=1, label="1m", step="month", stepmode="backward"),
+                dict(count=6, label="6m", step="month", stepmode="backward"),
+                dict(count=1, label="YTD", step="year", stepmode="todate"),
+                dict(count=1, label="1y", step="year", stepmode="backward"),
+                dict(step="all")
+            ]),
+            bgcolor='#212121',
+            activecolor='#939393'
+            
+        ),
+        tickformatstops = [
+            dict(dtickrange=[None, 604800000], value="%e. %b d"),
+            dict(dtickrange=[604800000, "M1"], value="%e. %b w"),
+            dict(dtickrange=["M1", "M12"], value="%b '%y M"),
+            dict(dtickrange=["M12", None], value="%Y Y")
+        ]
+    )
+    fig.update_layout(
+        yaxis_showline=True,
+        yaxis_rangemode='tozero',
+        xaxis_gridcolor='grey',
+        yaxis_gridcolor='grey'
+    )
+    
+    return fig

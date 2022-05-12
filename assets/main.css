@@ -210,14 +210,54 @@ td {
 }
 
 #log-output-bk {
-	white-space: pre-wrap;
-	height: 100px;
-	overflow: auto;
-	font-size: small;
+    white-space: pre-wrap;
+    height: 100px;
+    overflow: auto;
+    font-size: small;
     display: flex;
     flex-direction: column-reverse;
 }
 
 #log-output {
     text-align: center;
+}
+
+#user-logs-container {
+    width: 80%;
+    margin: auto;
+}
+
+.table-header {
+    background: #212121;
+    border-bottom: #EEE solid 1px;
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.table-title {
+    font-size: 25px;
+    text-align: center;
+}
+
+.logs-table {
+    margin: 4px;
+}
+
+.table-row {
+    padding: 4px;
+    text-align: justify;
+}
+
+.table-row:hover {
+    background-color: #939393;
+    cursor: pointer;
+}
+
+.left-table-header {
+    background: #212121;
+    border-right: #EEE solid 1px;
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
 }

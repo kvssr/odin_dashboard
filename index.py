@@ -9,8 +9,9 @@ import dash_bootstrap_components as dbc
 from urllib.parse import unquote
 import requests
 
-from app import app
-from apps import api_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page
+from app import app, db
+from apps import api_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
+from models import Account, Log
 
 server = app.server
 
@@ -79,6 +80,12 @@ def display_page(pathname):
         else:
             view = 'Redirecting to login...'
             url = '/login'
+    elif pathname == '/logs':
+        if current_user.is_authenticated:
+            view = user_logs_page.layout()
+        else:
+            view = 'Redirecting to login...'
+            url = '/login'
     elif pathname == '/howto':
         view = howto_page.layout
     elif pathname == '/':
@@ -112,6 +119,19 @@ def check_valid_guild():
                     print('Odin is in guilds. Refreshing api..')
                     session['LAST-CHECKED'] = str(date.today())
                     session.permanent = True
+                    name = request.json()['name']
+                    account_id = db.session.query(Account.id).filter_by(name = name).first()
+                    if account_id is None:
+                        account = Account(name=name)
+                        db.session.add(account)
+                        db.session.commit()
+                        account_id = account.id
+                    else:
+                        account_id = account_id[0]
+                    log = Log(account_id=account_id, log_date=date.today())
+                    print(f'account: {log.account_id} - date: {log.log_date}')
+                    db.session.add(log)
+                    db.session.commit()                    
                     return True
 
     today = date.today()
