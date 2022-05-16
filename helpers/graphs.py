@@ -1,8 +1,4 @@
 from __future__ import annotations
-from pydoc import classname
-from turtle import bgcolor
-import pandas as pd
-from pandas.core.frame import DataFrame
 import plotly.express as px
 import plotly.graph_objects as go
 
