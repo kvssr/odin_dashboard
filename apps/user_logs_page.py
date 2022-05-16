@@ -1,10 +1,12 @@
 import datetime
+import json
 import dash_bootstrap_components as dbc
 import plotly.express as px
 from sqlalchemy import func
 import pandas as pd
 from app import app, db
 from dash import html, dcc, Output, Input, State, MATCH, ALL, dash_table
+import dash
 
 from dash.exceptions import PreventUpdate
 from helpers.graphs import get_logs_line_chart
@@ -14,7 +16,7 @@ from models import Account, Log
 def layout():
     logs = db.session.query(Log.log_date, func.count(Log.id)).group_by(Log.log_date).order_by(Log.log_date).all()
     df_logs = pd.DataFrame(logs, columns=['Date', 'Number'])
-    print(df_logs)
+    #print(df_logs)
     fig = get_logs_line_chart(df_logs)
 
     accounts = db.session.query(Account).order_by(Account.name).all()
@@ -45,7 +47,7 @@ def layout():
 def show_graph_selection_in_table(data):
     if not data:
         raise PreventUpdate
-    print(data)
+    #print(data)
     grouped_logs_week = ''
     if 'xaxis.range[0]' in data:
         print(datetime.datetime.strptime(data['xaxis.range[0]'], '%Y-%m-%d'))
@@ -64,7 +66,8 @@ def show_graph_selection_in_table(data):
     df_top_logs_week = pd.DataFrame(top_logs_week, columns=['Account', 'Number'])
     df_bot_logs_week = pd.DataFrame(bot_logs_week, columns=['Account', 'Number'])
 
-    print(df_top_logs_week)
+    #print(df_top_logs_week)
+    #return get_data_table(df_top_logs_week, 'Top # Visits'), get_data_table(df_bot_logs_week, 'Bottom # Visits')
     return get_table(df_top_logs_week, 'Top # Visits'), get_table(df_bot_logs_week, 'Bottom # Visits')
     
 
@@ -129,11 +132,28 @@ def get_table(df, name):
             dbc.Col("Number"),
         ],
         class_name='table-header')]+
-        [dbc.Row(children=[
+        [html.Div(id={'type': 'log-row', 'index': account['Account']},children=dbc.Row(children=[
             dbc.Col(account['Account']),
             dbc.Col(account['Number']),
         ],
-        class_name='table-row') for i, account in df.iterrows()]
+        class_name='table-row')) for i, account in df.iterrows()]
     )
     
     return table
+
+
+@app.callback(
+    Output('log-search-account', 'value'),
+    Input({'type': 'log-row', 'index': ALL}, 'n_clicks'),
+    State({'type': 'log-row', 'index': ALL}, 'value'),
+    prevent_initial_call=True
+)
+def click_table_row(n, value):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        name = 'No clicks yet'
+    elif len(ctx.triggered) == 1:
+        name = ctx.triggered[0]['prop_id'].split('"')[3]
+        account_id = db.session.query(Account.id).filter_by(name = name).first()[0]
+        return account_id
+    raise PreventUpdate
