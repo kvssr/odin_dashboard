@@ -128,10 +128,15 @@ def check_valid_guild():
                         account_id = account.id
                     else:
                         account_id = account_id[0]
-                    log = Log(account_id=account_id, log_date=date.today())
-                    print(f'account: {log.account_id} - date: {log.log_date}')
-                    db.session.add(log)
-                    db.session.commit()                    
+                    logged_today = db.session.query(Log.id).filter_by(account_id=account_id).filter_by(log_date=date.today()).first()
+                    if logged_today:
+                        print('Already logged today')
+                    else:
+                        print('Not logged yet today')
+                        log = Log(account_id=account_id, log_date=date.today())
+                        print(f'account: {log.account_id} - date: {log.log_date}')
+                        db.session.add(log)
+                        db.session.commit()                    
                     return True
 
     today = date.today()
