@@ -10,7 +10,7 @@ from urllib.parse import unquote
 import requests
 
 from app import app, db
-from apps import api_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
+from apps import api_page, groups_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
 from models import Account, Log
 
 server = app.server
@@ -74,6 +74,12 @@ def display_page(pathname):
         else:
             view = 'Redirecting to api...'
             url = '/api'
+    elif pathname == '/groups':
+        if current_user.is_authenticated:
+            view = groups_page.layout
+        else:
+            view = 'Redirecting to login...'
+            url = '/login'
     elif pathname == '/upload':
         if current_user.is_authenticated:
             view = upload_page.layout

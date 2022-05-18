@@ -81,18 +81,19 @@ def write_xls_to_db(json_file, name = '' , t = 1):
                 cf_stat = CharacterFightStat()
                 cf_stat.character_id = char_id
                 cf_stat.fight_id = fight_id
+                cf_stat.group = fight['group']
                 cf_stat.damage = fight['dmg']
                 cf_stat.boonrips = fight['rips']
                 cf_stat.cleanses = fight['cleanses']
                 cf_stat.stability = fight['stab']
-                cf_stat.healing = fight['heal']
+                cf_stat.healing = fight['heal'] if fight['heal'] != -1 else 0
                 cf_stat.distance_to_tag = fight['dist']
                 cf_stat.deaths = fight['deaths']
                 cf_stat.protection = fight['prot']
                 cf_stat.aegis = fight['aegis']
                 cf_stat.might = fight['might']
                 cf_stat.fury = fight['fury']
-                cf_stat.barrier = fight['barrier']
+                cf_stat.barrier = fight['barrier'] if fight['barrier'] != -1 else 0
                 cf_stat.dmg_taken = fight['dmg_taken']
                 try:
                     db.session.add(cf_stat)
