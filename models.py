@@ -21,6 +21,7 @@ class Character(db.Model):
     profession = relationship("Profession", back_populates="characters")
     account = relationship("Account", back_populates='characters')
     playerstats = relationship("PlayerStat", back_populates="character")
+    character_fight_stats = relationship('CharacterFightStat', back_populates='character')
 
 
 class Profession(db.Model):
@@ -137,22 +138,10 @@ class Fight(db.Model):
     skipped = db.Column(db.Boolean())
     num_allies = db.Column(db.Integer())
     num_enemies = db.Column(db.Integer())
-    damage = db.Column(db.Integer())
-    boonrips = db.Column(db.Integer())
-    cleanses = db.Column(db.Integer())
-    stability = db.Column(db.Integer())
-    healing = db.Column(db.Integer())
-    distance_to_tag = db.Column(db.Integer())
-    deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
-    protection = db.Column(db.Integer())
-    aegis = db.Column(db.Integer())
-    might = db.Column(db.Integer())
-    fury = db.Column(db.Integer())
-    barrier = db.Column(db.Integer())
-    dmg_taken = db.Column(db.Integer())
-
+    
     raid = relationship("Raid", back_populates="fights")
+    character_fight_stats = relationship('CharacterFightStat', back_populates='fight')
 
     def to_dict(self):
         return {
@@ -163,12 +152,39 @@ class Fight(db.Model):
             '# Allies': self.num_allies,
             '# Enemies': self.num_enemies,
             'kills': self.kills,
-            'deaths': self.deaths,
-            'damage': f'{self.damage:,}',
-            'boonrips': f'{self.boonrips:,}',
-            'cleanses': f'{self.cleanses:,}',
-            'healing': f'{self.healing:,}'
+            'deaths': sum(stats.deaths for stats in self.character_fight_stats),
+            'damage': f'{sum(stats.damage for stats in self.character_fight_stats):,}',
+            'boonrips': f'{sum(stats.boonrips for stats in self.character_fight_stats):,}',
+            'cleanses': f'{sum(stats.cleanses for stats in self.character_fight_stats):,}',
+            'healing': f'{sum(stats.healing for stats in self.character_fight_stats):,}'
         }
+
+
+class CharacterFightStat(db.Model):
+
+    __tablename__ = 'character_fight_stat'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    fight_id = db.Column(db.Integer(), db.ForeignKey('fight.id', ondelete='CASCADE'))
+    character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
+    damage = db.Column(db.Integer())
+    boonrips = db.Column(db.Integer())
+    cleanses = db.Column(db.Integer())
+    stability = db.Column(db.Integer())
+    healing = db.Column(db.Integer())
+    distance_to_tag = db.Column(db.Integer())
+    deaths = db.Column(db.Integer())
+    protection = db.Column(db.Integer())
+    aegis = db.Column(db.Integer())
+    might = db.Column(db.Integer())
+    fury = db.Column(db.Integer())
+    barrier = db.Column(db.Integer())
+    dmg_taken = db.Column(db.Integer())
+    group = db.Column(db.Integer())
+
+    fight = relationship('Fight', back_populates='character_fight_stats')
+    character = relationship('Character', back_populates='character_fight_stats')
+
 
 
 class DmgStat(db.Model):
