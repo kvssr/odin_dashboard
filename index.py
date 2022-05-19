@@ -61,10 +61,11 @@ def display_page(pathname):
     elif pathname.startswith('/details/'):    
         name = pathname.split('/')[-1]
         char = unquote(name.split('(')[0]).rstrip()
-        if (check_valid_guild() and ('CHARACTERS' in session and char in session['CHARACTERS'])) or current_user.is_authenticated:
+        # if (check_valid_guild() and ('CHARACTERS' in session and char in session['CHARACTERS'])) or current_user.is_authenticated:
+        if check_valid_guild() or current_user.is_authenticated:
             view = personal_details.layout(unquote(name))
-        elif 'CHARACTERS' in session and check_valid_guild():
-            view = personal_details.layout('')
+        # elif 'CHARACTERS' in session and check_valid_guild():
+        #     view = personal_details.layout('')
         else:
             view = 'Redirecting to api...'
             url = '/api'

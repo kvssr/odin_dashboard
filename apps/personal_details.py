@@ -47,14 +47,14 @@ colum_models = {
 
 
 def layout(name):
-    if current_user.is_authenticated:
-        characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
-                                .join(Profession).order_by(Profession.name, Character.name).all()
-        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
-    else:
-        characters = db.session.query(Character).filter(Character.name.in_(session['CHARACTERS'])).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
-                                .join(Profession).order_by(Profession.name, Character.name).all()
-        dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
+    # if current_user.is_authenticated:
+    characters = db.session.query(Character).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
+                            .join(Profession).order_by(Profession.name, Character.name).all()
+    dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
+    # else:
+    #     characters = db.session.query(Character).filter(Character.name.in_(session['CHARACTERS'])).filter(Character.id.in_(db.session.query(PlayerStat.character_id).distinct()))\
+    #                             .join(Profession).order_by(Profession.name, Character.name).all()
+    #     dropdown_options = [{'label':f'{s.name} - {s.profession.name}', 'value':s.id} for s in characters]
 
     character_id = 0
     if name != '':
