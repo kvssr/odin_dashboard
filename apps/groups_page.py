@@ -1,8 +1,26 @@
 import dash_bootstrap_components as dbc
 from dash import dcc, html, Output, Input, State, MATCH, dash_table
+from numpy import int64
 from app import app, db
-from models import Character, CharacterFightStat, CleanseStat, DeathStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
+from models import Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
 import pandas as pd
+
+_stats_order = {
+    'Damage':'',
+    'Healing':'',
+    'Stability':'2f',
+    'Cleansing':'',
+    'Strips':'',
+    'Distance':'',
+    'Protection':'2f',
+    'Aegis':'2f',
+    'Might':'2f',
+    'Fury':'2f',
+    'Barrier':'',
+    'Damage In':'',
+    'Deaths':'',
+}
+
 
 layout = html.Div(children=[
             html.Div(id='details-output-data-upload', children=[
@@ -127,37 +145,34 @@ def show_groups_content(raid, fight):
         'Barrier',
         'Damage In',
         ]).sort_values(['Party', 'Profession'])
-    print(df_groups)
 
-    #top_dmg = db.session.query(Character).all()
+    print(df_groups)    
+
+    top_dmg = {name[0]:'damage' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dmg_stat).order_by(-DmgStat.total_dmg).limit(5).all()}
+    top_heals = {name[0]:'heals' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.heal_stat).order_by(-HealStat.total_heal).limit(3).all()}
+    top_distance = {name[0]:'distance' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dist_stat).order_by(-DistStat.percentage_top).limit(3).all()}
+    top_strips = {name[0]:'strips' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.rip_stat).order_by(-RipStat.total_rips).limit(3).all()}
+    top_cleanses = {name[0]:'cleanses' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.cleanse_stat).order_by(-CleanseStat.total_cleanses).limit(3).all()}
+    top_stab = {name[0]:'stab' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.stab_stat).order_by(-StabStat.total_stab).limit(3).all()}
+    print(top_dmg)
+
+    top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
 
     rows= [dbc.Row([
-        dbc.Col('Professions', width={'size': 3}),
-        dbc.Col('Damage'),
-        dbc.Col('Healing'),
-        dbc.Col('Stability'),
-        dbc.Col('Cleansing'),
-        dbc.Col('Strips'),
-        dbc.Col('Distance'),
-        dbc.Col('Protection'),
-        dbc.Col('Aegis'),
-        dbc.Col('Might'),
-        dbc.Col('Fury'),
-        dbc.Col('Barrier'),
-        dbc.Col('Damage In'),
-        dbc.Col('Deaths'),
-    ], class_name='groups-row-header')]
+        dbc.Col('Professions', width={'size': 2}),]+
+        [dbc.Col(stat) for stat in _stats_order]
+    , class_name='groups-row-header')]
     for party in df_groups['Party'].unique():
         row = html.Div(dbc.Row([
             dbc.Col([html.Div(id={'type': 'collapse-cross', 'index': str(party)}, children='+', className='collapse-cross')]+
-                [html.Img(src=f'assets/profession_icons/{player}.png', width='30px', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], width={'size': 3}
+                [html.Img(src=f'assets/profession_icons/{player}.png', width='30px', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], width={'size': 2}
                 , class_name='groups-prof-icon-col'),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Damage'].sum():,} ({df_groups[df_groups['Party'] == party]['Damage'].sum()/df_groups['Damage'].sum()*100:.2f}%)"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Healing'].sum():,}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Stability'].sum():,.2f}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Cleansing'].sum():,}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Strips'].sum():,}"),
-            dbc.Col(f"{df_groups[df_groups['Party'] == party]['Distance'].sum():,.2f}"),
+            dbc.Col(f"{df_groups[df_groups['Party'] == party]['Distance'].sum():,}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Protection'].sum():,.2f}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Aegis'].sum():,.2f}"),
             dbc.Col(f"{df_groups[df_groups['Party'] == party]['Might'].sum():,.2f}"),
@@ -173,21 +188,27 @@ def show_groups_content(raid, fight):
             className='groups-row-collapse-container',
             children=[
                 dbc.Row([
-                    dbc.Col([html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),player], width={'size': 3}),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Healing'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Stability'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Cleansing'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Strips'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Distance'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Protection'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Aegis'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Might'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Fury'].values[0]:,.2f}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Barrier'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage In'].values[0]:,}"),
-                    dbc.Col(f"{df_groups[df_groups['Character'] == player]['Deaths'].values[0]:,}"),
-                    ], class_name='groups-row-collapse') for player in df_groups.loc[df_groups['Party'] == party, 'Character']],
+                    dbc.Col(id=f'col-{player}', children=[
+                        html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
+                        player,
+                        html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
+                        dbc.Tooltip(f'Top {top_stats[player]}', target=f'col-{player}', placement='left') if player in top_stats else ''
+                        ], width={'size': 2}),]+
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Healing'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Stability'].values[0]:,.2f}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Cleansing'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Strips'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Distance'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Protection'].values[0]:,.2f}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Aegis'].values[0]:,.2f}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Might'].values[0]:,.2f}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Fury'].values[0]:,.2f}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Barrier'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage In'].values[0]:,}"),
+                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Deaths'].values[0]:,}"),
+                    [dbc.Col(format_stat(df_groups[df_groups['Character'] == player][stat].values[0])) for stat in _stats_order]
+                    , class_name='groups-row-collapse') for player in df_groups.loc[df_groups['Party'] == party, 'Character']],
             hidden=True)
 
         #for player in df_groups[df_groups['Party'] == party]['Character']:
@@ -195,6 +216,19 @@ def show_groups_content(raid, fight):
         rows.append(hidden_rows)
         #print(row)
     return rows
+
+
+def format_stat(stat):
+    if stat == 0:
+        return '-'
+    elif isinstance(stat, int64):
+        return f'{stat:,}'
+    elif isinstance(stat, float):
+        return f'{stat:,.2f}'
+    else:
+        print(type(stat))
+        print(stat)
+        return ''
 
 
 @app.callback(
