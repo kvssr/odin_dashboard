@@ -117,7 +117,7 @@ def get_dropdown_raids(value):
               Input('raids-dropdown', 'value')],
               State('intermediate-value', 'data'))
 def switch_tabs(tab, raid, datasets):
-    masked = True
+    masked = False
     if current_user.is_authenticated:
         masked = False
     if tab == 'dmg-tab':

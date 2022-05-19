@@ -296,7 +296,7 @@ def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
             return None, None, None
 
     if hoverData or hoverstore:        
-        masked = True
+        masked = False
         if current_user.is_authenticated:
             masked = False
         if hoverData:
