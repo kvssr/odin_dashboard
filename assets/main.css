@@ -262,8 +262,17 @@ td {
     padding-bottom: 8px;
 }
 
+
+/*
+    GROUP PAGE
+*/
+
+#groups-container {
+    width: 100%;
+    margin: auto;
+}
+
 .groups-row {
-    width: 80%;
     margin: auto;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -275,7 +284,6 @@ td {
 }
 
 .groups-row-header {
-    width: 80%;
     margin: auto;
     margin-bottom: 10px;
     border-bottom: #EEE solid 1px;
@@ -288,7 +296,6 @@ td {
 }
 
 .groups-row-collapse-container {
-    width: 80%;
     margin: auto;
     border-top: #EEE 1px solid;
     border-bottom: #414141 1px solid;

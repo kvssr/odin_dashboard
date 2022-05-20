@@ -23,7 +23,7 @@ _stats_order = {
 
 
 layout = html.Div(children=[
-            html.Div(id='details-output-data-upload', children=[
+            dbc.Container(id='details-output-data-upload',fluid=True, children=[
                 dbc.Row(id='input-row-top',class_name='input-row', children=[
                     dbc.Col([
                         html.Div("Select Raid", style={'text-align': 'center'}),
@@ -42,7 +42,7 @@ layout = html.Div(children=[
                 ], class_name='input-row'),
                 dbc.Row([
                     dbc.Col(id='groups-content')
-                ])
+                ], id='groups-container')
             ])
         ])
 
@@ -158,6 +158,49 @@ def show_groups_content(raid, fight):
 
     top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
 
+    table_header = [html.Thead(html.Tr([html.Th('Professions')]+[html.Th(stat) for stat in _stats_order]))]
+
+
+    table_rows = []
+    for party in df_groups['Party'].unique():
+        sum_row = html.Tr(
+            [html.Td([html.Div(id={'type': 'collapse-cross', 'index': str(party)}, children='+', className='collapse-cross')]+
+                [html.Img(src=f'assets/profession_icons/{player}.png', width='30px', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
+            [html.Td(f"{df_groups[df_groups['Party'] == party]['Damage'].sum():,} ({df_groups[df_groups['Party'] == party]['Damage'].sum()/df_groups['Damage'].sum()*100:.2f}%)")]+
+            [html.Td(format_stat(df_groups[df_groups['Party'] == party][stat].sum())) for stat in _stats_order if stat != 'Damage']
+        , className='groups-row', id={'type': 'groups-row', 'index': str(party)})
+        table_rows.append(html.Tbody(sum_row))
+
+        player_rows = []
+        for player in df_groups.loc[df_groups['Party'] == party, 'Character']:
+            player_row = html.Tr(
+                [html.Td([
+                    html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
+                    player,
+                    html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
+                    dbc.Tooltip(f'Top {top_stats[player]}', target=f'col-{player}', placement='left') if player in top_stats else ''
+                ])]+
+                [html.Td(format_stat(df_groups[df_groups['Character'] == player][stat].values[0])) for stat in _stats_order]
+            )
+            # table_rows.append(player_row)
+            player_rows.append(player_row)
+        player_body = html.Tbody(player_rows, hidden=True, className='groups-row-collapse-container', id={'type': 'groups-rows-toggle', 'index': str(party)})
+        table_rows.append(player_body)
+    # table_body = html.Tbody(table_rows)
+
+        
+
+    
+    table = dbc.Table(
+        table_header + table_rows,
+        responsive=True,
+        bordered=True,
+        dark=True,
+        hover=True,
+        striped=True,
+    )
+
+
     rows= [dbc.Row([
         dbc.Col('Professions', width={'size': 2}),]+
         [dbc.Col(stat) for stat in _stats_order]
@@ -215,7 +258,7 @@ def show_groups_content(raid, fight):
             #rows.append(dbc.Row(dbc.Col(player), class_name='groups-row-collapse', id={'type': 'groups-rows-toggle', 'index': str(party)}))
         rows.append(hidden_rows)
         #print(row)
-    return rows
+    return table
 
 
 def format_stat(stat):
