@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, Output, Input, State, MATCH, dash_table
 from numpy import int64
 from app import app, db
-from models import Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
+from models import Account, Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
 import pandas as pd
 
 _stats_order = {
@@ -109,6 +109,7 @@ def show_groups_content(raid, fight):
     all_players = db.session.query(
         Fight.number,
         CharacterFightStat.group,
+        Account.name,
         Character.name,
         Profession.name,
         CharacterFightStat.damage,
@@ -124,11 +125,12 @@ def show_groups_content(raid, fight):
         CharacterFightStat.fury,
         CharacterFightStat.barrier,
         CharacterFightStat.dmg_taken,
-        ).join(CharacterFightStat.fight).filter_by(raid_id = raid).filter_by(number = fight).join(CharacterFightStat.character).join(Character.profession).all()
+        ).join(CharacterFightStat.fight).filter_by(raid_id = raid).filter_by(number = fight).join(CharacterFightStat.character).join(Character.profession).join(Character.account).all()
     #print(all_players)
     df_groups = pd.DataFrame(all_players, columns=[
         'Fight',
-        'Party', 
+        'Party',
+        'Account', 
         'Character', 
         'Profession', 
         'Damage', 
@@ -160,7 +162,6 @@ def show_groups_content(raid, fight):
 
     table_header = [html.Thead(html.Tr([html.Th('Professions')]+[html.Th(stat) for stat in _stats_order]))]
 
-
     table_rows = []
     for party in df_groups['Party'].unique():
         sum_row = html.Tr(
@@ -178,8 +179,11 @@ def show_groups_content(raid, fight):
                     html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
                     player,
                     html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
-                    dbc.Tooltip(f'Top {top_stats[player]}', target=f'col-{player}', placement='left') if player in top_stats else ''
-                ])]+
+                    dbc.Tooltip(
+                        f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]} | Top {top_stats[player]}' if player in top_stats else f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]}',
+                         target=f'td-{player}', placement='right'
+                    )
+                ], id=f'td-{player}')]+
                 [html.Td(format_stat(df_groups[df_groups['Character'] == player][stat].values[0])) for stat in _stats_order]
             )
             # table_rows.append(player_row)
@@ -194,7 +198,7 @@ def show_groups_content(raid, fight):
     table = dbc.Table(
         table_header + table_rows,
         responsive=True,
-        bordered=True,
+        bordered=False,
         dark=True,
         hover=True,
         striped=True,
