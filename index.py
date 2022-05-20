@@ -10,7 +10,7 @@ from urllib.parse import unquote
 import requests
 
 from app import app, db
-from apps import api_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
+from apps import api_page, contact_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
 from models import Account, Log
 
 server = app.server
@@ -40,6 +40,8 @@ def display_page(pathname):
     url = dash.no_update
     if pathname == '/login':
         view = login.login
+    elif pathname == '/contact':
+        view = contact_page.layout()
     elif pathname == '/api':
         view = api_page.layout
     elif pathname == '/json':
