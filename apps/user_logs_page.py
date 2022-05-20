@@ -50,11 +50,12 @@ def show_graph_selection_in_table(data):
     #print(data)
     grouped_logs_week = ''
     if 'xaxis.range[0]' in data:
-        print(datetime.datetime.strptime(data['xaxis.range[0]'], '%Y-%m-%d'))
-        start_date = datetime.datetime.strptime(data['xaxis.range[0]'], '%Y-%m-%d')
-        end_date = datetime.datetime.strptime(data['xaxis.range[1]'], '%Y-%m-%d')
+        print(data['xaxis.range[0]'].split(' ')[0])
+        print(data['xaxis.range[1]'].split(' ')[0])
+        start_date = data['xaxis.range[0]'].split(' ')[0]
+        end_date = data['xaxis.range[1]'].split(' ')[0]
         grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number'))\
-        .join(Log.account).filter(Log.log_date > start_date, Log.log_date < end_date)\
+        .join(Log.account).filter(Log.log_date >= start_date, Log.log_date <= end_date)\
             .group_by(Account.name)
     else:
         grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number'))\
@@ -87,10 +88,10 @@ def show_account_table(graph_data, account):
     total_selection = 0
 
     if 'xaxis.range[0]' in graph_data:
-        print(datetime.datetime.strptime(graph_data['xaxis.range[0]'], '%Y-%m-%d'))
-        start_date = datetime.datetime.strptime(graph_data['xaxis.range[0]'], '%Y-%m-%d')
-        end_date = datetime.datetime.strptime(graph_data['xaxis.range[1]'], '%Y-%m-%d')
-        total_selection = db.session.query(func.count(Log.account_id)).filter_by(account_id = account).filter(Log.log_date > start_date, Log.log_date < end_date).scalar()
+        #print(datetime.datetime.strptime(graph_data['xaxis.range[0]'], '%Y-%m-%d'))
+        start_date = graph_data['xaxis.range[0]'].split(' ')[0]
+        end_date = graph_data['xaxis.range[1]'].split(' ')[0]
+        total_selection = db.session.query(func.count(Log.account_id)).filter_by(account_id = account).filter(Log.log_date >= start_date, Log.log_date <= end_date).scalar()
     else:
         total_selection = db.session.query(func.count(Log.account_id)).filter_by(account_id = account).scalar()
 
