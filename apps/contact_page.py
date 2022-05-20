@@ -25,7 +25,7 @@ def layout():
                     dbc.Col('Freya#7797'),
                 ]),
                 dbc.Row(class_name='table-row', children=[
-                    dbc.Col('Mustang Meringue'),
+                    dbc.Col('Mer'),
                     dbc.Col('Shunsui Jiraiya.9103'),
                     dbc.Col('Mustang.Meringue#4655'),
                 ]),
