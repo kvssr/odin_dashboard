@@ -105,6 +105,7 @@ login_menu = dbc.Nav(className='menu', children=[
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
     dbc.DropdownMenu([
         dbc.DropdownMenuItem("Howto", href='/howto'),
+        dbc.DropdownMenuItem("Contact", href='/contact'),
         ],
         label="Help",
         caret=False,
