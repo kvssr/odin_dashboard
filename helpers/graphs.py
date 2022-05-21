@@ -304,7 +304,7 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0)
     fig = add_times_top_annotation(fig, df)
-    #fig = add_clickable_names(fig, df)
+    fig = add_clickable_names(fig, df)
 
     for name in df['Name']:
         fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
@@ -370,7 +370,7 @@ def get_top_survivor_chart(df, t, title, legend = False):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0)
     fig = add_times_top_annotation(fig, df)
-#    fig = add_clickable_names(fig, df)
+    fig = add_clickable_names(fig, df)
     return fig
 
 def add_sorting_options(fig, df, t):
