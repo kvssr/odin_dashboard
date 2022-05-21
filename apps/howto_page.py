@@ -129,8 +129,8 @@ layout = [
                     html.Br(),
                     html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 15}, style={}),
-                ], className="centered-col"])
-            ),
+                ], className="centered-col")
+            ]),
 
             dbc.Row([
                 dbc.Col("On the top left, there is a drop down menu to sort the graphs differently. For most stats, the choices are: 'total', which usually is the default and means the total stat value achieved over the whole raid; 'average', which is the average stat value per second over all fights a character was involved in (default for Damage In); 'times top', which indicates how often someone achieved top stats; and 'attendance', which is how many fights someone was there for. Using this, you can for example check how you were doing compared to others on average, if you weren’t able to attend the whole raid."),
