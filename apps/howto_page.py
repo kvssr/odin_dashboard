@@ -113,16 +113,16 @@ layout = [
 
             dbc.Row(
                 dbc.Col([
-                    "Again, you can choose from which raid you would like to see stats using the drop down menu at the top, which by default is the last raid. You will see a short summary of the overall squad stats for the chosen raid in a table. Below that, you see tabs for different stats, namely Damage, Rips, Might, Fury, Healing, Barrier, Cleanses, Stability, Protection, Aegis, and Distance. The numbers shown in these bar charts are the same as those shown on the Home page, i.e. times top, attendance, total value and average value per second (or percentage times top for distance). Note that for your healing or barrier to register, you will need to have the ",
+                    "Again, you can choose from which raid you would like to see stats using the drop down menu at the top, which by default is the last raid. You will see a short summary of the overall squad stats for the chosen raid in a table. Below that, you see tabs for different stats, namely Damage, Rips, Might, Fury, Healing, Barrier, Cleanses, Stability, Protection, Aegis, Distance, and Damage In. For everything except Damage In, the numbers shown in these bar charts are the same as those shown on the Home page, i.e. times top, attendance, total value and average value per second (or percentage times top for distance). Note that for your healing or barrier to register, you will need to have the ",
                     html.A("arcdps healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases"),
-                    " running and stats sharing enabled. The top performing players will be shown by name. For might and fury, these are only the top 2 players, for all other stats you haven’t seen on the Home page yet it’s the top 3 players. All other players are shown by their profession only. ",
+                    " running and stats sharing enabled. Damage In includes the actual damage taken as well as damage absorbed by barrier. The graph shows times top / attendance at the beginning of each bar. In the middle of each bar, the number of deaths is shown to add some context. The number at the end of each bar is the average damage taken per second of being active in a fight, which is the time of first damage dealt or taken until death. The number behind each bar is the total damage in, which will naturally be higher for people who attended more fights. ",
                     html.Br(),
-                    "Additionally, you will be able to see your own character name if you were there for the chosen raid. This way, you can compare yourself to the top performing players, but can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
+                    "Seeing everyones performance allows you to compare yourself to the top performing players. You can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
                 ])
             ),
 
             dbc.Row([
-                dbc.Col("On the top left, there is a drop down menu to sort the graphs differently. The choices are: 'total', which is the default and means the total stat value achieved over the whole raid; 'average', which is the average stat value per second over all fights a character was involved in; 'times top', which indicates how often someone achieved top stats; and 'attendance', which is how many fights someone was there for. Using this, you can for example check how you were doing compared to others on average, if you weren’t able to attend the whole raid."),
+                dbc.Col("On the top left, there is a drop down menu to sort the graphs differently. For most stats, the choices are: 'total', which usually is the default and means the total stat value achieved over the whole raid; 'average', which is the average stat value per second over all fights a character was involved in (default for Damage In); 'times top', which indicates how often someone achieved top stats; and 'attendance', which is how many fights someone was there for. Using this, you can for example check how you were doing compared to others on average, if you weren’t able to attend the whole raid."),
                 dbc.Col(
                     html.Div(html.Img(id={'type': 'image', 'index': 7}, src="assets/sorting_order.png", style={'width': img_size[7]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 7}, style={}),
@@ -178,7 +178,7 @@ layout = [
                     align="center"),
 
             dbc.Row([
-                dbc.Col("If you hover over any of the data points, you will see the top 10 average stats as a bar chart on the right, where the top performing players and your own characters are shown by name. "),
+                dbc.Col("If you hover over any of the data points, you will see the top 10 average stats as a bar chart on the right. "),
                 dbc.Col(
                     html.Div(html.Img(id={'type': 'image', 'index': 13}, src="assets/hover_bar_chart.png", style={'width': img_size[13]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 13}, style={}),
