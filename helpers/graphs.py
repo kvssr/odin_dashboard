@@ -338,11 +338,13 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                     dict(label="Average",
                             method="relayout",
                             args=["yaxis", {"categoryarray": (df.sort_values(by="Average dmg_taken per s", ascending=False))["Name"],
-                                            "categoryorder": "array"}]),
+                                            "categoryorder": "array",
+                                            'showticklabels': False}]),
                     dict(label="Deaths",
                             method="relayout",
                             args=["yaxis", {"categoryarray": (df.sort_values(by=["Total deaths","Average dmg_taken per s"], ascending=[True, False]))["Name"],
-                                            "categoryorder": "array"}]),
+                                            "categoryorder": "array",
+                                            'showticklabels': False}]),
                 ]
             )
         ]
