@@ -21,6 +21,7 @@ img_size[11] = "100%"
 img_size[12] = "80%"
 img_size[13] = "80%"
 img_size[14] = "80%"
+img_size[15] = "70%"
 
 img_top_offset = {}
 img_top_offset[1] = "2.5%"
@@ -37,6 +38,7 @@ img_top_offset[11] = "20%"
 img_top_offset[12] = "10%"
 img_top_offset[13] = "25%"
 img_top_offset[14] = "20%"
+img_top_offset[15] = "2.5%"
 
 layout = [
     html.H2('How to read the Records of Valhalla', style={'text-align': 'center'}),
@@ -118,7 +120,11 @@ layout = [
                     " running and stats sharing enabled. Damage In includes the actual damage taken as well as damage absorbed by barrier. The graph shows times top / attendance at the beginning of each bar. In the middle of each bar, the number of deaths is shown to add some context. The number at the end of each bar is the average damage taken per second of being active in a fight, which is the time of first damage dealt or taken until death. The number behind each bar is the total damage in, which will naturally be higher for people who attended more fights. ",
                     html.Br(),
                     "Seeing everyone's performance allows you to compare yourself to the top performing players. You can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
-                ])
+                ]),
+                dbc.Col(
+                    html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
+                             id={'type': 'image-div', 'index': 15}, style={}),
+                    className="centered-col")
             ),
 
             dbc.Row([
@@ -154,7 +160,7 @@ layout = [
             ]),
 
             dbc.Row([
-                dbc.Col("At the top, you see a summary table of how many raids and how many fights this character attended, how many fights you missed if you weren’t there for a whole raid, and how often you achieved top stats in a chosen stat. Below that is a drop down menu showing all of your characters that were present for at least one raid. "),
+                dbc.Col("At the top, you see a summary table of how many raids and how many fights this character attended, how many fights you missed if you weren’t there for a whole raid, and how often you achieved top stats in a chosen stat. Below that is a drop down menu showing all characters that were present for at least one raid. You can also type to search for a specific character. "),
                 dbc.Col(
                     html.Div(html.Img(id={'type': 'image', 'index': 11}, src="assets/profile_overview.png", style={'width': img_size[11]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 11}, style={}),
