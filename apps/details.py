@@ -89,7 +89,7 @@ def hide_tabs(url):
             style = dict(
                 display = 'block'
             )
-        return style, style, style
+        return style, style
 
 
 
