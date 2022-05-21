@@ -117,7 +117,7 @@ layout = [
                     html.A("arcdps healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases"),
                     " running and stats sharing enabled. Damage In includes the actual damage taken as well as damage absorbed by barrier. The graph shows times top / attendance at the beginning of each bar. In the middle of each bar, the number of deaths is shown to add some context. The number at the end of each bar is the average damage taken per second of being active in a fight, which is the time of first damage dealt or taken until death. The number behind each bar is the total damage in, which will naturally be higher for people who attended more fights. ",
                     html.Br(),
-                    "Seeing everyones performance allows you to compare yourself to the top performing players. You can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
+                    "Seeing everyone's performance allows you to compare yourself to the top performing players. You can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
                 ])
             ),
 
