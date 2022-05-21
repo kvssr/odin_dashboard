@@ -38,7 +38,7 @@ img_top_offset[11] = "20%"
 img_top_offset[12] = "10%"
 img_top_offset[13] = "25%"
 img_top_offset[14] = "20%"
-img_top_offset[15] = "2.5%"
+img_top_offset[15] = "20%"
 
 layout = [
     html.H2('How to read the Records of Valhalla', style={'text-align': 'center'}),
@@ -121,10 +121,15 @@ layout = [
                     html.Br(),
                     "Seeing everyone's performance allows you to compare yourself to the top performing players. You can also see how you are doing compared to others in your class, using the color coding or profession names. If you want to see only players of specific classes, you can enable or disable them by clicking on the corresponding legend items. You can also view only players of a single class by double clicking the corresponding legend item.",
                 ]),
-                dbc.Col(
+                dbc.Col([
+                    html.Br(),
+                    html.Br(),
+                    html.Br(),
+                    html.Br(),
+                    html.Br(),
                     html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 15}, style={}),
-                    className="centered-col")
+                    className="centered-col"])
                 ],
             ),
 
