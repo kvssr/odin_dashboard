@@ -124,7 +124,7 @@ layout = [
                 dbc.Col(
                     html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 15}, style={}),
-                    className="centered-col")
+                    className="centered-col"),
             ),
 
             dbc.Row([
