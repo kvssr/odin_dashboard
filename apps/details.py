@@ -50,7 +50,8 @@ layout = html.Div(children=[
                 dbc.Tab(label='Protection', tab_id='prot-tab', label_style=tab_style),
                 dbc.Tab(label='Aegis', tab_id='aegis-tab', label_style=tab_style),
                 dbc.Tab(label='Distance', tab_id='dist-tab', label_style=tab_style),
-                dbc.Tab(label='Damage In', id='dmg-in-tab-id', tab_id='dmg_taken-tab', label_style=tab_style),
+                #dbc.Tab(label='Damage In', id='dmg-in-tab-id', tab_id='dmg_taken-tab', label_style=tab_style),
+                dbc.Tab(label='Damage In', tab_id='dmg_taken-tab', label_style=tab_style),
                 dbc.Tab(label='Deaths', id='deaths-tab-id', tab_id='deaths-tab', label_style=tab_style),
                 #dbc.Tab(label='Global', tab_id='global-tab', label_style=tab_style),
                 dbc.Tab(label='Summary', id='summary-tab-id', tab_id='summary-tab', label_style=tab_style),
@@ -72,7 +73,7 @@ layout = html.Div(children=[
 
 @app.callback(
     Output('deaths-tab-id', 'tab_style'),
-    Output('dmg-in-tab-id', 'tab_style'),
+#    Output('dmg-in-tab-id', 'tab_style'),
     Output('summary-tab-id', 'tab_style'),
     Input('url', 'pathname')
 )
@@ -88,7 +89,7 @@ def hide_tabs(url):
             style = dict(
                 display = 'block'
             )
-        return style, style, style
+        return style, style
 
 
 
