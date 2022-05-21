@@ -113,7 +113,7 @@ layout = [
             ],
                     align="center"),
 
-            dbc.Row(
+            dbc.Row([
                 dbc.Col([
                     "Again, you can choose from which raid you would like to see stats using the drop down menu at the top, which by default is the last raid. You will see a short summary of the overall squad stats for the chosen raid in a table. Below that, you see tabs for different stats, namely Damage, Rips, Might, Fury, Healing, Barrier, Cleanses, Stability, Protection, Aegis, Distance, and Damage In. For everything except Damage In, the numbers shown in these bar charts are the same as those shown on the Home page, i.e. times top, attendance, total value and average value per second (or percentage times top for distance). Note that for your healing or barrier to register, you will need to have the ",
                     html.A("arcdps healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases"),
@@ -124,7 +124,8 @@ layout = [
                 dbc.Col(
                     html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 15}, style={}),
-                    className="centered-col"),
+                    className="centered-col")
+                ],
             ),
 
             dbc.Row([
