@@ -89,7 +89,7 @@ td {
 }
 
 .js-plotly-plot .plotly svg a {
-    fill: white !important;
+    fill: inherit !important;
     text-decoration: none;
 }
 

@@ -7,6 +7,7 @@ from models import Fight, FightSummary, Profession
 import dash_bootstrap_components as dbc
 from dash import html
 from plotly.subplots import make_subplots
+from flask import session
 
 
 profession_colours = {
@@ -164,17 +165,27 @@ def add_annotations_graph(fig, df, t):
             ),
             text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
             color='#EEE'
+            background_color='#303030'
+            border = '#303030'
             if name[0].isdigit():
                 text = name
                 color = 'grey'
+            if 'CHARACTERS' in session:
+                print(f"{name.rsplit(' ', 1)[0]=}")
+                if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
+                    print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
+                    background_color='#616161'
+                    border = '#414141'
             fig.add_annotation(y=name, x=0,
                                 text=text,
                                 showarrow=False,
                                 yshift=0,
-                                xshift=2,
+                                xshift=-2,
                                 xanchor="right",
                                 font_size=13,
-                                font_color=color
+                                font_color=color,
+                                bgcolor=background_color,
+                                bordercolor=border
             ),
             fig.add_annotation(y=name, x=0,
                     text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
