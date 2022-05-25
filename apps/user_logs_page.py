@@ -1,22 +1,22 @@
-import datetime
-import json
+from datetime import date
 import dash_bootstrap_components as dbc
-import plotly.express as px
+import requests
 from sqlalchemy import func
 import pandas as pd
 from app import app, db
-from dash import html, dcc, Output, Input, State, MATCH, ALL, dash_table
+from dash import html, dcc, Output, Input, State, ALL
 import dash
 
 from dash.exceptions import PreventUpdate
+from helpers import graphs
 from helpers.graphs import get_logs_line_chart
-from models import Account, Log
+from models import Account, Guild, Log
 
 
 def layout():
+    update_guild_members()
     logs = db.session.query(Log.log_date, func.count(Log.id)).group_by(Log.log_date).order_by(Log.log_date).all()
     df_logs = pd.DataFrame(logs, columns=['Date', 'Number'])
-    #print(df_logs)
     fig = get_logs_line_chart(df_logs)
 
     accounts = db.session.query(Account).order_by(Account.name).all()
@@ -33,15 +33,13 @@ def layout():
             dbc.Col(id='account-log-output'),
         ]),
         dbc.Row(class_name='logs-row', children=[
-            dbc.Col(id='logs-col-top'),
-            dbc.Col(id='logs-col-bot'),
-        ])
+            dbc.Col(id='logs-col-graph'),
+        ]),
     ])
 
 
 @app.callback(
-    Output('logs-col-top', 'children'),
-    Output('logs-col-bot', 'children'),
+    Output('logs-col-graph', 'children'),
     Input('logs-graph','relayoutData')
 )
 def show_graph_selection_in_table(data):
@@ -49,27 +47,36 @@ def show_graph_selection_in_table(data):
         raise PreventUpdate
     #print(data)
     grouped_logs_week = ''
+    start_date = ''
+    guild_id = db.session.query(Guild.id).filter_by(id=1).scalar()
     if 'xaxis.range[0]' in data:
         print(data['xaxis.range[0]'].split(' ')[0])
         print(data['xaxis.range[1]'].split(' ')[0])
         start_date = data['xaxis.range[0]'].split(' ')[0]
         end_date = data['xaxis.range[1]'].split(' ')[0]
-        grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number'))\
+        grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number')).filter_by(guild_id=guild_id)\
         .join(Log.account).filter(Log.log_date >= start_date, Log.log_date <= end_date)\
             .group_by(Account.name)
     else:
-        grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number'))\
+        grouped_logs_week = db.session.query(Account.name, func.count(Log.account_id).label('Number')).filter_by(guild_id=guild_id)\
         .join(Log.account).group_by(Account.name)
 
-    top_logs_week = grouped_logs_week.order_by(-func.count(Log.account_id)).limit(10).all()
-    bot_logs_week = grouped_logs_week.order_by(func.count(Log.account_id)).limit(10).all()
+    no_visits = db.session.query(Account.name).filter_by(guild_id=guild_id).filter_by(logs = None)
+    print(f'{no_visits=}')
 
-    df_top_logs_week = pd.DataFrame(top_logs_week, columns=['Account', 'Number'])
-    df_bot_logs_week = pd.DataFrame(bot_logs_week, columns=['Account', 'Number'])
+    df_no_visits = pd.DataFrame(no_visits, columns=['Account'])
+    df_no_visits['Number'] = 0
+    print(df_no_visits)
 
-    #print(df_top_logs_week)
-    #return get_data_table(df_top_logs_week, 'Top # Visits'), get_data_table(df_bot_logs_week, 'Bottom # Visits')
-    return get_table(df_top_logs_week, 'Top # Visits'), get_table(df_bot_logs_week, 'Bottom # Visits')
+    all_logs = grouped_logs_week.order_by(func.count(Log.account_id))
+    df_all_logs = pd.DataFrame(all_logs, columns=['Account', 'Number'])
+    df_all_logs = df_all_logs.append(df_no_visits).sort_values(by=['Number'])
+
+    title = f'Total visits from {start_date} to {end_date}' if start_date != '' else 'Total visits'
+    fig = graphs.get_horizontal_bar_chart(df_all_logs, x='Number', y='Account', title=title)
+    visits_graph = dcc.Graph(id='visits-graph', figure=fig)
+
+    return visits_graph
     
 
 @app.callback(
@@ -88,7 +95,6 @@ def show_account_table(graph_data, account):
     total_selection = 0
 
     if 'xaxis.range[0]' in graph_data:
-        #print(datetime.datetime.strptime(graph_data['xaxis.range[0]'], '%Y-%m-%d'))
         start_date = graph_data['xaxis.range[0]'].split(' ')[0]
         end_date = graph_data['xaxis.range[1]'].split(' ')[0]
         total_selection = db.session.query(func.count(Log.account_id)).filter_by(account_id = account).filter(Log.log_date >= start_date, Log.log_date <= end_date).scalar()
@@ -158,3 +164,36 @@ def click_table_row(n, value):
         account_id = db.session.query(Account.id).filter_by(name = name).first()[0]
         return account_id
     raise PreventUpdate
+
+
+def update_guild_members():
+    last_checked = db.session.query(Guild.members_updated_last).filter_by(id=1).scalar()
+    print(f'{date.today()} - {last_checked}')
+    if last_checked != date.today():
+        guild = db.session.query(Guild).filter_by(id=1).first()
+        print(guild.leader_key)
+        headers = {'Authorization': f'Bearer {guild.leader_key}'}
+        request = requests.get(f'https://api.guildwars2.com/v2/guild/{guild.api_id}/members', headers=headers)
+        if request.status_code == 200 or request.status_code == 206:
+            members = request.json()
+            #print(members)
+            for member in members:
+                account = db.session.query(Account).filter_by(name = member['name']).first()
+                if account is None:
+                    print('Doesnt exist yet')
+                    continue
+                    # account = Account()
+                    # account.name = member['name']
+                account.guild = guild
+                try:
+                    db.session.add(account)
+                    db.session.commit()
+                except Exception as e:
+                    print(f'Couldnt update account: {account.name}')
+                    print(e)
+                print(f'Updated account: {account.name}')
+        guild.members_updated_last = date.today()
+        db.session.add(guild)
+        db.session.commit()
+        print('Members updated')
+    print('members already up to date')

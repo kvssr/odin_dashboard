@@ -548,3 +548,21 @@ def get_logs_line_chart(df):
     )
     
     return fig
+
+
+def get_horizontal_bar_chart(df, x, y, title):
+    fig = px.bar(df, y=y, x=x, 
+                 barmode="relative",
+                 orientation='h',
+                 title=title,
+                 height=1200
+                 )
+    fig.update_layout(general_layout_line)
+    fig.update_layout(
+        showlegend=False,
+        yaxis_tickfont_size = 10,
+        #paper_bgcolor = 'red',
+        #plot_bgcolor = 'grey',
+    )
+    fig.update_layout(dict(margin=dict(l=180, r=10)))
+    return fig
