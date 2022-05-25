@@ -683,9 +683,11 @@ class Account(db.Model):
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String(), unique= True)
+    guild_id = db.Column(db.Integer(), db.ForeignKey("guild.id", ondelete="SET NULL"))
 
     characters = relationship("Character", back_populates="account")
     logs = relationship("Log", back_populates="account")
+    guild = relationship('Guild', back_populates='members')
 
 
 class Log(db.Model):
@@ -698,3 +700,16 @@ class Log(db.Model):
 
     account = relationship("Account", back_populates="logs")
 
+
+class Guild(db.Model):
+
+    __tablename__ = 'guild'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    name = db.Column(db.String())
+    api_id = db.Column(db.String())
+    leader_key = db.Column(db.String())
+    members_updated_last = db.Column(db.Date())
+
+    members = relationship('Account', back_populates='guild')
+    
