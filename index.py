@@ -38,8 +38,12 @@ app.layout = dbc.Container(id='container', children=[
 def display_page(pathname):
     view = None
     url = dash.no_update
-    if pathname == '/login':
-        view = login.login
+    
+    # if pathname == '/login':
+    #     view = login.login()
+    if pathname.startswith('/login'):
+        redirect = pathname.split('/')[-1]
+        view = login.login(redirect)
     elif pathname == '/contact':
         view = contact_page.layout()
     elif pathname == '/api':
@@ -82,13 +86,13 @@ def display_page(pathname):
             view = upload_page.layout
         else:
             view = 'Redirecting to login...'
-            url = '/login'
+            url = f'/login{pathname}'
     elif pathname == '/logs':
         if current_user.is_authenticated:
             view = user_logs_page.layout()
         else:
             view = 'Redirecting to login...'
-            url = '/login'
+            url = f'/login{pathname}'
     elif pathname == '/howto':
         view = howto_page.layout
     elif pathname == '/':

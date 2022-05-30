@@ -6,33 +6,36 @@ from werkzeug.security import check_password_hash
 from app import app, db
 from models import User
 
-# login screen
-login = dbc.Row([
-    dcc.Location(id='url_login', refresh=True),
-    dbc.Col([
-        html.H2('Login Form', style={'text-align': 'center'}),
-        dbc.Card([
-            dbc.CardImg(src="assets/logo.png", top=True, style={'width': 200, 'margin': 'auto'}),
-            dbc.CardBody([
-                html.Div(
-                    className='mb-3',
-                    children=[
-                        dbc.Input(type='text', id='uname-box', placeholder='Enter your username')
-                    ]
-                ),
-                html.Div(
-                    className='mb-3',
-                    children=[
-                        dbc.Input(type='password', id='pwd-box', placeholder='Enter your password')
-                    ]
-                ),
-                dbc.Button('Login', id='login-button', class_name='btn btn-color px-5 w-100', n_clicks=0)
-            ])
-        ]),
-        html.Div(children='', id='output-state')
-    ],
-    width={'size': 4, 'offset': 4})
-])
+
+def login(redirect):
+    login = dbc.Row([
+        dcc.Location(id='url_login', refresh=True),
+        dbc.Col([
+            html.H2('Login Form', style={'text-align': 'center'}),
+            dbc.Card([
+                dbc.CardImg(src="/assets/logo.png", top=True, style={'width': 200, 'margin': 'auto'}),
+                dbc.CardBody([
+                    html.Div(
+                        className='mb-3',
+                        children=[
+                            dbc.Input(type='text', id='uname-box', placeholder='Enter your username')
+                        ]
+                    ),
+                    html.Div(
+                        className='mb-3',
+                        children=[
+                            dbc.Input(type='password', id='pwd-box', placeholder='Enter your password')
+                        ]
+                    ),
+                    dbc.Button('Login', id='login-button', class_name='btn btn-color px-5 w-100', n_clicks=0),
+                    dcc.Store(id='redirect-store', data=redirect)
+                ])
+            ]),
+            html.Div(children='', id='output-state')
+        ],
+        width={'size': 4, 'offset': 4})
+    ])
+    return login
 
 
 # Successful login
@@ -112,21 +115,24 @@ login_menu = dbc.Nav(className='menu', children=[
         nav=True,
         id='help',
     ),
-    dbc.NavItem(dbc.NavLink("Admin", href='/login')),
+    dbc.NavItem(dbc.NavLink("Admin", id='admin-link', href='/login')),
 ])
 
 
 @app.callback(Output('url_login', 'pathname'),
               Output('output-state', 'children'),
               [Input('login-button', 'n_clicks')],
-              [State('uname-box', 'value'), State('pwd-box', 'value')])
-def login_button_click(n_clicks, username, password):
+              [State('uname-box', 'value'), State('pwd-box', 'value'), State('redirect-store', 'data')],
+              prevent_initial_call=True)
+def login_button_click(n_clicks, username, password, redirect):
+    if redirect == '':
+        redirect = '/'
     if n_clicks > 0:
         user = db.session.query(User).filter_by(username = username).first()
         if user is not None:
             if check_password_hash(user.password, password):
                 login_user(user)
-                return '/success', ''
+                return redirect, ''
             else:
                 return '/login', 'Incorrect username or password'
         else:
@@ -146,3 +152,11 @@ def login_status(url):
         return logged_in_menu, current_user.get_id()
     else:
         return login_menu, 'loggedout'
+
+
+@app.callback(
+    Output('admin-link', 'href'),
+    Input('url', 'pathname')
+)
+def admin_link_redirect_update(pathname):
+    return f'/login{pathname}'
