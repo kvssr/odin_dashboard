@@ -14,11 +14,11 @@
 /* Change the link color on hover */
 
 .menu .nav-link:hover {
-    color: rgb(116, 0, 0);
+    color: #951313;
 }
 
 #login-row {
-    background-color: #212121;
+    background-color: #1c1c1c;
     border-bottom: rgb(255, 255, 255) solid 1px;
 }
 
