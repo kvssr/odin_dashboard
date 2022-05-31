@@ -171,7 +171,7 @@ def update_guild_members():
     print(f'{date.today()} - {last_checked}')
     if last_checked != date.today():
         guild = db.session.query(Guild).filter_by(id=1).first()
-        print(guild.leader_key)
+        #print(guild.leader_key)
         headers = {'Authorization': f'Bearer {guild.leader_key}'}
         request = requests.get(f'https://api.guildwars2.com/v2/guild/{guild.api_id}/members', headers=headers)
         if request.status_code == 200 or request.status_code == 206:
@@ -180,7 +180,7 @@ def update_guild_members():
             for member in members:
                 account = db.session.query(Account).filter_by(name = member['name']).first()
                 if account is None:
-                    print('Doesnt exist yet')
+                    print(f'{member["name"]} doesnt exist yet')
                     continue
                     # account = Account()
                     # account.name = member['name']

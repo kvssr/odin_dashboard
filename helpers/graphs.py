@@ -140,7 +140,7 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
         yaxis_categoryorder='total ascending',
         xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
         title=title,
-        showlegend=legend,
+        showlegend=legend
     )
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0, width=0.8)
@@ -171,9 +171,9 @@ def add_annotations_graph(fig, df, t):
                 text = name
                 color = 'grey'
             if 'CHARACTERS' in session:
-                print(f"{name.rsplit(' ', 1)[0]=}")
+                #print(f"{name.rsplit(' ', 1)[0]=}")
                 if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
-                    print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
+                    #print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
                     background_color='#616161'
                     #border = '#414141'
             fig.add_annotation(y=name, x=0,

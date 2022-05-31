@@ -1,18 +1,11 @@
-import base64
-import datetime
-import io
-import json
-from threading import Barrier
-
 from dash.dependencies import Input, Output, State
-from dash import dcc
-from dash import html
+from dash import dcc, html
+from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 from flask_login import current_user
 from app import app, db
 import pandas as pd
 from helpers import graphs
-from sqlalchemy.orm.session import close_all_sessions
 
 from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
 
@@ -75,7 +68,8 @@ layout = html.Div(children=[
     Output('deaths-tab-id', 'tab_style'),
 #    Output('dmg-in-tab-id', 'tab_style'),
     Output('summary-tab-id', 'tab_style'),
-    Input('url', 'pathname')
+    Input('url', 'pathname'),
+    prevent_initial_call = True
 )
 def hide_tabs(url):
     print(url)
@@ -90,6 +84,8 @@ def hide_tabs(url):
                 display = 'block'
             )
         return style, style
+    else:
+        raise PreventUpdate
 
 
 
