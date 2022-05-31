@@ -213,6 +213,7 @@ def update_highest_stats(character, col):
     Input('pers-raids-table', 'selected_columns'),
     Input('pers-raids-table', 'derived_virtual_selected_rows'),
     Input('pers-raids-table', 'data'),
+    prevent_initial_call=True
 )
 def show_selected_column(col, rows, data):
     print(f'col: {col}'),
