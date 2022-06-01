@@ -150,15 +150,21 @@ def show_groups_content(raid, fight):
 
     print(df_groups)    
 
-    top_dmg = {name[0]:'damage' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dmg_stat).order_by(-DmgStat.total_dmg).limit(5).all()}
-    top_heals = {name[0]:'heals' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.heal_stat).order_by(-HealStat.total_heal).limit(3).all()}
-    top_distance = {name[0]:'distance' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dist_stat).order_by(-DistStat.percentage_top).limit(3).all()}
-    top_strips = {name[0]:'strips' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.rip_stat).order_by(-RipStat.total_rips).limit(3).all()}
-    top_cleanses = {name[0]:'cleanses' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.cleanse_stat).order_by(-CleanseStat.total_cleanses).limit(3).all()}
-    top_stab = {name[0]:'stab' for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.stab_stat).order_by(-StabStat.total_stab).limit(3).all()}
+    top_dmg = {name[0]:['damage'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dmg_stat).order_by(-DmgStat.total_dmg).limit(5).all()}
+    top_heals = {name[0]:['heals'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.heal_stat).order_by(-HealStat.total_heal).limit(3).all()}
+    top_distance = {name[0]:['distance'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dist_stat).order_by(-DistStat.percentage_top).limit(5).all()}
+    top_strips = {name[0]:['strips'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.rip_stat).order_by(-RipStat.total_rips).limit(3).all()}
+    top_cleanses = {name[0]:['cleanses'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.cleanse_stat).order_by(-CleanseStat.total_cleanses).limit(3).all()}
+    top_stab = {name[0]:['stab'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.stab_stat).order_by(-StabStat.total_stab).limit(3).all()}
     print(top_dmg)
+    top_stats = merge_dicts(top_dmg, top_heals)
+    top_stats = merge_dicts(top_stats, top_distance)
+    top_stats = merge_dicts(top_stats, top_strips)
+    top_stats = merge_dicts(top_stats, top_cleanses)
+    top_stats = merge_dicts(top_stats, top_stab)
 
-    top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
+    #top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
+    print(f'{top_stats=}')
 
     table_header = [html.Thead(html.Tr([html.Th('Professions')]+[html.Th(stat) for stat in _stats_order]))]
 
@@ -174,14 +180,17 @@ def show_groups_content(raid, fight):
 
         player_rows = []
         for player in df_groups.loc[df_groups['Party'] == party, 'Character']:
+            hover_text = f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]} '
+            if player in top_stats:
+                top_text = ''.join([f'| Top {p} ' for p in top_stats[player]])
+            hover_text += top_text
             player_row = html.Tr(
                 [html.Td([
                     html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
                     player,
                     html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
                     dbc.Tooltip(
-                        f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]} | Top {top_stats[player]}' if player in top_stats else f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]}',
-                         target=f'td-{player}', placement='right'
+                        hover_text, target=f'td-{player}', placement='right'
                     )
                 ], id=f'td-{player}')]+
                 [html.Td(format_stat(df_groups[df_groups['Character'] == player][stat].values[0])) for stat in _stats_order]
@@ -276,6 +285,14 @@ def format_stat(stat):
         print(type(stat))
         print(stat)
         return ''
+
+
+def merge_dicts(dict_1, dict_2):
+    dict_3 = {**dict_2, **dict_1}
+    for key, value in dict_3.items():
+        if key in dict_1 and key in dict_2:
+                dict_3[key].append(dict_2[key][0])
+    return dict_3
 
 
 @app.callback(
