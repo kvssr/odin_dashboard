@@ -1,9 +1,11 @@
+from datetime import datetime, timedelta
 import dash_bootstrap_components as dbc
 from dash import dcc, html, Output, Input, State, MATCH, dash_table
 from numpy import int64
 from app import app, db
 from models import Account, Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
 import pandas as pd
+import rating as rt
 
 _stats_order = {
     'Damage':'',
@@ -163,6 +165,11 @@ def show_groups_content(raid, fight):
     top_stats = merge_dicts(top_stats, top_cleanses)
     top_stats = merge_dicts(top_stats, top_stab)
 
+    start_time = datetime.strptime(db.session.query(Fight.start_time).filter_by(raid_id=raid, number=fight).scalar(), '%H:%M:%S')
+    end_time = datetime.strptime(db.session.query(Fight.end_time).filter_by(raid_id=raid, number=fight).scalar(), '%H:%M:%S')
+    print(f'{start_time=}')
+    duration = (end_time - start_time).total_seconds()
+
     #top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
     print(f'{top_stats=}')
 
@@ -183,11 +190,12 @@ def show_groups_content(raid, fight):
             hover_text = f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]} '
             if player in top_stats:
                 top_text = ''.join([f'| Top {p} ' for p in top_stats[player]])
-            hover_text += top_text
+                hover_text += top_text
             player_row = html.Tr(
                 [html.Td([
                     html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
-                    player,
+                    f'{player} | ',
+                    rt.check_build(df_groups.loc[df_groups['Character'] == player].squeeze(), duration),
                     html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
                     dbc.Tooltip(
                         hover_text, target=f'td-{player}', placement='right'
@@ -197,7 +205,7 @@ def show_groups_content(raid, fight):
             )
             # table_rows.append(player_row)
             player_rows.append(player_row)
-        player_body = html.Tbody(player_rows, hidden=True, className='groups-row-collapse-container', id={'type': 'groups-rows-toggle', 'index': str(party)})
+        player_body = html.Tbody(player_rows, hidden=False, className='groups-row-collapse-container', id={'type': 'groups-rows-toggle', 'index': str(party)})
         table_rows.append(player_body)
     # table_body = html.Tbody(table_rows)
 
@@ -213,7 +221,7 @@ def show_groups_content(raid, fight):
         striped=True,
     )
 
-
+    return table
     rows= [dbc.Row([
         dbc.Col('Professions', width={'size': 2}),]+
         [dbc.Col(stat) for stat in _stats_order]
