@@ -172,7 +172,7 @@ def show_groups_content(raid, fight, rating):
     for party in df_groups['Party'].unique():
         sum_row = html.Tr(
             [html.Td([html.Div(id={'type': 'collapse-cross', 'index': str(party)}, children='-', className='collapse-cross')]+
-                [html.Img(src=f'assets/profession_icons/{player}.png', height='2em', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
+                [html.Img(src=f'assets/profession_icons/{player}.png', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
             [html.Td('')]+
             [html.Td(f"{df_groups[df_groups['Party'] == party]['Damage'].sum():,.0f} ({df_groups[df_groups['Party'] == party]['Damage'].sum()/df_groups['Damage'].sum()*100:.0f}%)")]+
             [html.Td(format_stat(df_groups[df_groups['Party'] == party][stat].sum())) for stat in _stats_order if stat != 'Damage']
