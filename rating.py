@@ -72,7 +72,8 @@ def calculate_ratings_per_fight(fight_id:int, players_df:pd.DataFrame) -> pd.Dat
 
 
 def update_db_rating(index, fight_id, char_df:pd.DataFrame):
-    char_id = db.session.query(Character.id).filter_by(name = index[0]).first()[0]
+    prof_id = db.session.query(Profession.id).filter_by(name = char_df['Profession']).first()[0]
+    char_id = db.session.query(Character.id).filter_by(name = index[0]).filter_by(profession_id = prof_id).first()[0]
     char_rating = CharacterFightRating(
         fight_id        = fight_id,
         character_id    = char_id,
@@ -102,8 +103,8 @@ def calculate_ratings_per_raid(raid_id:int):
     if ratings_exist != None:
         print('This raid already has ratings')
         return
-    excel_df = pd.DataFrame()
-    excel_df.to_excel('output.xlsx')
+    # excel_df = pd.DataFrame()
+    # excel_df.to_excel('output.xlsx')
     players2_df = pd.DataFrame(columns=['Name', 'Build', 'Change']).set_index(['Name', 'Build'])
     for fight in fights:
 
@@ -142,8 +143,8 @@ def calculate_ratings_per_raid(raid_id:int):
     print(fights)
     #print(players2_df)
     # players2_df.to_csv('file2.csv')
-    with pd.ExcelWriter('output.xlsx', mode='a') as writer: 
-        players2_df.to_excel(writer, sheet_name='Overview')
+    # with pd.ExcelWriter('output.xlsx', mode='a') as writer: 
+    #     players2_df.to_excel(writer, sheet_name='Overview')
 
 
 def get_players_ratings(players_df:pd.DataFrame) -> pd.DataFrame:
