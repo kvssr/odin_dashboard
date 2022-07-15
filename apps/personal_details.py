@@ -270,9 +270,11 @@ def get_rating_graph(cols, df_p, selected_raids):
         else:
             df = df.append(raid_stats, ignore_index=True)
 
+
     print(f'{cols=}')
     print(f'{cols[0]=}')
     print(f'{raid_date=}')
+    df.sort_values(by=['raid_date'], inplace=True)
     print(df)
     selected_cols = [colum_models[col][1] for col in cols]
     fig = graphs.get_rating_line_chart(df, selected_cols)
