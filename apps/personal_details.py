@@ -5,8 +5,9 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 from flask import session
 from flask_login import current_user
+from numpy import character
 from app import db, app
-from models import AegisStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, RipStat, StabStat
+from models import AegisStat, BarrierStat, Character, CharacterFightRating, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, RipStat, StabStat
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from helpers import graphs
@@ -30,19 +31,19 @@ config = {
 }
 
 colum_models = {
-    'Damage': [DmgStat, 'total_dmg', 'avg_dmg_s', 'Average dmg per s', 5],
-    'Rips': [RipStat, 'total_rips', 'avg_rips_s', 'Average rips per s', 3],
-    'Cleanses': [CleanseStat, 'total_cleanses', 'avg_cleanses_s', 'Average cleanses per s', 3],
-    'Stab': [StabStat, 'total_stab', 'avg_stab_s', 'Average stab per s', 3],
-    'Healing': [HealStat, 'total_heal', 'avg_heal_s', 'Average heal per s', 3],
-    'Sticky': [DistStat, 'percentage_top', 'percentage_top', 'Percentage Top', 5],
-    'Prot': [ProtStat, 'total_prot', 'avg_prot_s', 'Average prot per s', 3],
-    'Aegis': [AegisStat, 'total_aegis', 'avg_aegis_s', 'Average aegis per s', 3],
-    'Might': [MightStat, 'total_might', 'avg_might_s', 'Average might per s', 2],
-    'Fury': [FuryStat, 'total_fury', 'avg_fury_s', 'Average fury per s', 2],
-    'Barrier': [BarrierStat, 'total_barrier', 'avg_barrier_s', 'Average barrier per s', 3],
-    'Damage Taken': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
-    'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
+    'Damage': [DmgStat, 'damage', 'avg_dmg_s', 'Average dmg per s', 5],
+    'Rips': [RipStat, 'boonrips', 'avg_rips_s', 'Average rips per s', 3],
+    'Cleanses': [CleanseStat, 'cleanses', 'avg_cleanses_s', 'Average cleanses per s', 3],
+    'Stab': [StabStat, 'stability', 'avg_stab_s', 'Average stab per s', 3],
+    'Healing': [HealStat, 'healing', 'avg_heal_s', 'Average heal per s', 3],
+    'Sticky': [DistStat, '-', 'percentage_top', 'Percentage Top', 5],
+    'Prot': [ProtStat, 'protection', 'avg_prot_s', 'Average prot per s', 3],
+    'Aegis': [AegisStat, 'aegis', 'avg_aegis_s', 'Average aegis per s', 3],
+    'Might': [MightStat, 'might', 'avg_might_s', 'Average might per s', 2],
+    'Fury': [FuryStat, 'fury', 'avg_fury_s', 'Average fury per s', 2],
+    'Barrier': [BarrierStat, 'barrier', 'avg_barrier_s', 'Average barrier per s', 3],
+    'Damage Taken': [DmgTakenStat, '-', 'times_top', 'Times Top', 5],
+    'Deaths': [DeathStat, '-', 'times_top', 'Times Top', 5]
 }
 
 
@@ -113,7 +114,14 @@ def layout(name):
                 id='name-dropdown',
                 options=dropdown_options,
                 value=character_id
-            ), width={'size': 4 , 'offset': 4})
+                ), width={'size': 4 , 'offset': 4}
+            ),
+            dbc.Col(dbc.Switch(
+                            id="rating-switch-pers",
+                            label="Show Rating",
+                            value=False,
+                    ), width={'size': 1}
+            ),
         ]),
         dbc.Row([
             dbc.Col(
@@ -176,6 +184,18 @@ def layout(name):
 
 
 @app.callback(
+    Output('pers-raids-table', 'column_selectable'),
+    Input('rating-switch-pers', 'value'),
+    prevent_initial_call=True
+)
+def switch_table_col_selection(switch):
+    selectable = 'single'
+    if switch:
+        selectable = 'multi'
+    return selectable
+
+
+@app.callback(
     Output('pers-raids-table', 'data'),
     Input('name-dropdown', 'value'),
 )
@@ -213,65 +233,105 @@ def update_highest_stats(character, col):
     Input('pers-raids-table', 'selected_columns'),
     Input('pers-raids-table', 'derived_virtual_selected_rows'),
     Input('pers-raids-table', 'data'),
+    Input('rating-switch-pers', 'value'),
 )
-def show_selected_column(col, rows, data):
+def show_selected_column(col, rows, data, switch):
     print(f'col: {col}'),
     print(f'rows: {rows}')
     print(f'data: {data}')
     if col is not None and col[0] in colum_models:
         selected_raids = [data[s]['raid_id'] for s in rows]
-
-        # Get model and attribute depending on selected column
-        model = colum_models[col[0]][0]
-        model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
-
         df_p = pd.DataFrame(data)
-        df_p['mode'] = 'markers+lines'
-        df_p['fill'] = 'none'
-        profession = db.session.query(Character).filter_by(id = str(df_p['character_id'][0])).join(Profession).first().profession
-        df_p['Profession_color'] = profession.color
-        df_p['Profession'] = profession.name
 
-        df_p = df_p[df_p['raid_id'].isin(selected_raids)]
-        min_max = func.max(model_attr)
-   
-        for raid in df_p['raid_id']:
-            raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
-            raid_time = df_p.loc[df_p['raid_id']==raid, 'Start Time'].item()
-            raid_date = f'{raid_date} {raid_time}'
-            
-            df_p.loc[df_p['raid_id']==raid, 'Date'] = raid_date
-            if col[0] == 'Sticky':
-                df_p.loc[df_p['raid_id']==raid, col[0]] = int(df_p.loc[df_p['raid_id']==raid, col[0]].item().split('%')[0])
-
-            ### Get Lowest Profession
-            bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
-            df_bot_prof = pd.DataFrame(
-                [[raid, raid_date, 'Last Prof', bot_prof_value, profession.color, profession.name, 'lines', 'none']],
-                columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
-            )
-            df_p = df_p.append(df_bot_prof)
-
-            ### Get Top Profession
-            top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
-            df_top_prof = pd.DataFrame(
-                [[raid, raid_date, 'First Prof', top_prof_value, profession.color, profession.name, 'none', 'tonextx']],
-                columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
-            )
-            df_p = df_p.append(df_top_prof)
-
-            ### Get Top Player
-            top_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).group_by(PlayerStat.raid_id).scalar()
-            top_char = db.session.query(Character).join(PlayerStat).filter_by(raid_id=raid).join(model).filter(model_attr==top_value).first()
-            profession2 = top_char.profession.name
-            profession_color = top_char.profession.color
-            df_top_n = pd.DataFrame([[raid, raid_date, '#1 Person', top_value, profession_color, profession2, 'lines', 'none']], 
-                columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill'])
-            df_p = df_p.append(df_top_n.head())
-
-        
-        fig = graphs.get_personal_chart(df_p, col[0])
+        if not switch:
+            print(df_p.head())
+            fig = get_value_graph(col, df_p, selected_raids)
+        elif switch:
+            print(df_p.head())
+            fig = get_rating_graph(col, df_p, selected_raids)
+        else:
+            return None
         return dcc.Graph(id='personal-graph',figure=fig, style={'height': 500}, config=config)
+
+
+def get_rating_graph(cols, df_p, selected_raids):
+    # df = df[df['raid_id'].isin(selected_raids)]
+    df = pd.DataFrame
+    _columns = [col for col in CharacterFightRating.__table__.columns.keys()] + ['raid_date', 'raid_id']
+    for raid in selected_raids:
+        raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
+        raid_stats = db.session.query(CharacterFightRating).filter_by(character_id=str(df_p['character_id'][0])).join(CharacterFightRating.fight).filter_by(raid_id=raid)\
+            .order_by(CharacterFightRating.id.desc()).first().__dict__
+        raid_stats['raid_date'] = raid_date
+        raid_stats['raid_id'] = raid
+        print(f'{raid_stats=}')
+        if df.empty:
+            df = pd.DataFrame(raid_stats, columns = _columns, index=['id'])
+        else:
+            df = df.append(raid_stats, ignore_index=True)
+
+    print(f'{cols=}')
+    print(f'{cols[0]=}')
+    print(f'{raid_date=}')
+    print(df)
+    selected_cols = [colum_models[col][1] for col in cols]
+    fig = graphs.get_rating_line_chart(df, selected_cols)
+    return fig
+
+
+def get_value_graph(col, df_p, selected_raids):
+
+    # Get model and attribute depending on selected column
+    model = colum_models[col[0]][0]
+    model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
+
+
+    df_p['mode'] = 'markers+lines'
+    df_p['fill'] = 'none'
+    profession = db.session.query(Character).filter_by(id = str(df_p['character_id'][0])).join(Profession).first().profession
+    df_p['Profession_color'] = profession.color
+    df_p['Profession'] = profession.name
+
+    df_p = df_p[df_p['raid_id'].isin(selected_raids)]
+    min_max = func.max(model_attr)
+
+    for raid in df_p['raid_id']:
+        raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
+        raid_time = df_p.loc[df_p['raid_id']==raid, 'Start Time'].item()
+        raid_date = f'{raid_date} {raid_time}'
+        
+        df_p.loc[df_p['raid_id']==raid, 'Date'] = raid_date
+        if col[0] == 'Sticky':
+            df_p.loc[df_p['raid_id']==raid, col[0]] = int(df_p.loc[df_p['raid_id']==raid, col[0]].item().split('%')[0])
+
+        ### Get Lowest Profession
+        bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+        df_bot_prof = pd.DataFrame(
+            [[raid, raid_date, 'Last Prof', bot_prof_value, profession.color, profession.name, 'lines', 'none']],
+            columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
+        )
+        df_p = df_p.append(df_bot_prof)
+
+        ### Get Top Profession
+        top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+        df_top_prof = pd.DataFrame(
+            [[raid, raid_date, 'First Prof', top_prof_value, profession.color, profession.name, 'none', 'tonextx']],
+            columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
+        )
+        df_p = df_p.append(df_top_prof)
+
+        ### Get Top Player
+        top_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).group_by(PlayerStat.raid_id).scalar()
+        top_char = db.session.query(Character).join(PlayerStat).filter_by(raid_id=raid).join(model).filter(model_attr==top_value).first()
+        profession2 = top_char.profession.name
+        profession_color = top_char.profession.color
+        df_top_n = pd.DataFrame([[raid, raid_date, '#1 Person', top_value, profession_color, profession2, 'lines', 'none']], 
+            columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill'])
+        df_p = df_p.append(df_top_n.head())
+
+    
+    fig = graphs.get_personal_chart(df_p, col[0])
+    return fig
 
 
 @app.callback(
