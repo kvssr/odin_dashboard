@@ -282,8 +282,8 @@ def write_dmg_to_db(df, raid):
             dmgstat.player_stat_id = player_id
             dmgstat.times_top = row['Times Top']
             dmgstat.percentage_top = row['Percentage Top']
-            dmgstat.total_dmg = row['Total dmg']
-            dmgstat.avg_dmg_s = row['Average dmg per s']
+            dmgstat.total = row['Total dmg']
+            dmgstat.avg_s = row['Average dmg per s']
 
             db.session.add(dmgstat)
             db.session.commit()

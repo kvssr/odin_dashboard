@@ -27,22 +27,22 @@ stats = {
 def write_xls_to_db(json_file, name = '' , t = 1):
     json_fights = json_file['fights']
 
-    start_time_utc = datetime.strptime(json_file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
-    start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
+    # start_time_utc = datetime.strptime(json_file['overall_raid_stats']['start_time'], '%H:%M:%S %z')
+    # start_time_cet = start_time_utc.astimezone(pytz.timezone("CET"))
 
-    end_time_utc = datetime.strptime(json_file['overall_raid_stats']['end_time'], '%H:%M:%S %z')
-    end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
+    # end_time_utc = datetime.strptime(json_file['overall_raid_stats']['end_time'], '%H:%M:%S %z')
+    # end_time_cet = end_time_utc.astimezone(pytz.timezone("CET"))
 
-    #json_fight_date = date_time_cet.date()
-    json_raid_start_time = str(start_time_cet.timetz())
-    json_raid_end_time = str(end_time_cet.timetz())
+    # #json_fight_date = date_time_cet.date()
+    # json_raid_start_time = str(start_time_cet.timetz())
+    # json_raid_end_time = str(end_time_cet.timetz())
 
-    print(f'start time: {json_raid_start_time}')
-    print(f'end time: {json_raid_end_time}')
+    # print(f'start time: {json_raid_start_time}')
+    # print(f'end time: {json_raid_end_time}')
 
     json_fight_date = json_file['overall_raid_stats']['date']
-    #json_raid_start_time = json_file['overall_raid_stats']['start_time']
-    #json_raid_end_time = json_file['overall_raid_stats']['end_time']
+    json_raid_start_time = json_file['overall_raid_stats']['start_time']
+    json_raid_end_time = json_file['overall_raid_stats']['end_time']
 
     try:
         raids = db.session.query(Raid.id).filter_by(raid_date=json_fight_date)
@@ -301,9 +301,11 @@ def write_fight_summary_to_db(raid, raid_id, start_time, end_time):
 def write_stats_to_db(json_file, player_id, stat_model, json_stat):
     try:
         stat = stat_model()
-        total_stat = setattr(stat, f'total_{json_stat}', json_file['total_stats'][json_stat])
+        # total_stat = setattr(stat, f'total_{json_stat}', json_file['total_stats'][json_stat])
+        stat.total = json_file['total_stats'][json_stat]
         if json_stat != 'deaths':
-            setattr(stat, f'avg_{json_stat}_s', json_file['average_stats'][json_stat])
+            # setattr(stat, f'avg_{json_stat}_s', json_file['average_stats'][json_stat])
+            stat.avg_s = json_file['average_stats'][json_stat]
         else:
             setattr(stat, f'avg_{json_stat}_m', json_file['average_stats'][json_stat])
         stat.player_stat_id = player_id
