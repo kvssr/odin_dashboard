@@ -1,4 +1,5 @@
 from datetime import datetime
+from lib2to3.pytree import Base
 from flask import session
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
@@ -171,169 +172,74 @@ class Fight(db.Model):
         }
 
 
-class DmgStat(db.Model):
+class BaseStat(db.Model):
+    __abstract__ = True
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    times_top = db.Column(db.Integer())
+    percentage_top = db.Column(db.Integer())
+    total = db.Column(db.Integer())
+    avg_s = db.Column(db.Float())
+
+    
+    def to_dict(self, masked=False):
+        if masked:
+            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
+                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+            else:
+                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
+        else:
+            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+        return {
+            'Name': name,
+            'Times Top': self.times_top,
+            'Total': self.total,
+            'Average per s': self.avg_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
+
+class DmgStat(BaseStat):
 
     __tablename__ = 'dmg_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_dmg = db.Column(db.Integer())
-    avg_dmg_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="dmg_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total dmg': self.total_dmg,
-            'Average dmg per s': self.avg_dmg_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class RipStat(db.Model):
+class RipStat(BaseStat):
 
     __tablename__ = 'rip_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_rips = db.Column(db.Integer())
-    avg_rips_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="rip_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total rips': self.total_rips,
-            'Average rips per s': self.avg_rips_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-
-class CleanseStat(db.Model):
+class CleanseStat(BaseStat):
 
     __tablename__ = 'cleanse_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_cleanses = db.Column(db.Integer())
-    avg_cleanses_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="cleanse_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total cleanses': self.total_cleanses,
-            'Average cleanses per s': self.avg_cleanses_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class StabStat(db.Model):
+class StabStat(BaseStat):
 
     __tablename__ = 'stab_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_stab = db.Column(db.Integer())
-    avg_stab_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="stab_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total stab': self.total_stab,
-            'Average stab per s': self.avg_stab_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
-
-
-class HealStat(db.Model):
+class HealStat(BaseStat):
 
     __tablename__ = 'heal_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_heal = db.Column(db.Integer())
-    avg_heal_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="heal_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total heal': self.total_heal,
-            'Average heal per s': self.avg_heal_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-
-class DistStat(db.Model):
+class DistStat(BaseStat):
 
     __tablename__ = 'dist_stat'
 
@@ -365,208 +271,60 @@ class DistStat(db.Model):
             'Profession_color': self.player_stat.character.profession.color
         }
 
-class ProtStat(db.Model):
+class ProtStat(BaseStat):
 
     __tablename__ = 'prot_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_prot = db.Column(db.Integer())
-    avg_prot_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="prot_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total prot': self.total_prot,
-            'Average prot per s': self.avg_prot_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class AegisStat(db.Model):
+class AegisStat(BaseStat):
 
     __tablename__ = 'aegis_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_aegis = db.Column(db.Integer())
-    avg_aegis_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="aegis_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total aegis': self.total_aegis,
-            'Average aegis per s': self.avg_aegis_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class MightStat(db.Model):
+class MightStat(BaseStat):
 
     __tablename__ = 'might_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_might = db.Column(db.Integer())
-    avg_might_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="might_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total might': self.total_might,
-            'Average might per s': self.avg_might_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class FuryStat(db.Model):
+class FuryStat(BaseStat):
 
     __tablename__ = 'fury_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_fury = db.Column(db.Integer())
-    avg_fury_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="fury_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total fury': self.total_fury,
-            'Average fury per s': self.avg_fury_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-class BarrierStat(db.Model):
+class BarrierStat(BaseStat):
 
     __tablename__ = 'barrier_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_barrier = db.Column(db.Integer())
-    avg_barrier_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="barrier_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total barrier': self.total_barrier,
-            'Average barrier per s': self.avg_barrier_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
-
-class DmgTakenStat(db.Model):
+class DmgTakenStat(BaseStat):
 
     __tablename__ = 'dmg_taken_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_dmg_taken = db.Column(db.Integer())
-    avg_dmg_taken_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="dmg_taken_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total dmg_taken': self.total_dmg_taken,
-            'Average dmg_taken per s': self.avg_dmg_taken_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color,
-            'Total deaths': self.player_stat.death_stat.total_deaths
-        }
 
-class DeathStat(db.Model):
+class DeathStat(BaseStat):
 
     __tablename__ = 'death_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_deaths = db.Column(db.Integer())
     avg_deaths_m = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="death_stat")
 
     def to_dict(self, masked=False):
@@ -588,17 +346,12 @@ class DeathStat(db.Model):
         }
 
 
-class KillsStat(db.Model):
+class KillsStat(BaseStat):
 
     __tablename__ = 'kills_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_kills = db.Column(db.Integer())
     avg_kills_m = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="kills_stat")
 
     def to_dict(self, masked=False):
