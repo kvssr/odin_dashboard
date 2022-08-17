@@ -97,12 +97,13 @@ def display_page(pathname):
         view = howto_page.layout
     elif pathname == '/':
         if check_valid_guild() or current_user.is_authenticated:
-            view = top_stats.layout
+            view = top_stats.layout()
         else:
             view = 'Redirecting to api...'
             url = '/api'
     else:
-        view = top_stats.layout
+        view = 'Redirecting to api...'
+        url = '/api'
     # You could also return a 404 "URL not found" page here
     return view, url
 
