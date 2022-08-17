@@ -76,6 +76,9 @@ class PlayerStat(db.Model):
     dmg_taken_stat = relationship("DmgTakenStat", back_populates="player_stat", uselist=False, lazy='select')
     death_stat = relationship("DeathStat", back_populates="player_stat", uselist=False, lazy='select')
     kills_stat = relationship("KillsStat", back_populates="player_stat", uselist=False, lazy='select')
+    quick_stat = relationship("QuickStat", back_populates="player_stat", uselist=False, lazy='select')
+    alac_stat = relationship("AlacStat", back_populates="player_stat", uselist=False, lazy='select')
+    sup_speed_stat = relationship("SupSpeedStat", back_populates="player_stat", uselist=False, lazy='select')
 
     def to_dict(self):
         return {
@@ -195,6 +198,7 @@ class BaseStat(db.Model):
             'Total': self.total,
             'Average per s': self.avg_s,
             'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Percentage Top': self.percentage_top,
             'Profession': self.player_stat.character.profession.name,
             'Profession_color': self.player_stat.character.profession.color
         }
@@ -243,33 +247,9 @@ class DistStat(BaseStat):
 
     __tablename__ = 'dist_stat'
 
-    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
-    times_top = db.Column(db.Integer())
-    percentage_top = db.Column(db.Integer())
-    total_dist = db.Column(db.Integer())
-    avg_dist_s = db.Column(db.Float())
-
     player_stat = relationship("PlayerStat", back_populates="dist_stat")
 
-    def to_dict(self, masked=False):
-        if masked:
-            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
-                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-            else:
-                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
-        else:
-            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
-        return {
-            'Name': name,
-            'Times Top': self.times_top,
-            'Total dist': self.total_dist,
-            'Percentage Top': self.percentage_top,
-            'Average dist per s': self.avg_dist_s,
-            'Attendance (number of fights)': self.player_stat.attendance_count,
-            'Profession': self.player_stat.character.profession.name,
-            'Profession_color': self.player_stat.character.profession.color
-        }
 
 class ProtStat(BaseStat):
 
@@ -317,6 +297,30 @@ class DmgTakenStat(BaseStat):
 
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="dmg_taken_stat")
+
+
+class QuickStat(BaseStat):
+
+    __tablename__ = 'quick_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="quick_stat")
+
+
+class AlacStat(BaseStat):
+
+    __tablename__ = 'alac_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="alac_stat")
+
+
+class SupSpeedStat(BaseStat):
+
+    __tablename__ = 'sup_speed_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="sup_speed_stat")
 
 
 class DeathStat(BaseStat):

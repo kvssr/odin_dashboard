@@ -1,0 +1,36 @@
+top_page_stats:
+- model_name: DmgStat
+  name: Damage
+  top_limit: 5
+- model_name: DistStat
+  name: Sticky
+  top_limit: 5
+- model_name: StabStat
+  name: Stability
+  top_limit: 3
+- model_name: CleanseStat
+  name: Cleanses
+  top_limit: 3
+- model_name: HealStat
+  name: Heals
+  top_limit: 3
+- model_name: RipStat
+  name: Boonrips
+  top_limit: 3
+
+model_names_list:
+- DmgStat
+- DistStat
+- StabStat
+- CleanseStat
+- HealStat
+- RipStat
+- BarrierStat
+- ProtStat
+- AegisStat
+- MightStat
+- DmgTakenStat
+- FuryStat
+- QuickStat
+- AlacStat
+- SupSpeedStat

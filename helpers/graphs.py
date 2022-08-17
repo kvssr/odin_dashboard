@@ -1,12 +1,9 @@
 from __future__ import annotations
 import plotly.express as px
 import plotly.graph_objects as go
-
 from app import db
-from models import Fight, FightSummary, Profession
 import dash_bootstrap_components as dbc
 from dash import html
-from plotly.subplots import make_subplots
 from flask import session
 
 
@@ -128,9 +125,9 @@ general_layout_line = {
 }
 
 def get_top_bar_chart(df, t, title, legend = True, detailed = False):
-    fig = px.bar(df, y="Name", x="Total " + t, 
+    fig = px.bar(df, y="Name", x="Total", 
                  color="Profession", 
-                 text="Total "+ t,
+                 text="Total",
                  text_auto=',',
                  barmode="relative",
                  orientation='h',
@@ -138,7 +135,7 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
                  )
     fig.update_layout(
         yaxis_categoryorder='total ascending',
-        xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
+        xaxis_title="Times top / Times attended - Total | avg per sec",
         title=title,
         showlegend=legend
     )
@@ -154,9 +151,10 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
 
 def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
+        avg_s = df[df["Name"] == name]["Average per s"].values[0]
         if t != 'deaths':
-            fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total " + t].values[0]),
-                               text="{:,.0f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]) if t in ['dmg', 'heal', 'barrier', 'dmg_taken'] else "{:,.2f}".format(df[df["Name"] == name]["Average " + t + " per s"].values[0]),
+            fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total"].values[0]),
+                               text="{:,.0f}".format(avg_s) if avg_s >= 10 else "{:,.2f}".format(avg_s),
                                showarrow=False,
                                yshift=0,
                                xshift=2,
