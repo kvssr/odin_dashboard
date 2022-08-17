@@ -1,9 +1,7 @@
 from datetime import datetime
 import pytz
-from sqlalchemy.orm import session
-
-from models import Account, AegisStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, KillsStat, MightStat, PlayerStat, Profession, ProtStat, Raid, RaidType, RipStat, StabStat
-from app import db, server
+from models import Account, AegisStat, AlacStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, Profession, ProtStat, QuickStat, Raid, RaidType, RipStat, StabStat, SupSpeedStat
+from app import db
 from helpers import graphs
 
 
@@ -21,6 +19,9 @@ stats = {
     'prot': ProtStat,
     'rips': RipStat,
     'stab': StabStat,
+    'quick': QuickStat,
+    'alac': AlacStat,
+    'speed': SupSpeedStat,
 }
 
 
