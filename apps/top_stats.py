@@ -100,32 +100,33 @@ def get_drop_down_options(url):
               )
 def update_on_page_load(raid, data, editmode):
     stats_shown = layout_config['top_page_stats']
-    stats_names = layout_config['model_names_list']
-    stats_all = []
+    stats_models = layout_config['model_list']
 
-    print(f'EDITMODE: {editmode}')
-    # Get the right models
-    for m in stats_shown:
-        if 'model' not in m:
-            for n in db.Model.registry.mappers:
-                if n.class_.__name__ in m['model_name']:
-                    m['model'] = n.class_
+    # stats_all = []
 
-    for stat in stats_names:
-        for n in db.Model.registry.mappers:
-            if n.class_.__name__ == stat:
-                model_name = n.class_.__name__
-                name = n.class_.__name__
-                model = n.class_
-                dct = {
-                    'model_name': model_name,
-                    'name': name,
-                    'model': model,
-                    'top_limit': 3
-                }
-                stats_all.append(dct)
+    # print(f'EDITMODE: {editmode}')
+    # # Get the right models
+    # for m in stats_shown:
+    #     if 'model' not in m:
+    #         for n in db.Model.registry.mappers:
+    #             if n.class_.__name__ in m['model_name']:
+    #                 m['model'] = n.class_
 
-    layout_config['model_list'] = stats_all
+    # for stat in stats_names:
+    #     for n in db.Model.registry.mappers:
+    #         if n.class_.__name__ == stat:
+    #             model_name = n.class_.__name__
+    #             name = n.class_.__name__
+    #             model = n.class_
+    #             dct = {
+    #                 'model_name': model_name,
+    #                 'name': name,
+    #                 'model': model,
+    #                 'top_limit': 3
+    #             }
+    #             stats_all.append(dct)
+
+    # layout_config['model_list'] = stats_all
     cols = [dbc.Col([
         dbc.Card([
             dbc.CardBody([
@@ -161,9 +162,9 @@ def update_on_page_load(raid, data, editmode):
                         id={'type': 'slct-model', 'index': x},
                         className='edit-item',
                         style={'max-width': '120px'},
-                        value=stats_names.index(row['model_name']),
+                        value=list(stats_models.keys()).index(row['model_name']),
                         options=[
-                            {'label': s['name'], 'value': ix} for ix, s in enumerate(stats_all)
+                            {'label': s, 'value': ix} for ix, s in enumerate(stats_models)
                         ]
                     ),
                     dbc.Button(
@@ -176,7 +177,7 @@ def update_on_page_load(raid, data, editmode):
                     dcc.Graph(
                         id={'type': 'top-graph', 'index': x},
                         figure=get_fig_with_model(
-                            row['model'], 'dmg', f'Top {row["name"]}', row['top_limit'], raid),
+                            stats_models[row['model_name']], 'dmg', f'Top {row["name"]}', row['top_limit'], raid),
                         config=config
                     ), color='grey'
                 )
@@ -209,7 +210,10 @@ def toggle_editmode(editmode):
     prevent_initial_call=True
 )
 def update_graph(limit, model, id, raid):
-    stat = layout_config['model_list'][int(model)]
+    stat = {}
+    stat['model_name'] = list(layout_config['model_list'].keys())[int(model)]
+    stat['name'] = stat['model_name']
+    stat['model'] = layout_config['model_list'][stat['name']]
     layout_config['top_page_stats'][id['index']] = stat
     stat['top_limit'] = limit
     figure = get_fig_with_model(
