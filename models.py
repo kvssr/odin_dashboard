@@ -298,6 +298,26 @@ class DmgTakenStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="dmg_taken_stat")
 
+    def to_dict(self, masked=False):
+        if masked:
+            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
+                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+            else:
+                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
+        else:
+            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+        return {
+            'Name': name,
+            'Times Top': self.times_top,
+            'Total': self.total,
+            'Total Deaths': self.player_stat.death_stat.total,
+            'Average per s': self.avg_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Percentage Top': self.percentage_top,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
+
 
 class QuickStat(BaseStat):
 

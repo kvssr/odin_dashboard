@@ -34,3 +34,38 @@ model_names_list:
 - QuickStat
 - AlacStat
 - SupSpeedStat
+
+details_tabs:
+- Offensive:
+  - name: Damage
+    model: DmgStat
+  - name: Rips
+    model: RipStat
+  - name: Might
+    model: MightStat
+  - name: Fury
+    model: FuryStat
+  - name: Quickness
+    model: QuickStat
+  - name: Alacrity
+    model: AlacStat
+- Defensive:
+  - name: Stability
+    model: StabStat
+  - name: Healing
+    model: HealStat
+  - name: Barrier
+    model: BarrierStat
+  - name: Protection
+    model: ProtStat
+  - name: Aegis
+    model: AegisStat
+- General:
+  - name: Distance
+    model: DistStat
+  - name: DmgTaken
+    model: DmgTakenStat
+  - name: SuperSpeed
+    model: SupSpeedStat
+  - name: Summary
+    model: Summary

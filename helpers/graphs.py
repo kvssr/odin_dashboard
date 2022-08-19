@@ -142,8 +142,6 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig.update_layout(general_layout)
     fig.update_traces(textangle=0, width=0.8)
     fig = add_annotations_graph(fig, df, t)
-    #fig = add_times_top_annotation(fig, df)
-    #fig = add_clickable_names(fig, df)
     if detailed:
         fig = add_sorting_options(fig, df, t)
     return fig
@@ -294,7 +292,7 @@ def get_summary_table(df):
 
 #Total dmg_taken
 def get_top_dmg_taken_chart(df, t, title, legend = True):
-    fig = px.bar(df, y=df["Name"], x=df["Average dmg_taken per s"], 
+    fig = px.bar(df, y=df["Name"], x=df["Average per s"], 
                  color=df["Name"],
                  hover_name="Name",
                  text=df['Profession'],
@@ -304,7 +302,7 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                  color_discrete_sequence=df["Profession_color"].values
                  )
     fig.update_layout(
-        xaxis_title="Times top / Times attended - (Deaths) - " + t + " per sec | Total " + t,
+        xaxis_title="Times top / Times attended - (Deaths) - per sec | Total ",
         title=title,
         showlegend=legend,
         legend_y=1,
@@ -316,8 +314,8 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
     fig = add_clickable_names(fig, df)
 
     for name in df['Name']:
-        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Average dmg_taken per s"].values[0]),
-                                text="{:,.0f}".format(df[df["Name"] == name]["Total dmg_taken"].values[0]),
+        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Average per s"].values[0]),
+                                text="{:,.0f}".format(df[df["Name"] == name]["Total"].values[0]),
                                 showarrow=False,
                                 yshift=0,
                                 xshift=2,
@@ -325,8 +323,8 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                                 font_size=13,
         )
     for name in df['Name']:
-        fig.add_annotation(y=name, x=int(df.iloc[0]["Average dmg_taken per s"]/2),
-                                text="{:,.0f}".format(df[df["Name"] == name]["Total deaths"].values[0]),
+        fig.add_annotation(y=name, x=int(df.iloc[0]["Average per s"]/2),
+                                text="{:,.0f}".format(df[df["Name"] == name]["Total Deaths"].values[0]),
                                 showarrow=False,
                                 yshift=0,
                                 xshift=2,
@@ -346,12 +344,12 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
                 buttons=[
                     dict(label="Average",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by="Average dmg_taken per s", ascending=False))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by="Average per s", ascending=False))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                     dict(label="Deaths",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Total deaths","Average dmg_taken per s"], ascending=[True, False]))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Total Deaths","Average per s"], ascending=[True, False]))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                 ]
@@ -401,17 +399,17 @@ def add_sorting_options(fig, df, t):
                             args=["yaxis", {"categoryorder": "total ascending", 'showticklabels': False}]),
                     dict(label="Average",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by=f"Average {t} per s", ascending=True))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=f"Average per s", ascending=True))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                     dict(label="Times Top",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Times Top", f"Total {t}"], ascending=[True, True]))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Times Top", f"Total"], ascending=[True, True]))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                     dict(label="Attendance",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Attendance (number of fights)", "Times Top", f"Total {t}"], ascending=[True, True, True]))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=["Attendance (number of fights)", "Times Top", "Total"], ascending=[True, True, True]))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                 ],
