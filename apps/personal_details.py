@@ -30,17 +30,17 @@ config = {
 }
 
 colum_models = {
-    'Damage': [DmgStat, 'total_dmg', 'avg_dmg_s', 'Average dmg per s', 5],
-    'Rips': [RipStat, 'total_rips', 'avg_rips_s', 'Average rips per s', 3],
-    'Cleanses': [CleanseStat, 'total_cleanses', 'avg_cleanses_s', 'Average cleanses per s', 3],
-    'Stab': [StabStat, 'total_stab', 'avg_stab_s', 'Average stab per s', 3],
-    'Healing': [HealStat, 'total_heal', 'avg_heal_s', 'Average heal per s', 3],
+    'Damage': [DmgStat, 'total', 'avg_s', 'Average per s', 5],
+    'Rips': [RipStat, 'total', 'avg_s', 'Average per s', 3],
+    'Cleanses': [CleanseStat, 'total', 'avg_s', 'Average per s', 3],
+    'Stab': [StabStat, 'total', 'avg_s', 'Average per s', 3],
+    'Healing': [HealStat, 'total', 'avg_s', 'Average per s', 3],
     'Sticky': [DistStat, 'percentage_top', 'percentage_top', 'Percentage Top', 5],
-    'Prot': [ProtStat, 'total_prot', 'avg_prot_s', 'Average prot per s', 3],
-    'Aegis': [AegisStat, 'total_aegis', 'avg_aegis_s', 'Average aegis per s', 3],
-    'Might': [MightStat, 'total_might', 'avg_might_s', 'Average might per s', 2],
-    'Fury': [FuryStat, 'total_fury', 'avg_fury_s', 'Average fury per s', 2],
-    'Barrier': [BarrierStat, 'total_barrier', 'avg_barrier_s', 'Average barrier per s', 3],
+    'Prot': [ProtStat, 'total', 'avg_s', 'Average per s', 3],
+    'Aegis': [AegisStat, 'total', 'avg_s', 'Average per s', 3],
+    'Might': [MightStat, 'total', 'avg_s', 'Average per s', 2],
+    'Fury': [FuryStat, 'total', 'avg_s', 'Average per s', 2],
+    'Barrier': [BarrierStat, 'total', 'avg_s', 'Average per s', 3],
     'Damage Taken': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
     'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
 }
