@@ -172,7 +172,7 @@ def get_top_stat_graph(model, raid, name):
         raid_id=raid).order_by(-model.total).all()
         df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked)
                             for i, s in enumerate(query)])
-        fig = graphs.get_top_bar_chart(df, 'dmg', f'Top {name}', True, True)
+        fig = graphs.get_top_bar_chart(df, model, f'Top {name}', True, True)
 
     fig.update_layout(
         height=1000,

@@ -34,6 +34,7 @@ model_names_list:
 - QuickStat
 - AlacStat
 - SupSpeedStat
+- DeathStat
 
 details_tabs:
 - Offensive:
@@ -67,5 +68,7 @@ details_tabs:
     model: DmgTakenStat
   - name: SuperSpeed
     model: SupSpeedStat
+  - name: Deaths
+    model: DeathStat
   - name: Summary
     model: Summary
