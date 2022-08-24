@@ -1,27 +1,21 @@
 import json
-from os import stat
 from dash import html
 import dash_bootstrap_components as dbc
 from dash import dcc
 from flask import session
 from flask_login import current_user
-from app import db, app
-from models import AegisStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, RipStat, StabStat
+from app import db, app, layout_config
+from models import AegisStat, AlacStat, BarrierStat, Character, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, QuickStat, RipStat, StabStat, SupSpeedStat
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from helpers import graphs
-import plotly.express as px
 from dash import dash_table
 from sqlalchemy import func
 from dash.exceptions import PreventUpdate
 import dash
-from dash.dash_table.Format import Format, Scheme, Sign
 
 from models import DeathStat, DmgStat, FightSummary, PlayerStat, Raid
 
-
-tab_style={'padding': '.5rem 0',
-            'cursor': 'pointer'}
 
 config = {
     'displayModeBar': False,
@@ -34,14 +28,17 @@ colum_models = {
     'Rips': [RipStat, 'total', 'avg_s', 'Average per s', 3],
     'Cleanses': [CleanseStat, 'total', 'avg_s', 'Average per s', 3],
     'Stab': [StabStat, 'total', 'avg_s', 'Average per s', 3],
-    'Healing': [HealStat, 'total', 'avg_s', 'Average per s', 3],
+    'Heals': [HealStat, 'total', 'avg_s', 'Average per s', 3],
     'Sticky': [DistStat, 'percentage_top', 'percentage_top', 'Percentage Top', 5],
     'Prot': [ProtStat, 'total', 'avg_s', 'Average per s', 3],
     'Aegis': [AegisStat, 'total', 'avg_s', 'Average per s', 3],
     'Might': [MightStat, 'total', 'avg_s', 'Average per s', 2],
     'Fury': [FuryStat, 'total', 'avg_s', 'Average per s', 2],
     'Barrier': [BarrierStat, 'total', 'avg_s', 'Average per s', 3],
-    'Damage Taken': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
+    'Quick': [QuickStat, 'total', 'avg_s', 'Average per s', 3],
+    'Alac': [AlacStat, 'total', 'avg_s', 'Average per s', 3],
+    'SSpeed': [SupSpeedStat, 'total', 'avg_s', 'Average per s', 3],
+    'Dmg In': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
     'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
 }
 
@@ -80,7 +77,7 @@ def layout(name):
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
         enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
 
-
+    tab_list = layout_config['details_tabs']
     layout = [
         dbc.Row(class_name='input-row', children=[
             dbc.Col([
@@ -166,8 +163,7 @@ def layout(name):
         ]),
         dbc.Row(
             dbc.Col([
-                html.P(children=([f'*The healing and barrier stat will only show values for people that run ', html.A("the healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases", target='_blank')]), id='footnote-heal-barrier', className='text-center sm'),
-                
+                html.P(children=([f'*The healing and barrier stat will only show values for people that run ', html.A("the healing addon", href="https://github.com/Krappa322/arcdps_healing_stats/releases", target='_blank')]), id='footnote-heal-barrier', className='text-center sm'),        
             ])
         ),
         dcc.Store(id='hover-store')
@@ -317,7 +313,7 @@ def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
         fig = graphs.get_top_bar_chart_p(df, colum_models[col[0]][3], raid_date)
         highlight = [{"if": {"row_index":selected_raid[0]}, "backgroundColor": "grey"},]
 
-        return dcc.Graph(figure=fig, style=dict(height='500px')), highlight, json.dumps([raid, raid_date, selected_raid])
+        return dcc.Graph(figure=fig, style=dict(height='500px'), config=config), highlight, json.dumps([raid, raid_date, selected_raid])
     raise PreventUpdate
 
 
