@@ -362,8 +362,8 @@ class DeathStat(BaseStat):
         return {
             'Name': name,
             'Times Top': self.times_top,
-            'Total deaths': self.total_deaths,
-            'Average deaths per min': self.avg_deaths_m,
+            'Total': self.total,
+            'Average per m': self.avg_deaths_m,
             'Attendance (number of fights)': self.player_stat.attendance_count,
             'Profession': self.player_stat.character.profession.name,
             'Profession_color': self.player_stat.character.profession.color

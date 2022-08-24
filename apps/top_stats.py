@@ -27,7 +27,7 @@ def get_fig_with_model(model, t, title, limit, raid):
 
         if dmg_list:
             df = pd.DataFrame([s.to_dict() for s in dmg_list])
-            fig = graphs.get_top_bar_chart(df, t, title)
+            fig = graphs.get_top_bar_chart(df, model, title)
             return fig
     except Exception as e:
         print(e)
@@ -102,31 +102,6 @@ def update_on_page_load(raid, data, editmode):
     stats_shown = layout_config['top_page_stats']
     stats_models = layout_config['model_list']
 
-    # stats_all = []
-
-    # print(f'EDITMODE: {editmode}')
-    # # Get the right models
-    # for m in stats_shown:
-    #     if 'model' not in m:
-    #         for n in db.Model.registry.mappers:
-    #             if n.class_.__name__ in m['model_name']:
-    #                 m['model'] = n.class_
-
-    # for stat in stats_names:
-    #     for n in db.Model.registry.mappers:
-    #         if n.class_.__name__ == stat:
-    #             model_name = n.class_.__name__
-    #             name = n.class_.__name__
-    #             model = n.class_
-    #             dct = {
-    #                 'model_name': model_name,
-    #                 'name': name,
-    #                 'model': model,
-    #                 'top_limit': 3
-    #             }
-    #             stats_all.append(dct)
-
-    # layout_config['model_list'] = stats_all
     cols = [dbc.Col([
         dbc.Card([
             dbc.CardBody([

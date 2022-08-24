@@ -6,6 +6,8 @@ import dash_bootstrap_components as dbc
 from dash import html
 from flask import session
 
+from models import DeathStat
+
 
 profession_colours = {
     'Guardian': '#186885',
@@ -149,8 +151,8 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
 
 def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
-        avg_s = df[df["Name"] == name]["Average per s"].values[0]
-        if t != 'deaths':
+        if not isinstance(t(), DeathStat):
+            avg_s = df[df["Name"] == name]["Average per s"].values[0]
             fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total"].values[0]),
                                text="{:,.0f}".format(avg_s) if avg_s >= 10 else "{:,.2f}".format(avg_s),
                                showarrow=False,
@@ -159,40 +161,40 @@ def add_annotations_graph(fig, df, t):
                                xanchor="left",
                                font_size=13,
             ),
-            text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
-            color='#EEE'
-            background_color=None
-            #border = '#303030'
-            if name[0].isdigit():
-                text = name
-                color = 'grey'
-            if 'CHARACTERS' in session:
-                #print(f"{name.rsplit(' ', 1)[0]=}")
-                if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
-                    #print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
-                    background_color='#616161'
-                    #border = '#414141'
-            fig.add_annotation(y=name, x=0,
-                                text=text,
-                                showarrow=False,
-                                yshift=0,
-                                xshift=-2,
-                                xanchor="right",
-                                font_size=13,
-                                font_color=color,
-                                bgcolor=background_color,
-                                #bordercolor=border
-            ),
-            fig.add_annotation(y=name, x=0,
-                    text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
-                        + " / " +
-                        str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
-                    showarrow=False,
-                    yshift=0,
-                    xshift=0,
-                    xanchor="left",
-                    font_size=13,
-            )
+        text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
+        color='#EEE'
+        background_color=None
+        #border = '#303030'
+        if name[0].isdigit():
+            text = name
+            color = 'grey'
+        if 'CHARACTERS' in session:
+            #print(f"{name.rsplit(' ', 1)[0]=}")
+            if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
+                #print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
+                background_color='#616161'
+                #border = '#414141'
+        fig.add_annotation(y=name, x=0,
+                            text=text,
+                            showarrow=False,
+                            yshift=0,
+                            xshift=-2,
+                            xanchor="right",
+                            font_size=13,
+                            font_color=color,
+                            bgcolor=background_color,
+                            #bordercolor=border
+        ),
+        fig.add_annotation(y=name, x=0,
+                text=" " + str(int(df[df["Name"] == name]["Times Top"].values[0]))
+                    + " / " +
+                    str(int(df[df["Name"] == name]["Attendance (number of fights)"].values[0])),
+                showarrow=False,
+                yshift=0,
+                xshift=0,
+                xanchor="left",
+                font_size=13,
+        )
     return fig
 
 
@@ -383,6 +385,7 @@ def get_top_survivor_chart(df, t, title, legend = False):
     return fig
 
 def add_sorting_options(fig, df, t):
+    avg = "Average per m" if isinstance(t(), DeathStat) else "Average per s"
     fig.update_layout(
         updatemenus=[
             dict(
@@ -399,7 +402,7 @@ def add_sorting_options(fig, df, t):
                             args=["yaxis", {"categoryorder": "total ascending", 'showticklabels': False}]),
                     dict(label="Average",
                             method="relayout",
-                            args=["yaxis", {"categoryarray": (df.sort_values(by=f"Average per s", ascending=True))["Name"],
+                            args=["yaxis", {"categoryarray": (df.sort_values(by=avg, ascending=True))["Name"],
                                             "categoryorder": "array",
                                             'showticklabels': False}]),
                     dict(label="Times Top",
