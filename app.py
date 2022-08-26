@@ -1,5 +1,4 @@
 import os
-
 import dash
 import dash_bootstrap_components as dbc
 from flask import Flask
@@ -7,11 +6,10 @@ from flask_login import LoginManager, UserMixin
 from flask_sqlalchemy import SQLAlchemy
 #from dotenv import load_dotenv
 from flask_migrate import Migrate
-import yaml
+from helpers import yaml_writer
 
 external_stylesheets = [dbc.themes.DARKLY]
 #load_dotenv()
-
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = 'Records of Valhalla'
@@ -22,25 +20,7 @@ db = SQLAlchemy(server)
 from models import *
 migrate = Migrate(server, db, compare_type=True)
 
-
-def load_stat_models():
-    stats_names = layout_config['model_names_list']
-    stats_all = {}
-
-    for stat in stats_names:
-        for n in db.Model.registry.mappers:
-            if n.class_.__name__ == stat:
-                model = n.class_
-                stats_all[stat] = model
-
-    return stats_all
-
-
-with open('config.yaml', 'r') as file:
-    print('loading config..')
-    layout_config = yaml.safe_load(file)
-    layout_config['model_list'] = load_stat_models()
-    print('config loaded successfully')
+layout_config = yaml_writer.load_config_file(db)
 
 server.config.update(SECRET_KEY=os.getenv('SECRET_KEY'))
 
