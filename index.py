@@ -28,7 +28,8 @@ app.layout = dbc.Container(id='container', children=[
             ], sm=10)]),
     html.Hr(id='hr-header'),
     dcc.Store(id='db-update-date'),
-    html.Div(id='page-content')
+    html.Div(id='page-content'),
+    dbc.Row(id='footer')
 ])
 
 # All the routes from the app
