@@ -105,6 +105,13 @@ def update_on_page_load(raid, data, editmode):
 
     cols = [dbc.Col([
         dbc.Card([
+            dbc.CardHeader([
+                html.Div(
+                    id={'type': 'card-title', 'index': x},
+                    className='card-title',
+                    children=row['title'],
+                ),
+            ]),
             dbc.CardBody([
                 html.Div(id={'type': 'edit-row', 'index': x}, hidden=not editmode, children=[
                     html.Div([
@@ -203,6 +210,7 @@ def save_on_editmode_toggle(editmode):
 
 @app.callback(
     Output({'type': 'top-graph', 'index': MATCH}, 'figure'),
+    Output({'type': 'card-title', 'index': MATCH}, 'children'),
     Input({'type': 'input-limit', 'index': MATCH}, 'value'),
     Input({'type': 'slct-model', 'index': MATCH}, 'value'),
     Input({'type': 'input-title', 'index': MATCH}, 'value'),
@@ -220,7 +228,7 @@ def update_graph(limit, model, title, id, raid):
     stat['top_limit'] = limit
     figure = get_fig_with_model(
         model, 'dmg', f'{stat["title"]}', stat['top_limit'], raid)
-    return figure
+    return figure, title
 
 
 @app.callback(

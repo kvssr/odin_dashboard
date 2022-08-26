@@ -79,6 +79,27 @@ td {
     height: auto;
 }
 
+.card-title {
+    font-size: larger;
+    font-weight: bold;
+}
+
+.card-header {
+    text-align: center;
+    background-color: #6a6a6a;
+    background-image: url('Banner.jpg');
+    background-blend-mode: overlay;
+    background-position: top;
+}
+
+.card-body {
+    padding: 0px;
+}
+
+.card {
+    margin-bottom: 10px;
+}
+
 .tableFixHead {
     overflow: auto;
     height: 100px;

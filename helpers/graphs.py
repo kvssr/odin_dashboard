@@ -100,7 +100,7 @@ general_layout = {
         'title_x':0.5,
         'legend_y':0,
         'legend_x':0.9,
-        'margin':dict(l=200),
+        'margin':dict(l=200, t=20, b=20),
         'font_size':13,
         'yaxis_title':'',
         'paper_bgcolor':'rgba(0,0,0,0)',
@@ -138,7 +138,7 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
     fig.update_layout(
         yaxis_categoryorder='total ascending',
         xaxis_title="Times top / Times attended - Total | avg per sec",
-        title=title,
+        # title=title,
         showlegend=legend
     )
     fig.update_layout(general_layout)
@@ -230,7 +230,7 @@ def get_top_dist_bar_chart(df, t, legend=True):
         xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
         xaxis_range=xaxis_range,
-        title=t,
+        # title=t,
     )
     fig.update_layout(general_layout)
     fig = add_times_top_annotation(fig, df)
