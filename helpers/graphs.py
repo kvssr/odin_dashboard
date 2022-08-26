@@ -100,7 +100,7 @@ general_layout = {
         'title_x':0.5,
         'legend_y':0,
         'legend_x':0.9,
-        'margin':dict(l=200, t=20, b=20),
+        'margin':dict(l=200, t=30, b=20),
         'font_size':13,
         'yaxis_title':'',
         'paper_bgcolor':'rgba(0,0,0,0)',
