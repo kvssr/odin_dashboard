@@ -236,13 +236,17 @@ def show_selected_column(col, rows, data):
             raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
             raid_time = df_p.loc[df_p['raid_id']==raid, 'Start Time'].item()
             raid_date = f'{raid_date} {raid_time}'
+
+            max_attendance = db.session.query(PlayerStat.attendance_count).join(Raid).filter_by(id = raid).first()[0]
+            print(f'Max Attendance: {max_attendance}')
+            min_attend = int(max_attendance * 0.2)
             
             df_p.loc[df_p['raid_id']==raid, 'Date'] = raid_date
             if col[0] == 'Sticky':
                 df_p.loc[df_p['raid_id']==raid, col[0]] = int(df_p.loc[df_p['raid_id']==raid, col[0]].item().split('%')[0])
 
             ### Get Lowest Profession
-            bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+            bot_prof_value = db.session.query(func.min(model_attr)).join(PlayerStat).filter_by(raid_id=raid).filter(PlayerStat.attendance_count > min_attend).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
             df_bot_prof = pd.DataFrame(
                 [[raid, raid_date, 'Last Prof', bot_prof_value, profession.color, profession.name, 'lines', 'none']],
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
@@ -250,7 +254,7 @@ def show_selected_column(col, rows, data):
             df_p = df_p.append(df_bot_prof)
 
             ### Get Top Profession
-            top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
+            top_prof_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).filter(PlayerStat.attendance_count > min_attend).join(Character).join(Profession).filter_by(name=profession.name).group_by(PlayerStat.raid_id).scalar()
             df_top_prof = pd.DataFrame(
                 [[raid, raid_date, 'First Prof', top_prof_value, profession.color, profession.name, 'none', 'tonextx']],
                 columns=['raid_id', 'Date', 'Name', col[0], 'Profession_color', 'Profession', 'mode', 'fill']
@@ -258,7 +262,7 @@ def show_selected_column(col, rows, data):
             df_p = df_p.append(df_top_prof)
 
             ### Get Top Player
-            top_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).group_by(PlayerStat.raid_id).scalar()
+            top_value = db.session.query(min_max).join(PlayerStat).filter_by(raid_id=raid).filter(PlayerStat.attendance_count > min_attend).group_by(PlayerStat.raid_id).scalar()
             top_char = db.session.query(Character).join(PlayerStat).filter_by(raid_id=raid).join(model).filter(model_attr==top_value).first()
             profession2 = top_char.profession.name
             profession_color = top_char.profession.color
@@ -308,7 +312,11 @@ def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
         model = colum_models[col[0]][0]
         model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
         show_limit = colum_models[col[0]][4]
-        stat_list = db.session.query(model).filter(model_attr > 0).order_by(-model_attr).join(PlayerStat).join(Raid).filter_by(id = raid).limit(10).all()
+
+        max_attendance = db.session.query(PlayerStat.attendance_count).join(Raid).filter_by(id = raid).first()[0]
+        print(f'Max Attendance: {max_attendance}')
+        min_attend = int(max_attendance * 0.2)
+        stat_list = db.session.query(model).filter(model_attr > 0).order_by(-model_attr).join(PlayerStat).filter_by(raid_id = raid).filter(PlayerStat.attendance_count > min_attend).limit(10).all()
         df = pd.DataFrame([s.to_dict(masked) if i >= show_limit else s.to_dict() for i, s in enumerate(stat_list)])
         fig = graphs.get_top_bar_chart_p(df, colum_models[col[0]][3], raid_date)
         highlight = [{"if": {"row_index":selected_raid[0]}, "backgroundColor": "grey"},]
