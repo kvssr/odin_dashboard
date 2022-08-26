@@ -217,7 +217,7 @@ def add_clickable_names(fig, df):
     return fig
 
 
-def get_top_dist_bar_chart(df, legend=True):
+def get_top_dist_bar_chart(df, t, legend=True):
     #only range from 0-100 in detailed
     xaxis_range = None
     if len(df) > 5:
@@ -230,7 +230,7 @@ def get_top_dist_bar_chart(df, legend=True):
         xaxis_ticksuffix="%",
         xaxis_title="% times top closest to tag",
         xaxis_range=xaxis_range,
-        title="Top Closest To Tag",
+        title=t,
     )
     fig.update_layout(general_layout)
     fig = add_times_top_annotation(fig, df)

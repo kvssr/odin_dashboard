@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State, MATCH, ALL
 from dash import dcc, html
 import dash_bootstrap_components as dbc
 from itsdangerous import json
-from helpers import graphs
+from helpers import graphs, yaml_writer
 from flask_login import current_user
 
 import pandas as pd
@@ -20,7 +20,7 @@ config = {
 
 def get_fig_with_model(model, t, title, limit, raid):
     if model == DistStat:
-        return get_fig_dist(raid)
+        return get_fig_dist(raid, title)
     try:
         dmg_list = db.session.query(model).order_by(-model.total).join(
             PlayerStat).join(Raid).filter_by(id=raid).limit(limit).all()
@@ -33,14 +33,14 @@ def get_fig_with_model(model, t, title, limit, raid):
         print(e)
 
 
-def get_fig_dist(raid):
+def get_fig_dist(raid, title):
     try:
         dist_list = db.session.query(DistStat).order_by(-DistStat.percentage_top).join(
             PlayerStat).join(Raid).filter_by(id=raid).limit(5).all()
 
         if dist_list:
             df = pd.DataFrame([s.to_dict() for s in dist_list])
-            fig = graphs.get_top_dist_bar_chart(df)
+            fig = graphs.get_top_dist_bar_chart(df, title)
             return fig
     except Exception as e:
         print(e)
@@ -79,7 +79,8 @@ def layout():
                 style={'display': 'block'} if current_user.is_authenticated else {'display': 'none'}),
             html.Div(id='top-stats-layout', className='row')
         ]),
-        dcc.Store(id='order-status')
+        dcc.Store(id='order-status'),
+        dcc.Store(id='editmode-save'),
     ])
     return layout
 
@@ -106,53 +107,66 @@ def update_on_page_load(raid, data, editmode):
         dbc.Card([
             dbc.CardBody([
                 html.Div(id={'type': 'edit-row', 'index': x}, hidden=not editmode, children=[
-                    dbc.Label('Position',
-                              align='center',
-                              className='edit-item',
-                              ),
-                    dbc.Select(
-                        id={'type': 'slct-pos', 'index': x},
-                        className='edit-item',
-                        style={'max-width': '60px'},
-                        value=x,
-                        options=[
-                            {'label': n+1, 'value': n} for n in range(len(stats_shown))
-                        ]
-                    ),
-                    dbc.Label('Limit',
-                              className='edit-item'),
-                    dbc.Input(
-                        id={'type': 'input-limit', 'index': x},
-                        type='number',
-                        min=1,
-                        max=10,
-                        value=row['top_limit'],
-                        size='sm',
-                        className='edit-item',
-                        style={'max-width': '60px'}
-                    ),
-                    dbc.Label('Model',
-                              className='edit-item'),
-                    dbc.Select(
-                        id={'type': 'slct-model', 'index': x},
-                        className='edit-item',
-                        style={'max-width': '120px'},
-                        value=list(stats_models.keys()).index(row['model_name']),
-                        options=[
-                            {'label': s, 'value': ix} for ix, s in enumerate(stats_models)
-                        ]
-                    ),
-                    dbc.Button(
-                        'Delete',
-                        id={'type': 'btn-delete', 'index': x},
-                        className='btn btn-primary edit-item btn-delete-graph',
-                    ),
-                ], className='edit-row', style={'display': 'flex'}),
+                    html.Div([
+                        dbc.Label('Position',
+                                align='center',
+                                className='edit-item',
+                                ),
+                        dbc.Select(
+                            id={'type': 'slct-pos', 'index': x},
+                            className='edit-item',
+                            style={'max-width': '60px'},
+                            value=x,
+                            options=[
+                                {'label': n+1, 'value': n} for n in range(len(stats_shown))
+                            ]
+                        ),
+                        dbc.Label('Limit',
+                                className='edit-item'),
+                        dbc.Input(
+                            id={'type': 'input-limit', 'index': x},
+                            type='number',
+                            min=1,
+                            max=10,
+                            value=row['top_limit'],
+                            size='sm',
+                            className='edit-item',
+                            style={'max-width': '60px'}
+                        ),
+                        dbc.Label('Model',
+                                className='edit-item'),
+                        dbc.Select(
+                            id={'type': 'slct-model', 'index': x},
+                            className='edit-item',
+                            style={'max-width': '120px'},
+                            value=list(stats_models.keys()).index(row['model_name']),
+                            options=[
+                                {'label': s, 'value': ix} for ix, s in enumerate(stats_models)
+                            ]
+                        ),
+                        dbc.Button(
+                            'Delete',
+                            id={'type': 'btn-delete', 'index': x},
+                            className='btn btn-primary edit-item btn-delete-graph',
+                        ),
+                    ], style={'display': 'flex'}),
+                    html.Div([
+                        dbc.Label('Title',
+                                className='edit-item'),
+                        dbc.Input(
+                            id={'type': 'input-title', 'index': x},
+                            type='text',
+                            debounce=True,
+                            value=row['title'],
+                            className='edit-item',
+                        ),
+                    ], style={'display': 'flex', 'max-width': '400px'}),
+                ], className='edit-row'),
                 dcc.Loading(
                     dcc.Graph(
                         id={'type': 'top-graph', 'index': x},
                         figure=get_fig_with_model(
-                            stats_models[row['model_name']], 'dmg', f'Top {row["name"]}', row['top_limit'], raid),
+                            stats_models[row['model_name']], 'dmg', f'{row["title"]}', row['top_limit'], raid),
                         config=config
                     ), color='grey'
                 )
@@ -177,22 +191,35 @@ def toggle_editmode(editmode):
 
 
 @app.callback(
+    Output('editmode-save', 'data'),
+    Input('edit-switch', 'value'),
+    prevent_initial_call=True
+)
+def save_on_editmode_toggle(editmode):
+    yaml_writer.save_config_to_file(layout_config, 'config.yaml')
+    return 'saved'
+    
+
+
+@app.callback(
     Output({'type': 'top-graph', 'index': MATCH}, 'figure'),
     Input({'type': 'input-limit', 'index': MATCH}, 'value'),
     Input({'type': 'slct-model', 'index': MATCH}, 'value'),
+    Input({'type': 'input-title', 'index': MATCH}, 'value'),
     State({'type': 'top-graph', 'index': MATCH}, 'id'),
     State('raids-dropdown', 'value'),
     prevent_initial_call=True
 )
-def update_graph(limit, model, id, raid):
+def update_graph(limit, model, title, id, raid):
     stat = {}
     stat['model_name'] = list(layout_config['model_list'].keys())[int(model)]
-    stat['name'] = stat['model_name']
-    stat['model'] = layout_config['model_list'][stat['name']]
+    stat['title'] = title
+    model = layout_config['model_list'][stat['model_name']]
+    stat['model'] = stat['model_name']
     layout_config['top_page_stats'][id['index']] = stat
     stat['top_limit'] = limit
     figure = get_fig_with_model(
-        stat['model'], 'dmg', f'Top {stat["name"]}', stat['top_limit'], raid)
+        model, 'dmg', f'{stat["title"]}', stat['top_limit'], raid)
     return figure
 
 
