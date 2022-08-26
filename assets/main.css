@@ -1,5 +1,5 @@
 body {
-    background-color: #303030;
+    background-color: #313131;
     color: #EEE;
 }
 
@@ -48,6 +48,10 @@ td {
 
 #header {
     display: flex;
+    background-image: url('Banner.jpg');
+    background-color: #1c1c1c87;
+    background-position-y: 600px;
+    background-blend-mode: overlay;
 }
 
 #container {
