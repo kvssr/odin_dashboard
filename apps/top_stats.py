@@ -46,20 +46,6 @@ def get_fig_dist(raid, title):
         print(e)
 
 
-def get_summary_table(raid):
-    df = []
-    try:
-        query = db.session.query(FightSummary).join(
-            Raid).filter_by(id=raid).first()
-        db.session.commit()
-        df = pd.DataFrame(query.to_dict(), index=[0])
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-
-    return graphs.get_summary_table(df)
-
-
 def layout():
     layout = html.Div(children=[
         dbc.Row(id='input-row-top', class_name='input-row', children=[
@@ -71,6 +57,7 @@ def layout():
                                  ),
                 ], width={'size': 4, 'offset': 4}),
                 ]),
+        html.Div(id='summary-table'),
         dbc.Row([
             dbc.Switch(
                 id="edit-switch",

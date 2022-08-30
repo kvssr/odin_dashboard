@@ -278,15 +278,19 @@ def write_fight_summary_to_db(raid, raid_id, start_time, end_time):
         fight.damage = raid['overall_squad_stats']['dmg']
         fight.boonrips = raid['overall_squad_stats']['rips']
         fight.cleanses = raid['overall_squad_stats']['cleanses']
-        fight.stability = raid['overall_squad_stats']['stab']
         fight.healing = raid['overall_squad_stats']['heal']
         fight.distance_to_tag = raid['overall_squad_stats']['dist']
+        fight.barrier = raid['overall_squad_stats']['barrier']
+        fight.dmg_taken = raid['overall_squad_stats']['dmg_taken']
+        # Boons
+        fight.stability = raid['overall_squad_stats']['stab']
         fight.protection = raid['overall_squad_stats']['prot']
         fight.aegis = raid['overall_squad_stats']['aegis']
         fight.might = raid['overall_squad_stats']['might']
         fight.fury = raid['overall_squad_stats']['fury']
-        fight.barrier = raid['overall_squad_stats']['barrier']
-        fight.dmg_taken = raid['overall_squad_stats']['dmg_taken']
+        fight.quickness = raid['overall_squad_stats']['quick']
+        fight.alacrity = raid['overall_squad_stats']['alac']
+        fight.superspeed = raid['overall_squad_stats']['speed']
         db.session.add(fight)
         db.session.commit()
     except Exception as e:

@@ -414,22 +414,26 @@ class FightSummary(db.Model):
     damage = db.Column(db.Integer())
     boonrips = db.Column(db.Integer())
     cleanses = db.Column(db.Integer())
-    stability = db.Column(db.Integer())
     healing = db.Column(db.Integer())
     deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
     distance_to_tag = db.Column(db.Integer())
-    protection = db.Column(db.Integer())
-    aegis = db.Column(db.Integer())
-    might = db.Column(db.Integer())
-    fury = db.Column(db.Integer())
-    barrier = db.Column(db.Integer())
     dmg_taken = db.Column(db.Integer())
+    barrier = db.Column(db.Integer())
+    # Boons
+    stability = db.Column(db.Float())
+    protection = db.Column(db.Float())
+    aegis = db.Column(db.Float())
+    might = db.Column(db.Float())
+    fury = db.Column(db.Float())
+    quickness = db.Column(db.Float())
+    alacrity = db.Column(db.Float())
+    superspeed = db.Column(db.Float())
 
     raid = relationship("Raid", back_populates="fightsummary")
 
-    def to_dict(self):
-        return {
+    def to_dict(self, short = True):
+        d = {
             'Date': self.raid.raid_date,
             'Title': self.raid.name,
             'Type': self.raid.raid_type.name,
@@ -440,10 +444,21 @@ class FightSummary(db.Model):
             'Damage': f'{self.damage:,}',
             'Boonrips': f'{self.boonrips:,}',
             'Cleanses': f'{self.cleanses:,}',
-            'Stability Output': f'{self.stability:,}',
+            'Stability Output': f'{self.stability:,.2f}',
             'Healing': f'{self.healing:,}',
             'Damage Taken': f'{self.dmg_taken:,}',
         }
+        if not short:
+            d.update({
+                'Protections': f'{self.protection:,.2f}',
+                'Aegis': f'{self.aegis:,.2f}',
+                'Might': f'{self.might:,.2f}',
+                'Fury': f'{self.fury:,.2f}',
+                'Quickness': f'{self.quickness:,.2f}',
+                'Alacrity': f'{self.alacrity:,.2f}',
+                'Superspeed': f'{self.superspeed:,.2f}'
+            })
+        return d
 
 
 class User(UserMixin, db.Model):
