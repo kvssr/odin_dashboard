@@ -66,8 +66,7 @@ def layout():
                 style={'display': 'block'} if current_user.is_authenticated else {'display': 'none'}),
             html.Div(id='top-stats-layout', className='row')
         ]),
-        dcc.Store(id='order-status'),
-        dcc.Store(id='editmode-save'),
+        dcc.Store('st-graph-deleted'),
     ])
     return layout
 
@@ -83,10 +82,10 @@ def get_drop_down_options(url):
 
 @app.callback(Output('top-stats-layout', 'children'),
               Input('raids-dropdown', 'value'),
-              Input('order-status', 'data'),
+              Input('st-graph-deleted', 'children'),
               State('edit-switch', 'value')
               )
-def update_on_page_load(raid, data, editmode):
+def update_on_page_load(raid, deleted, editmode):
     stats_shown = layout_config['top_page_stats']
     stats_models = layout_config['model_list']
 
@@ -117,6 +116,7 @@ def update_on_page_load(raid, data, editmode):
                         ),
                         dbc.Label('Limit',
                                 className='edit-item'),
+                                
                         dbc.Input(
                             id={'type': 'input-limit', 'index': x},
                             type='number',
@@ -185,6 +185,28 @@ def toggle_editmode(editmode):
 
 
 @app.callback(
+    Output({'type': 'btn-delete', 'index': MATCH}, 'disabled'),
+    Input({'type': 'btn-delete', 'index': MATCH}, 'n_clicks'),
+    State({'type': 'btn-delete', 'index': MATCH}, 'id'),
+    prevent_initial_call=True
+)
+def delete_button_clicked(n, id):
+    index = id['index']
+    layout_config['top_page_stats'].pop(index)
+    print(f'Deleted graph {index}')
+    return True
+
+
+@app.callback(
+    Output('st-graph-deleted', 'children'),
+    Input({'type': 'btn-delete', 'index': ALL}, 'disabled'),
+    prevent_initial_call=True
+)
+def delete_graph(buttons):
+    return buttons
+
+
+@app.callback(
     Output('editmode-save', 'data'),
     Input('edit-switch', 'value'),
     prevent_initial_call=True
@@ -193,7 +215,6 @@ def save_on_editmode_toggle(editmode):
     yaml_writer.save_config_to_file(layout_config, 'config.yaml')
     return 'saved'
     
-
 
 @app.callback(
     Output({'type': 'top-graph', 'index': MATCH}, 'figure'),

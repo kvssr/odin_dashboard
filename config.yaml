@@ -23,7 +23,7 @@ model_names_list: [DmgStat, DistStat, StabStat, CleanseStat, HealStat, RipStat, 
   ProtStat, AegisStat, MightStat, DmgTakenStat, FuryStat, QuickStat, AlacStat, SupSpeedStat,
   DeathStat]
 top_page_stats:
-- {model: DmgStat, model_name: DmgStat, title: Top Damage, top_limit: 5}
+- {model_name: DmgStat, title: Top Damage, top_limit: 5}
 - {model_name: DistStat, title: Top Closest To Tag, top_limit: 5}
 - {model_name: StabStat, title: Top Stability, top_limit: 3}
 - {model_name: CleanseStat, title: Top Cleanses, top_limit: 3}
