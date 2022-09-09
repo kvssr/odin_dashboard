@@ -62,7 +62,7 @@ def show_graph_selection_in_table(data):
         .join(Log.account).group_by(Account.name)
 
     no_visits = db.session.query(Account.name).filter_by(guild_id=guild_id).filter_by(logs = None)
-    print(f'{no_visits=}')
+    print(f'{no_visits}')
 
     df_no_visits = pd.DataFrame(no_visits, columns=['Account'])
     df_no_visits['Number'] = 0
