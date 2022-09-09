@@ -59,14 +59,19 @@ def layout():
                 ]),
         html.Div(id='summary-table'),
         dbc.Row([
-            dbc.Switch(
-                id="edit-switch",
-                label="EditMode",
-                value=False,
-                style={'display': 'block'} if current_user.is_authenticated else {'display': 'none'}),
+            dbc.Col([
+                dbc.Switch(
+                    id="edit-switch",
+                    label="EditMode",
+                    value=False,
+                    style={'display': 'block'}),
+                dbc.Button(id='btn-new-graph', children='Add Graph', style={'margin-left': '10px', 'margin-bottom': '10px'}),
+            ], style={'align-items': 'center', 'display': 'flex'} if current_user.is_authenticated else {'display': 'none'}),
             html.Div(id='top-stats-layout', className='row')
         ]),
         dcc.Store('st-graph-deleted'),
+        dcc.Store('order-status'),
+        dcc.Store('editmode-save'),
     ])
     return layout
 
@@ -83,9 +88,11 @@ def get_drop_down_options(url):
 @app.callback(Output('top-stats-layout', 'children'),
               Input('raids-dropdown', 'value'),
               Input('st-graph-deleted', 'children'),
+              Input('btn-new-graph', 'n_clicks'),
+              Input('order-status', 'data'),
               State('edit-switch', 'value')
               )
-def update_on_page_load(raid, deleted, editmode):
+def update_on_page_load(raid, deleted, added, order, editmode):
     stats_shown = layout_config['top_page_stats']
     stats_models = layout_config['model_list']
 
@@ -198,6 +205,17 @@ def delete_button_clicked(n, id):
 
 
 @app.callback(
+    Output('btn-new-graph', 'disabled'),
+    Input('btn-new-graph', 'n_clicks'),
+    prevent_initial_call=True
+)
+def add_button_clicked(n):
+    layout_config['top_page_stats'].insert(0, layout_config['top_page_stats'][0])
+    print(f'Added graph')
+    return False
+
+
+@app.callback(
     Output('st-graph-deleted', 'children'),
     Input({'type': 'btn-delete', 'index': ALL}, 'disabled'),
     prevent_initial_call=True
@@ -247,6 +265,7 @@ def update_graph(limit, model, title, id, raid):
 )
 def change_graph_position(values, index):
     stats = layout_config['top_page_stats']
+    print(f'STATS_ORDER: {stats}')
     old_p = 0
     new_p = 0
     for x, i in enumerate(values):
