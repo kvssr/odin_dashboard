@@ -79,13 +79,13 @@ def display_page(pathname):
             view = 'Redirecting to api...'
             url = '/api'
     elif pathname == '/details':
-        if  (check_valid_guild() and 'CHARACTERS' in session) or current_user.is_authenticated:
+        if check_valid_guild() or current_user.is_authenticated:
             view = details.layout()
         else:
             view = 'Redirecting to api...'
             url = '/api'
     elif pathname == '/groups':
-        if current_user.is_authenticated:
+        if check_valid_guild() or current_user.is_authenticated:
             view = groups_page.layout
         else:
             view = 'Redirecting to login...'

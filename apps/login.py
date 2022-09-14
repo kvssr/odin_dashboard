@@ -70,6 +70,7 @@ logged_in_menu = dbc.Nav(className='menu', children=[
         ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
+    dbc.NavItem(dbc.NavLink("Groups", href='/groups')),
      dbc.DropdownMenu(
          [
              dbc.DropdownMenuItem("Howto", href='/howto'),
@@ -106,6 +107,7 @@ login_menu = dbc.Nav(className='menu', children=[
     ),
     dbc.NavItem(dbc.NavLink("Home", href='/')),
     dbc.NavItem(dbc.NavLink("Details", href='/details')),
+    dbc.NavItem(dbc.NavLink("Groups", href='/groups')),
     dbc.DropdownMenu([
         dbc.DropdownMenuItem("Howto", href='/howto'),
         dbc.DropdownMenuItem("Contact", href='/contact'),
