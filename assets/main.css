@@ -296,3 +296,89 @@ td {
     padding-top: 8px;
     padding-bottom: 8px;
 }
+
+
+/*
+    GROUP PAGE
+*/
+
+#groups-container {
+    width: 100%;
+    margin: auto;
+}
+
+.groups-row {
+    margin: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.groups-row:hover {
+    background-color: #717171;
+    cursor: pointer;
+}
+
+.groups-row-header {
+    margin: auto;
+    margin-bottom: 10px;
+    border-bottom: #EEE solid 1px;
+    background-color: #212121;
+    position: sticky;
+    top: 0px;
+    font-weight: bold;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.groups-row-collapse-container {
+    margin: auto;
+    border-top: #EEE 1px solid;
+    border-bottom: #414141 1px solid;
+    background: #373737;
+}
+
+.groups-row-collapse {
+    margin: auto;
+    margin-bottom: 5px;
+}
+
+.groups-row-collapse:hover {
+    background-color: #717171;
+    cursor: pointer;
+}
+
+.groups-prof-icon {
+    margin-left: 5px;
+}
+
+.collapse-cross {
+    width: auto;
+    margin: auto;
+    padding: 0px;
+    margin-left: 5px;
+}
+
+.groups-prof-icon-col {
+    display: block ruby;
+}
+
+#fight-page {
+    width: fit-content;
+    margin: auto;
+}
+
+.page-link {
+    background-color: #525252;
+}
+
+.page-link:hover {
+    background-color: #811;
+}
+
+.page-item.active .page-link {
+    background-color: #811;
+}
+
+.page-item.disabled .page-link {
+    background-color: #411;
+}

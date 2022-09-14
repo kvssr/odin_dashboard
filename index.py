@@ -1,16 +1,18 @@
-from datetime import date, datetime
 import time
-from dash import dcc, dash
-from dash import html
+from datetime import date, datetime
+from urllib.parse import unquote
+
+import dash_bootstrap_components as dbc
+import requests
+from dash import dash, dcc, html
 from dash.dependencies import Input, Output
 from flask import session
 from flask_login import current_user, logout_user
-import dash_bootstrap_components as dbc
-from urllib.parse import unquote
-import requests
 
 from app import app, db
-from apps import api_page, contact_page, personal_details, top_stats, details, login, upload_page, howto_page, json_page, user_logs_page
+from apps import (api_page, contact_page, details, groups_page, howto_page,
+                  json_page, login, personal_details, top_stats, upload_page,
+                  user_logs_page)
 from models import Account, Log
 
 server = app.server
@@ -82,6 +84,12 @@ def display_page(pathname):
         else:
             view = 'Redirecting to api...'
             url = '/api'
+    elif pathname == '/groups':
+        if current_user.is_authenticated:
+            view = groups_page.layout
+        else:
+            view = 'Redirecting to login...'
+            url = '/login'
     elif pathname == '/upload':
         if current_user.is_authenticated:
             view = upload_page.layout

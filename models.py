@@ -1,7 +1,4 @@
-from datetime import datetime
-from lib2to3.pytree import Base
 from flask import session
-from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from app import db
 from flask_login import UserMixin, current_user
@@ -22,6 +19,7 @@ class Character(db.Model):
     profession = relationship("Profession", back_populates="characters")
     account = relationship("Account", back_populates='characters')
     playerstats = relationship("PlayerStat", back_populates="character")
+    character_fight_stats = relationship('CharacterFightStat', back_populates='character')
 
 
 class Profession(db.Model):
@@ -144,22 +142,10 @@ class Fight(db.Model):
     skipped = db.Column(db.Boolean())
     num_allies = db.Column(db.Integer())
     num_enemies = db.Column(db.Integer())
-    damage = db.Column(db.Integer())
-    boonrips = db.Column(db.Integer())
-    cleanses = db.Column(db.Integer())
-    stability = db.Column(db.Integer())
-    healing = db.Column(db.Integer())
-    distance_to_tag = db.Column(db.Integer())
-    deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
-    protection = db.Column(db.Integer())
-    aegis = db.Column(db.Integer())
-    might = db.Column(db.Integer())
-    fury = db.Column(db.Integer())
-    barrier = db.Column(db.Integer())
-    dmg_taken = db.Column(db.Integer())
-
+    
     raid = relationship("Raid", back_populates="fights")
+    character_fight_stats = relationship('CharacterFightStat', back_populates='fight')
 
     def to_dict(self):
         return {
@@ -170,12 +156,39 @@ class Fight(db.Model):
             '# Allies': self.num_allies,
             '# Enemies': self.num_enemies,
             'kills': self.kills,
-            'deaths': self.deaths,
-            'damage': f'{self.damage:,}',
-            'boonrips': f'{self.boonrips:,}',
-            'cleanses': f'{self.cleanses:,}',
-            'healing': f'{self.healing:,}'
+            'deaths': sum(stats.deaths for stats in self.character_fight_stats),
+            'damage': f'{sum(stats.damage for stats in self.character_fight_stats):,}',
+            'boonrips': f'{sum(stats.boonrips for stats in self.character_fight_stats):,}',
+            'cleanses': f'{sum(stats.cleanses for stats in self.character_fight_stats):,}',
+            'healing': f'{sum(stats.healing for stats in self.character_fight_stats):,}'
         }
+
+
+class CharacterFightStat(db.Model):
+
+    __tablename__ = 'character_fight_stat'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    fight_id = db.Column(db.Integer(), db.ForeignKey('fight.id', ondelete='CASCADE'))
+    character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
+    damage = db.Column(db.Integer())
+    boonrips = db.Column(db.Integer())
+    cleanses = db.Column(db.Integer())
+    stability = db.Column(db.Float())
+    healing = db.Column(db.Integer())
+    distance_to_tag = db.Column(db.Integer())
+    deaths = db.Column(db.Integer())
+    protection = db.Column(db.Float())
+    aegis = db.Column(db.Float())
+    might = db.Column(db.Float())
+    fury = db.Column(db.Float())
+    barrier = db.Column(db.Integer())
+    dmg_taken = db.Column(db.Integer())
+    group = db.Column(db.Integer())
+
+    fight = relationship('Fight', back_populates='character_fight_stats')
+    character = relationship('Character', back_populates='character_fight_stats')
+
 
 
 class BaseStat(db.Model):
@@ -222,6 +235,8 @@ class RipStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="rip_stat")
 
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="rip_stat")
 
 class CleanseStat(BaseStat):
 
@@ -261,6 +276,23 @@ class ProtStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="prot_stat")
 
+    def to_dict(self, masked=False):
+        if masked:
+            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
+                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+            else:
+                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
+        else:
+            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+        return {
+            'Name': name,
+            'Times Top': self.times_top,
+            'Total prot': self.total_prot,
+            'Average prot per s': self.avg_prot_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 class AegisStat(BaseStat):
 
@@ -269,6 +301,23 @@ class AegisStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="aegis_stat")
 
+    def to_dict(self, masked=False):
+        if masked:
+            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
+                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+            else:
+                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
+        else:
+            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+        return {
+            'Name': name,
+            'Times Top': self.times_top,
+            'Total aegis': self.total_aegis,
+            'Average aegis per s': self.avg_aegis_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 class MightStat(BaseStat):
 
@@ -277,6 +326,23 @@ class MightStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="might_stat")
 
+    def to_dict(self, masked=False):
+        if masked:
+            if self.player_stat.character.name in session['CHARACTERS'] or current_user.is_authenticated:
+                name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+            else:
+                name = f'{self.player_stat.character.id:03d} | Anon ({self.player_stat.character.profession.abbreviation})'
+        else:
+            name = f'{self.player_stat.character.name} ({self.player_stat.character.profession.abbreviation})'
+        return {
+            'Name': name,
+            'Times Top': self.times_top,
+            'Total might': self.total_might,
+            'Average might per s': self.avg_might_s,
+            'Attendance (number of fights)': self.player_stat.attendance_count,
+            'Profession': self.player_stat.character.profession.name,
+            'Profession_color': self.player_stat.character.profession.color
+        }
 
 class FuryStat(BaseStat):
 

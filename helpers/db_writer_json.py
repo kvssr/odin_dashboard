@@ -1,9 +1,11 @@
 from datetime import datetime
-import pytz
-from models import Account, AegisStat, AlacStat, BarrierStat, Character, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, Profession, ProtStat, QuickStat, Raid, RaidType, RipStat, StabStat, SupSpeedStat
 from app import db
+from models import (Account, AegisStat, AlacStat, BarrierStat, Character,
+                    CharacterFightStat, CleanseStat, DeathStat, DistStat,
+                    DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat,
+                    HealStat, MightStat, PlayerStat, Profession, ProtStat,
+                    QuickStat, Raid, RaidType, RipStat, StabStat, SupSpeedStat)
 from helpers import graphs
-
 
 stats = {
     'dmg': DmgStat,
@@ -71,6 +73,36 @@ def write_xls_to_db(json_file, name = '' , t = 1):
             professionId = db.session.query(Profession.id).filter_by(name=player['profession']).first()[0]
             char_id = db.session.query(Character.id).filter_by(name=player['name'], profession_id=professionId).first()[0]
             player_id = db.session.query(PlayerStat.id).filter_by(character_id = char_id, raid_id=raid_id).first()[0]
+
+            for x, fight in enumerate(player['stats_per_fight']):
+                if fight['dmg'] == -1:
+                    continue
+                fight_id = db.session.query(Fight.id).filter_by(raid_id=raid_id).filter_by(number = x).first()[0]
+                cf_stat = CharacterFightStat()
+                cf_stat.character_id = char_id
+                cf_stat.fight_id = fight_id
+                cf_stat.group = fight['group']
+                cf_stat.damage = fight['dmg']
+                cf_stat.boonrips = fight['rips']
+                cf_stat.cleanses = fight['cleanses']
+                cf_stat.stability = fight['stab']
+                cf_stat.healing = fight['heal'] if fight['heal'] != -1 else 0
+                cf_stat.distance_to_tag = fight['dist']
+                cf_stat.deaths = fight['deaths']
+                cf_stat.protection = fight['prot']
+                cf_stat.aegis = fight['aegis']
+                cf_stat.might = fight['might']
+                cf_stat.fury = fight['fury']
+                cf_stat.barrier = fight['barrier'] if fight['barrier'] != -1 else 0
+                cf_stat.dmg_taken = fight['dmg_taken']
+                try:
+                    db.session.add(cf_stat)
+                    db.session.commit()
+                except Exception as e:
+                    print(e)
+            print(f'Added {x+1} fights for {player["account"]}')
+
+
             for stat in stats:
                 write_stats_to_db(player, player_id, stats[stat], stat)
         print('Updated database succesfully')
@@ -78,6 +110,10 @@ def write_xls_to_db(json_file, name = '' , t = 1):
     except Exception as e:
         print(e)
         return "There was an error updating the database"
+
+
+def write_char_fight_stats():
+    pass
 
 
 def write_raid_type_to_db(types):
@@ -197,6 +233,11 @@ def write_player_stat_to_db(players, raid_id):
         try:
             player_stat = PlayerStat()
             player_stat.raid_id = raid_id
+
+            for fight in player['stats_per_fight']:
+                if 'group' in fight:
+                    player_stat.party = fight['group']
+                    break
             professionId = db.session.query(Profession.id).filter_by(name=player['profession']).first()[0]
             player_stat.character_id = db.session.query(Character.id).filter_by(name=player['name'], profession_id=professionId).first()[0]
             player_stat.attendance_count = player['num_fights_present']
@@ -216,42 +257,19 @@ def write_player_stat_to_db(players, raid_id):
 def write_fights_to_db(fights, raid_id):
     counter = 0
     date_time_end_cet = None
-    for fight_row in fights:
+    for x, fight in enumerate(fights):
         try:
-            date_time_utc = datetime.strptime(fight_row['start_time'], '%Y-%m-%d %H:%M:%S %z')
-            date_time_cet = date_time_utc.astimezone(pytz.timezone("CET"))
-
-            json_fight_date = date_time_cet.date()
-            json_fight_start_time = str(date_time_cet.timetz())
-
-            date_time_utc = datetime.strptime(fight_row['end_time'], '%Y-%m-%d %H:%M:%S %z')
-            date_time_end_cet = date_time_utc.astimezone(pytz.timezone("CET"))
-            json_fight_end_time = str(date_time_end_cet.timetz())
-
-            fight = Fight()
-            fight.raid_id = raid_id
-            fight.number = counter
-            fight.fight_date = json_fight_date
-            fight.start_time = json_fight_start_time
-            fight.end_time = json_fight_end_time
-            fight.skipped = fight_row['skipped']
-            fight.num_allies = fight_row['allies']
-            fight.num_enemies = fight_row['enemies']
-            fight.damage = fight_row['total_stats']['dmg']
-            fight.boonrips = fight_row['total_stats']['rips']
-            fight.cleanses = fight_row['total_stats']['cleanses']
-            fight.distance_to_tag = fight_row['total_stats']['dist']
-            fight.stability = fight_row['total_stats']['stab']
-            fight.protection = fight_row['total_stats']['prot']
-            fight.aegis = fight_row['total_stats']['aegis']
-            fight.might = fight_row['total_stats']['might']
-            fight.fury = fight_row['total_stats']['fury']
-            fight.barrier = fight_row['total_stats']['barrier']
-            fight.dmg_taken = fight_row['total_stats']['dmg_taken']
-            fight.healing = fight_row['total_stats']['heal']
-            fight.deaths = fight_row['total_stats']['deaths']
-            fight.kills = fight_row['kills']
-            db.session.add(fight)
+            f = Fight()
+            f.raid_id = raid_id
+            f.number = x
+            f.fight_date = fight['start_time'].split(' ')[0]
+            f.start_time = fight['start_time'].split(' ')[1]
+            f.end_time = fight['end_time'].split(' ')[1]
+            f.num_allies = fight['allies']
+            f.num_enemies = fight['enemies']
+            f.skipped = fight['skipped']
+            f.kills = fight['kills']
+            db.session.add(f)
             db.session.commit()
             counter += 1
         except Exception as e:
@@ -324,6 +342,14 @@ def write_stats_to_db(json_file, player_id, stat_model, json_stat):
         print(e)
     finally:
         db.session.close()
+
+
+def write_fights_stats_to_db():
+    try:
+        pass
+    except Exception as e:
+        print(e)
+    pass
 
 
 def delete_raid(raid):
