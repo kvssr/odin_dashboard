@@ -10,7 +10,6 @@ from flask_migrate import Migrate
 
 external_stylesheets = [dbc.themes.DARKLY]
 #load_dotenv()
-
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = 'Records of Valhalla'

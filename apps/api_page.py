@@ -3,7 +3,6 @@ import dash_bootstrap_components as dbc
 from dash import dcc
 from dash import html
 from flask import session
-from numpy import character, place
 from dash.dependencies import Input, Output, State
 import pandas as pd
 import requests
@@ -76,7 +75,7 @@ layout = dbc.Row([
                     'id': i,
                     'type': 'text',
                     'presentation': 'markdown'
-                } for i in ['Name', 'Profession', '# Raids']],
+                } for i in ['Name', '# Raids']],
                 editable=False,
                 cell_selectable=False,
                 style_as_list_view=True,
@@ -116,7 +115,7 @@ def show_character_info(msg, del_msg):
         info = {}
         info['# Raids'] = []
         info['Name'] = []
-        info['Profession'] = session['PROFESSION']
+        # info['Profession'] = session['PROFESSION']
         for name in session['CHARACTERS']:
             char_id = db.session.query(Character.id).filter_by(name = name).first()
             print(char_id)
@@ -175,15 +174,16 @@ def save_api_key(n, key):
                 characters = request.json()
             else:
                 raise Exception
-            
-            for name in characters:
-                request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
-                if request.status_code == 200 or request.status_code == 206:
-                    prof = request.json()['profession']
-                    icon = requests.get(f'https://api.guildwars2.com/v2/professions/{prof}').json()['icon_big']
-                    professions.append(f"![{prof}]({icon}){prof}")
-                else:
-                    raise Exception
+
+            # GETS PROFESSIONS AND ICONS. IS VERY SLOW AND CAUSES TIME OUT
+            # for name in characters:
+            #     request = requests.get(f'https://api.guildwars2.com/v2/characters/{name}', headers=headers)
+            #     if request.status_code == 200 or request.status_code == 206:
+            #         prof = request.json()['profession']
+            #         icon = requests.get(f'https://api.guildwars2.com/v2/professions/{prof}').json()['icon_big']
+            #         professions.append(f"![{prof}]({icon}){prof}")
+            #     else:
+            #         raise Exception
 
             request = requests.get('https://api.guildwars2.com/v2/account', headers=headers)
             if request.status_code == 200:
