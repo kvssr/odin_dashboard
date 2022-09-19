@@ -201,18 +201,14 @@ def show_groups_content(raid, fight):
         table_rows.append(player_body)
     # table_body = html.Tbody(table_rows)
 
-        
-
-    
     table = dbc.Table(
         table_header + table_rows,
-        responsive=True,
+        responsive=False,
         bordered=False,
         dark=True,
         hover=True,
         striped=True,
     )
-
 
     rows= [dbc.Row([
         dbc.Col('Professions', width={'size': 2}),]+

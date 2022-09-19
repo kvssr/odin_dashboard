@@ -296,6 +296,11 @@ td {
     cursor: pointer;
 }
 
+#groups-content th {
+    position: sticky;
+    top: 0;
+}
+
 .left-table-header {
     background: #212121;
     border-right: #EEE solid 1px;
