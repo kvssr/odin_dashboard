@@ -183,7 +183,7 @@ def show_groups_content(raid, fight):
             hover_text = f'{df_groups.loc[df_groups["Character"] == player, "Account"].values[0]} '
             if player in top_stats:
                 top_text = ''.join([f'| Top {p} ' for p in top_stats[player]])
-            hover_text += top_text
+                hover_text += top_text
             player_row = html.Tr(
                 [html.Td([
                     html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
