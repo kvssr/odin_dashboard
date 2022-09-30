@@ -11,6 +11,7 @@ import dash_bootstrap_components as dbc
 import pytz
 from sqlalchemy.sql.elements import Null
 from helpers import db_writer, db_writer_json, graphs
+from dash.exceptions import PreventUpdate
 
 import pandas as pd
 from app import app, db
@@ -63,11 +64,12 @@ layout = [
                 columns=[{
                     'name': i,
                     'id': i,
+                    'editable': True if i == 'Title' else False,
                 } for i in raids_df.columns],
                 data=raids_dict,
                 editable=False,
                 row_selectable='multi',
-                cell_selectable=False,
+                #cell_selectable=False,
                 style_as_list_view=True,
                 style_cell={
                     'border': '1px solid #444',
@@ -97,6 +99,32 @@ def get_temp_data(content):
     if content:
         content_type, content_string = content.split(',')
         return content_string
+
+
+@app.callback(
+    Output('raids-table', 'style_header'),
+    Input('raids-table', 'data'),
+    State('raids-table', 'data_previous'),
+    State('raids-table', 'style_header'),
+    prevent_initial_call=True)
+def update_raid_info(rows, old_rows, style):
+    # df = pd.DataFrame(rows, columns=[c['name'] for c in columns])
+    print(old_rows)
+    print(rows)
+    if old_rows is None:
+        raise PreventUpdate
+    if rows != old_rows:
+        for x, row in enumerate(rows):
+            if row['Title'] != old_rows[x]['Title']:
+                print(f"{row['Title']} - {old_rows[x]['Title']}")
+                raid = db.session.query(Raid).filter(Raid.raid_date == row['Date']).join(FightSummary).filter(FightSummary.kills == row['Kills']).first()
+                raid.name = row['Title']
+                db.session.add(raid)
+                db.session.commit()
+                print(raid)
+        style['border-bottom'] = '1px solid green'
+    return style
+        
 
 
 @app.callback(
