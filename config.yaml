@@ -8,6 +8,7 @@ details_tabs:
   - {model: AlacStat, name: Alacrity}
 - Defensive:
   - {model: StabStat, name: Stability}
+  - {model: CleanseStat, name: Cleanses}
   - {model: HealStat, name: Healing}
   - {model: BarrierStat, name: Barrier}
   - {model: ProtStat, name: Protection}
