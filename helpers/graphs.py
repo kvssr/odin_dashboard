@@ -362,7 +362,7 @@ def get_top_dmg_taken_chart(df, t, title, legend = True):
 
 
 def get_top_survivor_chart(df, t, title, legend = False):
-    fig = px.bar(df, y=df["Name"], x=df["Total deaths"], 
+    fig = px.bar(df, y=df["Name"], x=df["Total"], 
                 color=df["Name"],
                 hover_name="Name",
                 text=df['Profession'],
@@ -373,7 +373,7 @@ def get_top_survivor_chart(df, t, title, legend = False):
                 )
     fig.update_layout(
                 xaxis_title="Times top / Times attended - Total " + t + " | " + t + " per sec",
-        title=title,
+        #title=title,
         showlegend=legend,
         legend_y=1,
         legend_x=0.9,

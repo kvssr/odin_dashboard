@@ -167,6 +167,10 @@ def get_top_stat_graph(model, raid, name):
                           for i, s in enumerate(query)])
         fig = graphs.get_top_dmg_taken_chart(
             df, 'dmg_taken', "Least Damage Taken", False)
+    elif isinstance(model(), DeathStat):
+        query = db.session.query(DeathStat).join(PlayerStat).filter_by(raid_id=raid).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total.asc()).all()
+        df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
+        fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
     else:
         query = db.session.query(model).join(PlayerStat).filter_by(
         raid_id=raid).order_by(-model.total).all()
