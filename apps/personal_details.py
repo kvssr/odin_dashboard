@@ -73,9 +73,9 @@ def layout(name):
     raids_df = pd.DataFrame(raids_dict)
     #print(f'raids_df: {raids_df}')
 
-    enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
-    if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
-        enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
+    # enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
+    # if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
+    enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
 
     tab_list = layout_config['details_tabs']
     layout = [
