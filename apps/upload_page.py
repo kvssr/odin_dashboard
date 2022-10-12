@@ -64,19 +64,21 @@ layout = [
                 columns=[{
                     'name': i,
                     'id': i,
+                    'type': 'text' if i in ['Title', 'Date', 'Type'] else 'numeric',
                     'editable': True if i == 'Title' else False,
                 } for i in raids_df.columns],
                 data=raids_dict,
                 editable=False,
                 row_selectable='multi',
-                #cell_selectable=False,
+                cell_selectable=True,
                 style_as_list_view=True,
                 style_cell={
                     'border': '1px solid #444',
                     'padding': '0.5rem',
                     'textAlign': 'center',
                     'font-family': 'var(--bs-body-font-family)',
-                    'line-height': 'var(--bs-body-line-height)'
+                    'line-height': 'var(--bs-body-line-height)',
+                    'cursor': 'default',
                 },
                 style_data={
                     'backgroundColor': '#424242',
@@ -88,6 +90,39 @@ layout = [
                     'border-top': '0px',
                     'border-bottom': '1px solid white'
                 },
+                style_cell_conditional=[
+                    {
+                        'if': {'column_id': c},
+                        'textAlign': 'left'
+                    } for c in ['Date', 'Title', 'Type']
+                ],
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': '#363636',
+                    },
+                    {
+                        'if': {
+                            'column_editable': True  # True | False
+                        },
+                        'cursor': 'cell'
+                    },                    
+                    {
+                        'if': {
+                            'state': 'active'  # 'active' | 'selected'
+                        },
+                        'backgroundColor': '#515151',
+                        'border': '1px solid #EEE',
+                        'font-color': '#EEE'
+                    },
+                    {
+                        'if': {
+                            'state': 'selected'  # 'active' | 'selected'
+                        },
+                        'backgroundColor': '#616161',
+                        'border': '1px solid #EEE',
+                    },
+                ],
             ),
         ))
     ]),
