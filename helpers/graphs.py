@@ -151,29 +151,22 @@ def get_top_bar_chart(df, t, title, legend = True, detailed = False):
 
 def add_annotations_graph(fig, df, t):
     for name in df["Name"]:
-        if not isinstance(t(), DeathStat):
-            avg_s = df[df["Name"] == name]["Average per s"].values[0]
-            fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total"].values[0]),
-                               text="{:,.0f}".format(avg_s) if avg_s >= 10 else "{:,.2f}".format(avg_s),
-                               showarrow=False,
-                               yshift=0,
-                               xshift=2,
-                               xanchor="left",
-                               font_size=13,
-            ),
+        # if not isinstance(t(), DeathStat):
+        avg_s = df[df["Name"] == name]["Average per s"].values[0]
+        fig.add_annotation(y=name, x=int(df[df["Name"] == name]["Total"].values[0]),
+                            text="{:,.0f}".format(avg_s) if avg_s >= 10 else "{:,.2f}".format(avg_s),
+                            showarrow=False,
+                            yshift=0,
+                            xshift=2,
+                            xanchor="left",
+                            font_size=13,
+        ),
         text = f"""<a href="/details/{name}" target='_self'>{name}</a>"""
         color='#EEE'
         background_color=None
-        #border = '#303030'
-        if name[0].isdigit():
-            text = name
-            color = 'grey'
         if 'CHARACTERS' in session:
-            #print(f"{name.rsplit(' ', 1)[0]=}")
             if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
-                #print(f"FOUND ON: {name.rsplit(' ', 1)[0]}")
                 background_color='#616161'
-                #border = '#414141'
         fig.add_annotation(y=name, x=0,
                             text=text,
                             showarrow=False,
