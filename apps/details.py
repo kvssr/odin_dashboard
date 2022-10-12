@@ -190,7 +190,7 @@ def get_top_stat_graph(model, raid, name):
 
 
 def get_summary_table(raid):
-    query = db.session.query(Fight).join(Raid).filter_by(id=raid).all()
+    query = db.session.query(Fight).join(Raid).filter_by(id=raid).order_by(Fight.start_time).all()
     df = pd.DataFrame([s.to_dict() for s in query])
     table = dbc.Table.from_dataframe(
         df, striped=True, bordered=True, hover=True, responsive=True, class_name='tableFixHead')
