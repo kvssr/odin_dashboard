@@ -73,6 +73,7 @@ def layout(name):
     raids_df = pd.DataFrame(raids_dict)
     #print(f'raids_df: {raids_df}')
 
+    # OLD PART. ONLY ADMINS COULD SEE ALL THE STATS
     # enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
     # if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
     enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
@@ -215,7 +216,7 @@ def show_selected_column(col, rows, data):
     print(f'col: {col}'),
     print(f'rows: {rows}')
     print(f'data: {data}')
-    if col is not None and col[0] in colum_models:
+    if rows and col is not None and col[0] in colum_models:
         selected_raids = [data[s]['raid_id'] for s in rows]
 
         # Get model and attribute depending on selected column
