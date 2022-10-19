@@ -23,6 +23,8 @@ tab_style_admin = {'padding': '.5rem 0',
 
 
 def layout():
+    options = [{'label': f'{s.raid_date} | {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} | {s.raid_type.name} | {s.name}',
+                'value': s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
     tab_list = layout_config['details_tabs']
     print(list(tab_list[0].keys())[0])
     print(list(tab_list[2].values())[0])
@@ -34,7 +36,8 @@ def layout():
                     html.Div("Select Raid", style={'text-align': 'center'}),
                     dcc.Dropdown(id='raids-dropdown',
                                  placeholder='Select raid type',
-                                 options=[],
+                                 options=options,
+                                 value=options[0]['value'],
                                  )
                 ], width={'size': 4, 'offset': 4}),
             ]),

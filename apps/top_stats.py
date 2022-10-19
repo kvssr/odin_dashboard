@@ -47,13 +47,17 @@ def get_fig_dist(raid, title):
 
 
 def layout():
+    options = [{'label': f'{s.raid_date} | {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} | {s.raid_type.name} | {s.name}',
+                'value': s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
+
     layout = html.Div(children=[
         dbc.Row(id='input-row-top', class_name='input-row', children=[
                 dbc.Col([
                     html.Div("Select Raid", style={'text-align': 'center'}),
-                    dcc.Dropdown(id='raids-dropdown',
+                    dcc.Dropdown(id='raids-dropdown-topstat',
                                  placeholder='Select raid type',
-                                 options=[],
+                                 options=options,
+                                 value=options[0]['value']
                                  ),
                 ], width={'size': 4, 'offset': 4}),
                 ]),
@@ -76,17 +80,8 @@ def layout():
     return layout
 
 
-@app.callback(Output('raids-dropdown', 'option'),
-              Output('raids-dropdown', 'value'),
-              Input('url', 'pathname'))
-def get_drop_down_options(url):
-    options = [{'label': f'{s.raid_date} | {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} | {s.raid_type.name} | {s.name}',
-                'value': s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
-    return options, options[0]['value']
-
-
 @app.callback(Output('top-stats-layout', 'children'),
-              Input('raids-dropdown', 'value'),
+              Input('raids-dropdown-topstat', 'value'),
               Input('st-graph-deleted', 'children'),
               Input('btn-new-graph', 'n_clicks'),
               Input('order-status', 'data'),
