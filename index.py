@@ -86,7 +86,7 @@ def display_page(pathname):
             url = '/api'
     elif pathname == '/groups':
         if check_valid_guild() or current_user.is_authenticated:
-            view = groups_page.layout
+            view = groups_page.layout()
         else:
             view = 'Redirecting to login...'
             url = '/login'
