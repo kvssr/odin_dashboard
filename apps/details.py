@@ -158,15 +158,18 @@ def get_top_stat_graph(model, raid, name):
     if current_user.is_authenticated:
         masked = False
     print(f'Model for fig: {model}')
+    max_attendance = db.session.query(PlayerStat.attendance_count).join(Raid).filter_by(id = raid).first()[0]
+    min_attend = int(max_attendance * 0.3)
+    print(f'Max Attendance: {max_attendance}')
     if isinstance(model(), DistStat):
         query = db.session.query(DistStat).join(PlayerStat).filter_by(
-        raid_id=raid).order_by(-DistStat.percentage_top).limit(MAX_PLAYERS).all()
+        raid_id=raid).filter(PlayerStat.attendance_count > min_attend).order_by(-DistStat.percentage_top).all()
         df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked)
                             for i, s in enumerate(query)])                       
         fig = graphs.get_top_dist_bar_chart(df, True)
     elif isinstance(model(), DmgTakenStat):
         query = db.session.query(DmgTakenStat).join(PlayerStat).filter_by(
-        raid_id=raid).order_by(DmgTakenStat.avg_s.asc()).limit(MAX_PLAYERS).all()
+        raid_id=raid).filter(PlayerStat.attendance_count > min_attend).order_by(DmgTakenStat.avg_s.asc()).all()
         df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked)
                           for i, s in enumerate(query)])
         fig = graphs.get_top_dmg_taken_chart(
