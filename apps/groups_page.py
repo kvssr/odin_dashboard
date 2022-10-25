@@ -2,7 +2,7 @@ import dash_bootstrap_components as dbc
 from dash import dcc, html, Output, Input, State, MATCH, dash_table
 from numpy import int64
 from app import app, db
-from models import Account, Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat
+from models import Account, Character, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, Raid, RipStat, StabStat
 import pandas as pd
 
 _stats_order = {
@@ -22,29 +22,34 @@ _stats_order = {
 }
 
 
-layout = html.Div(children=[
-            dbc.Container(id='details-output-data-upload',fluid=True, children=[
-                dbc.Row(id='input-row-top',class_name='input-row', children=[
-                    dbc.Col([
-                        html.Div("Select Raid", style={'text-align': 'center'}),
-                        dcc.Dropdown(id='raids-dropdown',
-                                    placeholder='Select raid type',
-                                    options=[],
-                                    )
-                        ],width={'size': 4, 'offset': 4}),
-                ]),
-                dbc.Row([
-                    html.H6("Fight #"),
-                    dbc.Col(dbc.Pagination(id='fight-page', size='sm', first_last=True, previous_next=True, min_value=0, max_value=5, active_page=0))
-                ], class_name='input-row', style={'text-align': 'center'}),
-                dbc.Row([
-                    dbc.Col(id='fight-group-summary')
-                ], class_name='input-row'),
-                dbc.Row([
-                    dbc.Col(id='groups-content')
-                ], id='groups-container')
+def layout():
+    options = [{'label': f'{s.raid_date} | {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} | {s.raid_type.name} | {s.name}',
+                'value': s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
+    layout = html.Div(children=[
+                dbc.Container(id='details-output-data-upload',fluid=True, children=[
+                    dbc.Row(id='input-row-top',class_name='input-row', children=[
+                        dbc.Col([
+                            html.Div("Select Raid", style={'text-align': 'center'}),
+                            dcc.Dropdown(id='raids-dropdown',
+                                        placeholder='Select raid type',
+                                        options=options,
+                                        value=options[0]['value']
+                                        )
+                            ],width={'size': 4, 'offset': 4}),
+                    ]),
+                    dbc.Row([
+                        html.H6("Fight #"),
+                        dbc.Col(dbc.Pagination(id='fight-page', size='sm', first_last=True, previous_next=True, min_value=0, max_value=5, active_page=0))
+                    ], class_name='input-row', style={'text-align': 'center'}),
+                    dbc.Row([
+                        dbc.Col(id='fight-group-summary')
+                    ], class_name='input-row'),
+                    dbc.Row([
+                        dbc.Col(id='groups-content')
+                    ], id='groups-container')
+                ])
             ])
-        ])
+    return layout
 
 
 @app.callback(
@@ -246,19 +251,6 @@ def show_groups_content(raid, fight):
                         html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
                         dbc.Tooltip(f'Top {top_stats[player]}', target=f'col-{player}', placement='left') if player in top_stats else ''
                         ], width={'size': 2}),]+
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Healing'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Stability'].values[0]:,.2f}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Cleansing'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Strips'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Distance'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Protection'].values[0]:,.2f}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Aegis'].values[0]:,.2f}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Might'].values[0]:,.2f}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Fury'].values[0]:,.2f}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Barrier'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Damage In'].values[0]:,}"),
-                    # dbc.Col(f"{df_groups[df_groups['Character'] == player]['Deaths'].values[0]:,}"),
                     [dbc.Col(format_stat(df_groups[df_groups['Character'] == player][stat].values[0])) for stat in _stats_order]
                     , class_name='groups-row-collapse') for player in df_groups.loc[df_groups['Party'] == party, 'Character']],
             hidden=True)
@@ -300,9 +292,6 @@ def merge_dicts(dict_1, dict_2):
     prevent_initial_call=True
 )
 def toggle_group_rows(n, style, icon):
-    print('CLICK!')
-    print(style)
-    print(not style)
     new_icon = '+'
     if icon == '+':
         new_icon = '-'
