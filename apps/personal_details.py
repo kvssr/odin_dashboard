@@ -84,25 +84,25 @@ def layout(name):
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader("Raids Attended"),
-                    dbc.CardBody(id='raids-attended')
+                    dbc.CardBody(id='raids-attended', class_name='pers-stat-card-body')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader("Fights Attended"),
-                    dbc.CardBody(id='fights-attended')
+                    dbc.CardBody(id='fights-attended', class_name='pers-stat-card-body')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader("Fights Missed"),
-                    dbc.CardBody(id='fights-missed')
+                    dbc.CardBody(id='fights-missed', class_name='pers-stat-card-body')
                 ])
             ]),
             dbc.Col([
                 dbc.Card([
                     dbc.CardHeader("Times Top", id='times-top-header'),
-                    dbc.CardBody(id='times-top')
+                    dbc.CardBody(id='times-top', class_name='pers-stat-card-body')
                 ])
             ]),
         ]),
