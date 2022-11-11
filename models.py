@@ -480,12 +480,42 @@ class User(UserMixin, db.Model):
     __tablename__ = 'odin_user'
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
-    username = db.Column(db.String(), unique= True)
+    username = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
     email = db.Column(db.String())
+    role_id = db.Column(db.Integer(), db.ForeignKey('role.id', ondelete="CASCADE"))
+    last_checked = db.Column(db.Date())
+    active = db.Column(db.Boolean(), default=True)
+
+    role = relationship("Role", back_populates="users")
 
     def __init__(self, username):
         self.username = username
+
+    def to_json(self):        
+        return {"name": self.username,
+                "email": self.email}
+
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):   
+        return self.active           
+
+    def is_anonymous(self):
+        return False          
+
+    def get_id(self):         
+        return str(self.id)
+
+
+class Role(db.Model):
+    __tablename__ = 'role'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    name = db.Column(db.String(), unique= True)
+
+    users = relationship("User", back_populates="role")
 
 
 class Account(db.Model):

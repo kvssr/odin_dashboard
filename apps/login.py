@@ -1,6 +1,8 @@
+from datetime import date
 from dash import html, dcc, Output, Input, State
 import dash_bootstrap_components as dbc
 from flask_login import login_user, current_user
+from flask import session
 from werkzeug.security import check_password_hash
 
 from app import app, db
@@ -36,7 +38,6 @@ def login(redirect):
         width={'size': 4, 'offset': 4})
     ])
     return login
-
 
 # Successful login
 success = html.Div([html.Div([html.H2('Login successful.'),
@@ -131,7 +132,7 @@ def login_button_click(n_clicks, username, password, redirect):
         redirect = '/'
     if n_clicks > 0:
         user = db.session.query(User).filter_by(username = username).first()
-        if user is not None:
+        if user is not None and user.active:
             if check_password_hash(user.password, password):
                 login_user(user)
                 return redirect, ''
@@ -145,10 +146,26 @@ def login_button_click(n_clicks, username, password, redirect):
 @app.callback(
     Output('user-status-div', 'children'), 
     Output('login-status', 'data'), 
-    [Input('url', 'pathname')]
+    Input('login-row', 'loading_state'),
+    State('url', 'pathname'),
     )
-def login_status(url):
+def login_status(state, url):
     ''' callback to display login/logout link in the header '''
+    print(f'STATE: {state}')
+
+    if hasattr(current_user, 'last_checked') and current_user.last_checked != date.today():
+        check_user = db.session.query(User).filter(User.id == current_user.id).first()
+        print('Checking user')
+        print(f'User ID: {session["_user_id"]}')
+        print(f'User: {check_user}')
+        print(f'C User: {current_user.username}')
+        if check_user and check_user.active:
+            current_user.last_checked = date.today()
+            db.session.add(current_user)
+            db.session.commit()
+        else:
+            return login_menu, 'loggedout'
+        
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
             and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
         return logged_in_menu, current_user.get_id()
