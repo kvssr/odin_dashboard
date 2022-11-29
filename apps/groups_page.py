@@ -152,8 +152,7 @@ def show_groups_content(raid, fight):
         'Barrier',
         'Damage In',
         ]).sort_values(['Party', 'Profession'])
-
-    print(df_groups)    
+ 
 
     top_dmg = {name[0]:['damage'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dmg_stat).order_by(-DmgStat.total).limit(5).all()}
     top_heals = {name[0]:['heals'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.heal_stat).order_by(-HealStat.total).limit(3).all()}
@@ -161,7 +160,7 @@ def show_groups_content(raid, fight):
     top_strips = {name[0]:['strips'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.rip_stat).order_by(-RipStat.total).limit(3).all()}
     top_cleanses = {name[0]:['cleanses'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.cleanse_stat).order_by(-CleanseStat.total).limit(3).all()}
     top_stab = {name[0]:['stab'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.stab_stat).order_by(-StabStat.total).limit(3).all()}
-    print(top_dmg)
+
     top_stats = merge_dicts(top_dmg, top_heals)
     top_stats = merge_dicts(top_stats, top_distance)
     top_stats = merge_dicts(top_stats, top_strips)
@@ -169,7 +168,6 @@ def show_groups_content(raid, fight):
     top_stats = merge_dicts(top_stats, top_stab)
 
     #top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
-    print(f'{top_stats=}')
 
     table_header = [html.Thead(html.Tr([html.Th('Professions')]+[html.Th(stat) for stat in _stats_order]))]
 
