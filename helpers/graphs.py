@@ -198,6 +198,10 @@ def add_clickable_names(fig, df):
         if name[0].isdigit():
             text = name
             color = 'grey'
+        background_color=None
+        if 'CHARACTERS' in session:
+            if name.rsplit(' ', 1)[0] in session['CHARACTERS']:
+                background_color='#616161'
         fig.add_annotation(y=name, x=0,
                             text=text,
                             showarrow=False,
@@ -205,7 +209,8 @@ def add_clickable_names(fig, df):
                             xshift=2,
                             xanchor="right",
                             font_size=13,
-                            font_color=color
+                            font_color=color,
+                            bgcolor=background_color,
         )
     return fig
 
