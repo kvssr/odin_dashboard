@@ -149,7 +149,7 @@ class Fight(db.Model):
 
     def to_dict(self):
         return {
-            'number': self.number,
+            'number': self.number + 1,
             'start time': self.start_time,
             'end time': self.end_time,
             'skipped': 'yes' if self.skipped else 'no',
