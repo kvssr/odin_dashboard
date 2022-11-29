@@ -1,0 +1,8 @@
+td a{
+    color: #EEE;
+    text-decoration: none;
+}
+
+td a:hover{
+    color: rgb(116, 0, 0);
+}
