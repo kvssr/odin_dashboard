@@ -450,6 +450,8 @@ class FightSummary(db.Model):
     def to_dict(self, short = True):
         d = {
             'Date': self.raid.raid_date,
+            'Start': self.start_time,
+            'End': self.end_time,
             'Title': self.raid.name,
             'Type': self.raid.raid_type.name,
             'Kills': self.kills,
@@ -461,10 +463,10 @@ class FightSummary(db.Model):
             'Cleanses': f'{self.cleanses:,}',
             'Stability Output': f'{self.stability:,.2f}',
             'Healing': f'{self.healing:,}',
-            'Damage Taken': f'{self.dmg_taken:,}',
         }
         if not short:
             d.update({
+                'Damage Taken': f'{self.dmg_taken:,}',
                 'Protections': f'{self.protection:,.2f}',
                 'Aegis': f'{self.aegis:,.2f}',
                 'Might': f'{self.might:,.2f}',
