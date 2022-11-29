@@ -17,116 +17,121 @@ import pandas as pd
 from app import app, db
 from models import FightSummary, Raid, RaidType
 
-dropdown_options = [{'label':s.name, 'value':s.id} for s in db.session.query(RaidType).all()]
-raids_dict = [s.to_dict() for s in db.session.query(FightSummary).all()]
-raids_df = pd.DataFrame(raids_dict)
 
+def layout():
+    dropdown_options = [{'label':s.name, 'value':s.id} for s in db.session.query(RaidType).all()]
+    dropdown_value_guild = db.session.query(RaidType.id).filter_by(name='guild').first()[0]
+    print(dropdown_value_guild)
+    raids_dict = [s.to_dict() for s in db.session.query(FightSummary).all()]
+    raids_df = pd.DataFrame(raids_dict)
 
-layout = [
-    dcc.Store(id='temp-data'),
-    dcc.Store(id='temp-raid'),
-    dcc.ConfirmDialog(
-        id='confirm-raid-exists',
-        message='This raid already exists. Want to overwrite?',
-    ),
-    dcc.ConfirmDialog(
-        id='confirm-raid-delete',
-        message='Are you sure you want to delete this raid?',
-    ),
-    dbc.Row([dcc.Loading(dbc.Col(id='raid-summary'))]),
-    dbc.Row([
-        dbc.Col(dcc.Upload(id='upload-file', children=html.Div([
-                    'Drag and Drop or ',
-                    html.A('Select Files')
-                ])),md=12)               
-    ]),
-    dbc.Row([
-        dbc.Col([
-            dbc.Row(id='input-row', class_name='input-row', children=[
-                dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
-                dbc.Col(dbc.Input(id='raid-name-input',placeholder='Raid title (optionel)', value='')),
-                dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
-                                    placeholder='Select raid type',
-                                    options=dropdown_options,
-                                    value=dropdown_options[1]['value'])),
-                dbc.Col(dbc.Button("Save", id='save-button')),
-            ]),
-        ])
-    ]),
-    dbc.Row([
-        dbc.Col(id='raids-update-output'),
-        dbc.Col(dbc.Button("Delete Raid(s)", id='delete-raid-btn'), width={}, style={'text-align':'end'})
-    ], justify='end'),
-    dbc.Row([
-        dcc.Loading(html.Div(
-            dash_table.DataTable(
-                id='raids-table',
-                columns=[{
-                    'name': i,
-                    'id': i,
-                    'type': 'text' if i in ['Title', 'Date', 'Type'] else 'numeric',
-                    'editable': True if i == 'Title' else False,
-                } for i in raids_df.columns],
-                data=raids_dict,
-                editable=False,
-                row_selectable='multi',
-                cell_selectable=True,
-                style_as_list_view=True,
-                style_cell={
-                    'border': '1px solid #444',
-                    'padding': '0.5rem',
-                    'textAlign': 'center',
-                    'font-family': 'var(--bs-body-font-family)',
-                    'line-height': 'var(--bs-body-line-height)',
-                    'cursor': 'default',
-                },
-                style_data={
-                    'backgroundColor': '#424242',
-                },
-                style_header={
-                    'backgroundColor': '#212121',
-                    'textAlign': 'center',
-                    'fontWeight': 'bold',
-                    'border-top': '0px',
-                    'border-bottom': '1px solid white'
-                },
-                style_cell_conditional=[
-                    {
-                        'if': {'column_id': c},
-                        'textAlign': 'left'
-                    } for c in ['Date', 'Title', 'Type']
-                ],
-                style_data_conditional=[
-                    {
-                        'if': {'row_index': 'odd'},
-                        'backgroundColor': '#363636',
+    layout = [
+        dcc.Store(id='temp-data'),
+        dcc.Store(id='temp-raid'),
+        dcc.ConfirmDialog(
+            id='confirm-raid-exists',
+            message='This raid already exists. Want to overwrite?',
+        ),
+        dcc.ConfirmDialog(
+            id='confirm-raid-delete',
+            message='Are you sure you want to delete this raid?',
+        ),
+        dbc.Row([dcc.Loading(dbc.Col(id='raid-summary'))]),
+        dbc.Row([
+            dbc.Col(dcc.Upload(id='upload-file', children=html.Div([
+                        'Drag and Drop or ',
+                        html.A('Select Files')
+                    ])),md=12)               
+        ]),
+        dbc.Row([
+            dbc.Col([
+                dbc.Row(id='input-row', class_name='input-row', children=[
+                    dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
+                    dbc.Col(dbc.Input(id='raid-name-input',placeholder='Raid title (optionel)', value='')),
+                    dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
+                                        placeholder='Select raid type',
+                                        options=dropdown_options,
+                                        value=dropdown_value_guild)),
+                    dbc.Col(dbc.Button("Save", id='save-button')),
+                ]),
+            ])
+        ]),
+        dbc.Row([
+            dbc.Col(id='raids-update-output'),
+            dbc.Col(dbc.Button("Delete Raid(s)", id='delete-raid-btn'), width={}, style={'text-align':'end'})
+        ], justify='end'),
+        dbc.Row([
+            dcc.Loading(html.Div(
+                dash_table.DataTable(
+                    id='raids-table',
+                    columns=[{
+                        'name': i,
+                        'id': i,
+                        'type': 'text' if i in ['Title', 'Date', 'Type'] else 'numeric',
+                        'editable': True if i == 'Title' else False,
+                    } for i in raids_df.columns],
+                    data=raids_dict,
+                    editable=False,
+                    row_selectable='multi',
+                    cell_selectable=True,
+                    style_as_list_view=True,
+                    style_cell={
+                        'border': '1px solid #444',
+                        'padding': '0.5rem',
+                        'textAlign': 'center',
+                        'font-family': 'var(--bs-body-font-family)',
+                        'line-height': 'var(--bs-body-line-height)',
+                        'cursor': 'default',
                     },
-                    {
-                        'if': {
-                            'column_editable': True  # True | False
-                        },
-                        'cursor': 'cell'
-                    },                    
-                    {
-                        'if': {
-                            'state': 'active'  # 'active' | 'selected'
-                        },
-                        'backgroundColor': '#515151',
-                        'border': '1px solid #EEE',
-                        'font-color': '#EEE'
+                    style_data={
+                        'backgroundColor': '#424242',
                     },
-                    {
-                        'if': {
-                            'state': 'selected'  # 'active' | 'selected'
-                        },
-                        'backgroundColor': '#616161',
-                        'border': '1px solid #EEE',
+                    style_header={
+                        'backgroundColor': '#212121',
+                        'textAlign': 'center',
+                        'fontWeight': 'bold',
+                        'border-top': '0px',
+                        'border-bottom': '1px solid white'
                     },
-                ],
-            ),
-        ))
-    ]),
-]
+                    style_cell_conditional=[
+                        {
+                            'if': {'column_id': c},
+                            'textAlign': 'left'
+                        } for c in ['Date', 'Title', 'Type']
+                    ],
+                    style_data_conditional=[
+                        {
+                            'if': {'row_index': 'odd'},
+                            'backgroundColor': '#363636',
+                        },
+                        {
+                            'if': {
+                                'column_editable': True  # True | False
+                            },
+                            'cursor': 'cell'
+                        },                    
+                        {
+                            'if': {
+                                'state': 'active'  # 'active' | 'selected'
+                            },
+                            'backgroundColor': '#515151',
+                            'border': '1px solid #EEE',
+                            'font-color': '#EEE'
+                        },
+                        {
+                            'if': {
+                                'state': 'selected'  # 'active' | 'selected'
+                            },
+                            'backgroundColor': '#616161',
+                            'border': '1px solid #EEE',
+                        },
+                    ],
+                ),
+            ))
+        ]),
+    ]
+    return layout
+
 
 @app.callback(Output('temp-data', 'data'),
             Input('upload-file', 'contents'))

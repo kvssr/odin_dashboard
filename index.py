@@ -92,7 +92,7 @@ def display_page(pathname):
             url = '/login'
     elif pathname == '/upload':
         if current_user.is_authenticated:
-            view = upload_page.layout
+            view = upload_page.layout()
         else:
             view = 'Redirecting to login...'
             url = f'/login{pathname}'
