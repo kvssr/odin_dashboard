@@ -492,6 +492,16 @@ class User(UserMixin, db.Model):
     def __init__(self, username):
         self.username = username
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.username,
+            'email': self.email,
+            'role': self.role.name,
+            'active': self.active,
+            'last_checked': self.last_checked
+        }
+
     def to_json(self):        
         return {"name": self.username,
                 "email": self.email}
@@ -516,6 +526,12 @@ class Role(db.Model):
     name = db.Column(db.String(), unique= True)
 
     users = relationship("User", back_populates="role")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
 
 
 class Account(db.Model):

@@ -30,14 +30,6 @@ login_manager.init_app(server)
 login_manager.login_view = '/login'
 
 
-class User(UserMixin):
-    def __init__(self, username):
-        self.id = username
-
-
 @login_manager.user_loader
-def load_user(username):
-    return User(username)
-
-
-
+def load_user(id):
+    return db.session.query(User).filter_by(id = id).first()
