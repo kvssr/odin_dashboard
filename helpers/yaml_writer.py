@@ -29,3 +29,9 @@ def save_config_to_file(config, filename):
         yaml.dump(temp, file)
         print('Config Saved Successfully')
 
+
+def load_file(filename:str) -> dict:
+    with open(filename, 'r') as file:
+        print(f'loading file: {filename}')
+        db_data = yaml.load(file)
+    return db_data

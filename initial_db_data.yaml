@@ -1,0 +1,53 @@
+roles:
+- {name: superadmin, power: 100}
+- {name: admin, power: 50}
+- {name: user, power: 10}
+- {name: guest, power: 0}
+
+admin_user:
+- {username: Admin, password: Admin, role_id: 1, active: True}
+
+raid_types:
+- {name: unknown}
+- {name: afternoon}
+- {name: morning}
+- {name: guild}
+- {name: reset}
+
+professions:
+- {name: Guardian, abbreviation: Gdn, color: /#186885}
+- {name: Dragonhunter, abbreviation: Dgh, color: /#186885}
+- {name: Firebrand, abbreviation: Fbd, color: /#186885}
+- {name: Willbender, abbreviation: Wbr, color: /#186885}
+- {name: Revenant, abbreviation: Rev, color: /#661100}
+- {name: Herald, abbreviation: Her, color: /#661100}
+- {name: Renegade, abbreviation: Ren, color: /#661100}
+- {name: Vindicator, abbreviation: Vin, color: /#661100}
+- {name: Warrior, abbreviation: War, color: /#CAAA2A}
+- {name: Berserker, abbreviation: Brs, color: /#CAAA2A}
+- {name: Spellbreaker, abbreviation: Spb, color: /#CAAA2A}
+- {name: BladeSworn, abbreviation: Bls, color: /#CAAA2A}
+- {name: Engineer, abbreviation: Eng, color: /#87581D}
+- {name: Scrapper, abbreviation: Scr, color: /#87581D}
+- {name: Holosmith, abbreviation: Hls, color: /#87581D}
+- {name: Mechanist, abbreviation: Mec, color: /#87581D}
+- {name: Ranger, abbreviation: Rgr, color: /#67A833}
+- {name: Druid, abbreviation: Dru, color: /#67A833}
+- {name: Soulbeast, abbreviation: Slb, color: /#67A833}
+- {name: Untamed, abbreviation: Unt, color: /#67A833}
+- {name: Thief, abbreviation: Thf, color: /#974550}
+- {name: Daredevil, abbreviation: Dar, color: /#974550}
+- {name: Deadeye, abbreviation: Ded, color: /#974550}
+- {name: Specter, abbreviation: Spe, color: /#974550}
+- {name: Elementalist, abbreviation: Ele, color: /#DC423E}
+- {name: Tempest, abbreviation: Tmp, color: /#DC423E}
+- {name: Weaver, abbreviation: Wea, color: /#DC423E}
+- {name: Catalyst, abbreviation: Cat, color: /#DC423E}
+- {name: Mesmer, abbreviation: Mes, color: /#69278A}
+- {name: Chronomancer, abbreviation: Chr, color: /#69278A}
+- {name: Mirage, abbreviation: Mir, color: /#69278A}
+- {name: Virtuoso, abbreviation: Vir, color: /#69278A}
+- {name: Necromancer, abbreviation: Nec, color: /#2C9D5D}
+- {name: Reaper, abbreviation: Rea, color: /#2C9D5D}
+- {name: Scourge, abbreviation: Scg, color: /#2C9D5D}
+- {name: Harbinger, abbreviation: Hrb, color: /#2C9D5D}
