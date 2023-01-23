@@ -524,6 +524,7 @@ class Role(db.Model):
 
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     name = db.Column(db.String(), unique= True)
+    power = db.Column(db.Integer())
 
     users = relationship("User", back_populates="role")
 

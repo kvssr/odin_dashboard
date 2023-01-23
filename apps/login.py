@@ -35,7 +35,8 @@ def login(redirect):
             ]),
             html.Div(children='', id='output-state')
         ],
-        width={'size': 4, 'offset': 4})
+        md={'size': 4, 'offset': 4},
+        xs={'size': 8, 'offset': 2})
     ])
     return login
 
@@ -84,8 +85,8 @@ logged_in_menu = dbc.Nav(className='menu', children=[
      ),
     dbc.DropdownMenu([
         dbc.DropdownMenuItem("Overview", href='/upload'), 
-        dbc.DropdownMenuItem("Upload json", href='/json'),
         dbc.DropdownMenuItem("Visit log", href='/logs'),
+        dbc.DropdownMenuItem("Users", href='/admin/users'),
         ],
         label="Admin",
         caret=False,
@@ -155,10 +156,6 @@ def login_status(state, url):
 
     if hasattr(current_user, 'last_checked') and current_user.last_checked != date.today():
         check_user = db.session.query(User).filter(User.id == current_user.id).first()
-        print('Checking user')
-        print(f'User ID: {session["_user_id"]}')
-        print(f'User: {check_user}')
-        print(f'C User: {current_user.username}')
         if check_user and check_user.active:
             current_user.last_checked = date.today()
             db.session.add(current_user)

@@ -10,7 +10,7 @@ from flask import session
 from flask_login import current_user, logout_user
 
 from app import app, db
-from apps import (api_page, contact_page, details, groups_page, howto_page,
+from apps import (access_denied, api_page, contact_page, details, groups_page, howto_page,
                   json_page, login, personal_details, top_stats, upload_page, user_edit,
                   user_logs_page, user_management)
 from models import Account, Log
@@ -84,34 +84,6 @@ def display_page(pathname):
         else:
             view = 'Redirecting to login...'
             url = '/login'
-    elif pathname == '/upload':
-        if current_user.is_authenticated:
-            view = upload_page.layout
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
-    elif pathname == '/logs':
-        if current_user.is_authenticated:
-            view = user_logs_page.layout()
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
-    elif pathname == '/admin/users':
-        if not current_user.is_authenticated:
-            view = user_management.layout()
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
-    elif pathname.startswith('/admin/users/'):
-        if not current_user.is_authenticated:
-            id = pathname.split('/')[-1]
-            if id == 'add':
-                view = user_edit.layout()
-            else:
-                view = user_edit.layout(int(id))
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
     elif pathname == '/howto':
         view = howto_page.layout
     elif pathname == '/':
@@ -120,6 +92,37 @@ def display_page(pathname):
         else:
             view = 'Redirecting to api...'
             url = '/api'
+    #################
+    ## ADMIN LINKS ##
+    #################
+    elif pathname == '/upload':
+        if current_user.is_authenticated and current_user.role.power >= 50:
+            view = upload_page.layout
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname == '/logs':
+        if current_user.is_authenticated and current_user.role.power >= 50:
+            view = user_logs_page.layout()
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname == '/admin/users':
+        if current_user.is_authenticated and current_user.role.power == 100:
+            view = user_management.layout()
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname.startswith('/admin/users/'):
+        if current_user.is_authenticated and current_user.role.power == 100:
+            id = pathname.split('/')[-1]
+            if id == 'add':
+                view = user_edit.layout()
+            else:
+                view = user_edit.layout(int(id))
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
     else:
         view = 'Redirecting to api...'
         url = '/api'

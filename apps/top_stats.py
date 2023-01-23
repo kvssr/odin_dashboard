@@ -70,7 +70,7 @@ def layout():
                     value=False,
                     style={'display': 'block'}),
                 dbc.Button(id='btn-new-graph', children='Add Graph', style={'margin-left': '10px', 'margin-bottom': '10px'}),
-            ], style={'align-items': 'center', 'display': 'flex'} if current_user.is_authenticated else {'display': 'none'}),
+            ], style={'align-items': 'center', 'display': 'flex'} if current_user.is_authenticated and current_user.role.power >= 50 else {'display': 'none'}),
             html.Div(id='top-stats-layout', className='row')
         ]),
         dcc.Store('st-graph-deleted'),
