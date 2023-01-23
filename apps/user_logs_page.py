@@ -177,6 +177,15 @@ def update_guild_members():
         if request.status_code == 200 or request.status_code == 206:
             members = request.json()
             #print(members)
+            accounts = db.session.query(Account).filter(Account.guild_id == guild.id).all()
+            for acc in accounts:
+                if acc.name not in members:
+                    acc.guild_id = None
+                    db.session.add(acc)
+                    db.session.commit()
+                else:
+                    members.remove(acc.name)
+
             for member in members:
                 account = db.session.query(Account).filter_by(name = member['name']).first()
                 if account is None:
