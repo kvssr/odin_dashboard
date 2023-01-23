@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 #from dotenv import load_dotenv
 from flask_migrate import Migrate
 from helpers import yaml_writer
+from werkzeug.security import generate_password_hash
 
 external_stylesheets = [dbc.themes.DARKLY]
 #load_dotenv()
@@ -30,14 +31,51 @@ login_manager.init_app(server)
 login_manager.login_view = '/login'
 
 
-class User(UserMixin):
-    def __init__(self, username):
-        self.id = username
-
-
 @login_manager.user_loader
-def load_user(username):
-    return User(username)
+def load_user(id):
+    return db.session.query(User).filter_by(id = id).first()
 
 
-
+@server.before_first_request
+def load_initial_db_data():
+    roles = db.session.query(Role).first()
+    raid_types = db.session.query(RaidType).first()
+    admin = db.session.query(User).first()
+    profession = db.session.query(Profession).first()
+    print('****************')
+    print('INITIAL DB DATA')
+    print('****************')
+    db_data = yaml_writer.load_file('initial_db_data.yaml')
+    if not roles:
+        print('No roles in db')
+        for role in db_data['roles']:
+            r = Role()
+            r.name = role['name']
+            r.power = role['power']
+            db.session.add(r)
+            db.session.commit()
+    if not raid_types:
+        print('No raid types in db')
+        for raid_type in db_data['raid_type']:
+            rt = RaidType()
+            rt.name = raid_type['name']
+            db.session.add(rt)
+            db.session.commit()
+    if not admin:
+        print('No admin in db')
+        print(db_data['admin_user'][0])
+        user = User(db_data['admin_user'][0]['username'])
+        user.password = generate_password_hash(db_data['admin_user'][0]['password'])
+        user.role_id = db_data['admin_user'][0]['role_id']
+        user.active = db_data['admin_user'][0]['active']
+        db.session.add(user)
+        db.session.commit()
+    if not profession:
+        print('No profession in db')
+        for profession in db_data['professions']:
+            prof = Profession()
+            prof.name = profession['name']
+            prof.abbreviation = profession['abbreviation']
+            prof.color = profession['color'][1:]
+            db.session.add(rt)
+            db.session.commit()

@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output, State
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-from helpers import db_writer, db_writer_json
+from helpers import db_writer_excel, db_writer_json, graphs
 from dash.exceptions import PreventUpdate
 
 import pandas as pd
@@ -190,8 +190,8 @@ def confirm_delete_row(submit_n_clicks, rows, data):
     if submit_n_clicks:
         row_list = []
         for row in rows:
-            raid = db_writer.get_raid_by_summary(data[row]['Date'], data[row]['Kills'], data[row]['Deaths'])
-            db_writer.delete_raid(raid.id)
+            raid = db_writer_excel.get_raid_by_summary(data[row]['Date'], data[row]['Kills'], data[row]['Deaths'])
+            db_writer_excel.delete_raid(raid.id)
             row_list.append(raid)
             data[row] = {}
         data = [s for s in data if s != {}]
@@ -243,10 +243,10 @@ def on_save_click(n, content, name, t, filename):
             return db_msg, False
         elif filename.split('.')[1] in ['xls', 'csv', 'xlsx']:
             df_fights = pd.read_excel(io.BytesIO(decoded), sheet_name='fights overview').tail(1).iloc[:,1:]
-            raid = db_writer.check_if_raid_exists(df_fights['Date'].values[0], df_fights['Start Time'].values[0])
+            raid = db_writer_excel.check_if_raid_exists(df_fights['Date'].values[0], df_fights['Start Time'].values[0])
             if raid:
                 return raid.id, True
-            db_msg = db_writer.write_xls_to_db(decoded, name, t)
+            db_msg = db_writer_excel.write_xls_to_db(decoded, name, t)
             return db_msg, False
     return content, False
 
@@ -261,11 +261,11 @@ def on_save_click(n, content, name, t, filename):
               )
 def update_output(submit_n_clicks, raid, data, name, t, filename):
     if submit_n_clicks:
-        db_writer.delete_raid(raid)
+        db_writer_excel.delete_raid(raid)
         decoded = base64.b64decode(data)
         if filename.split('.')[1] == 'json':
             file = json.loads(decoded.decode('utf8').replace("'", '"'))
             db_writer_json.write_xls_to_db(file, name, t)
         elif filename.split('.')[1] in ['xls', 'csv', 'xlsx']:
-            db_writer.write_xls_to_db(decoded, name, t)
+            db_writer_excel.write_xls_to_db(decoded, name, t)
         return f'Overwriting raid {raid}'

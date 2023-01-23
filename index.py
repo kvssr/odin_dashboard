@@ -10,9 +10,9 @@ from flask import session
 from flask_login import current_user, logout_user
 
 from app import app, db
-from apps import (api_page, contact_page, details, groups_page, howto_page,
-                  json_page, login, personal_details, top_stats, upload_page,
-                  user_logs_page)
+from apps import (access_denied, api_page, contact_page, details, groups_page, howto_page,
+                  json_page, login, personal_details, top_stats, upload_page, user_edit,
+                  user_logs_page, user_management)
 from models import Account, Log
 
 server = app.server
@@ -24,7 +24,7 @@ app.layout = dbc.Container(id='container', children=[
     dcc.Store(id='login-status', storage_type='session'),
     dbc.Row(id='login-row', children=dbc.Col(html.Div(id='user-status-div'))),
     dbc.Row(id='header', children=[
-        dbc.Col(html.Img(id='logo', src='../assets/logo.png'), sm=1),
+        dbc.Col(html.Img(id='logo', src='/assets/logo.png'), sm=1),
         dbc.Col(children=[
             html.H1('Records of Valhalla', 'title'),
             ], sm=10)]),
@@ -42,10 +42,8 @@ def display_page(pathname):
     view = None
     url = dash.no_update
     
-    # if pathname == '/login':
-    #     view = login.login()
     if pathname.startswith('/login'):
-        redirect = pathname.split('/')[-1]
+        redirect = pathname[6:]
         view = login.login(redirect)
     elif pathname == '/contact':
         view = contact_page.layout()
@@ -69,12 +67,8 @@ def display_page(pathname):
             url = '/login'
     elif pathname.startswith('/details/'):    
         name = pathname.split('/')[-1]
-        char = unquote(name.split('(')[0]).rstrip()
-        # if (check_valid_guild() and ('CHARACTERS' in session and char in session['CHARACTERS'])) or current_user.is_authenticated:
         if check_valid_guild() or current_user.is_authenticated:
             view = personal_details.layout(unquote(name))
-        # elif 'CHARACTERS' in session and check_valid_guild():
-        #     view = personal_details.layout('')
         else:
             view = 'Redirecting to api...'
             url = '/api'
@@ -90,18 +84,6 @@ def display_page(pathname):
         else:
             view = 'Redirecting to login...'
             url = '/login'
-    elif pathname == '/upload':
-        if current_user.is_authenticated:
-            view = upload_page.layout()
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
-    elif pathname == '/logs':
-        if current_user.is_authenticated:
-            view = user_logs_page.layout()
-        else:
-            view = 'Redirecting to login...'
-            url = f'/login{pathname}'
     elif pathname == '/howto':
         view = howto_page.layout
     elif pathname == '/':
@@ -110,6 +92,37 @@ def display_page(pathname):
         else:
             view = 'Redirecting to api...'
             url = '/api'
+    #################
+    ## ADMIN LINKS ##
+    #################
+    elif pathname == '/upload':
+        if current_user.is_authenticated and current_user.role.power >= 50:
+            view = upload_page.layout
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname == '/logs':
+        if current_user.is_authenticated and current_user.role.power >= 50:
+            view = user_logs_page.layout()
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname == '/admin/users':
+        if current_user.is_authenticated and current_user.role.power == 100:
+            view = user_management.layout()
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
+    elif pathname.startswith('/admin/users/'):
+        if current_user.is_authenticated and current_user.role.power == 100:
+            id = pathname.split('/')[-1]
+            if id == 'add':
+                view = user_edit.layout()
+            else:
+                view = user_edit.layout(int(id))
+        else:
+            view = access_denied.layout()
+            url = dash.no_update
     else:
         view = 'Redirecting to api...'
         url = '/api'
