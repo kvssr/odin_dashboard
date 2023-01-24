@@ -97,7 +97,7 @@ def display_page(pathname):
     #################
     elif pathname == '/upload':
         if current_user.is_authenticated and current_user.role.power >= 50:
-            view = upload_page.layout
+            view = upload_page.layout()
         else:
             view = access_denied.layout()
             url = dash.no_update
