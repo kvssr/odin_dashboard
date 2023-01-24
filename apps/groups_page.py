@@ -39,7 +39,7 @@ def layout():
                     ]),
                     dbc.Row([
                         html.H6("Fight #"),
-                        dbc.Col(dbc.Pagination(id='fight-page', size='sm', first_last=True, previous_next=True, min_value=0, max_value=5, active_page=0))
+                        dbc.Col(dbc.Pagination(id='fight-page', size='sm', first_last=True, previous_next=True, min_value=1, max_value=5, active_page=1))
                     ], class_name='input-row', style={'text-align': 'center'}),
                     dbc.Row([
                         dbc.Col(id='fight-group-summary')
@@ -54,11 +54,12 @@ def layout():
 
 @app.callback(
     Output('fight-page', 'max_value'),
+    Output('fight-page', 'active_page'),
     Input('raids-dropdown', 'value')
 )
 def get_number_of_fights(raid):
     num_fights = db.session.query(Fight.id).filter_by(raid_id = raid).count()
-    return num_fights - 1
+    return num_fights, 1
 
 
 @app.callback(
@@ -67,6 +68,7 @@ def get_number_of_fights(raid):
     Input('fight-page', 'active_page'),
 )
 def show_fight_summary(raid, fight):
+    fight -= 1
     fight_sum = [db.session.query(Fight).filter_by(raid_id = raid, number = fight).first().to_dict()]
     print(fight_sum)
     fight_df = pd.DataFrame.from_dict(fight_sum)
@@ -109,6 +111,8 @@ def show_fight_summary(raid, fight):
 def show_groups_content(raid, fight):
     if not fight:
         fight = 0
+    else:
+        fight -= 1
     print(raid)
 
     all_players = db.session.query(
