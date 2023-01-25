@@ -18,7 +18,7 @@ def layout():
     dropdown_options = [{'label':s.name, 'value':s.id} for s in db.session.query(RaidType).all()]
     dropdown_value_guild = db.session.query(RaidType.id).filter_by(name='guild').first()[0]
     print(dropdown_value_guild)
-    raids_dict = [s.to_dict() for s in db.session.query(FightSummary).all()]
+    raids_dict = [s.to_dict() for s in db.session.query(FightSummary).join(Raid).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
     raids_df = pd.DataFrame(raids_dict)
 
     layout = [
@@ -65,7 +65,7 @@ def layout():
                         'id': i,
                         'type': 'text' if i in ['Title', 'Date', 'Type'] else 'numeric',
                         'editable': True if i == 'Title' else False,
-                    } for i in raids_df.columns],
+                    } for i in raids_df.columns if i in ['Date', 'Start', 'End', 'Title', 'Type', 'Kills', 'Deaths', '⌀ Allies', '⌀ Enemies', 'Damage']],
                     data=raids_dict,
                     editable=False,
                     row_selectable='multi',
@@ -78,7 +78,17 @@ def layout():
                         'font-family': 'var(--bs-body-font-family)',
                         'line-height': 'var(--bs-body-line-height)',
                         'cursor': 'default',
+                        'overflow': 'hidden',
+                        'textOverflow': 'ellipsis',
+                        'maxWidth': 0
                     },
+                    tooltip_data=[
+                    {
+                        column: {'value': value, 'type': 'markdown'}
+                        for column, value in row.items() if column == 'Title'
+                    } for row in raids_dict
+                    ],
+                    tooltip_duration=None,
                     style_data={
                         'backgroundColor': '#424242',
                     },

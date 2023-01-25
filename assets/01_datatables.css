@@ -1,3 +1,8 @@
 .dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner input:not([type="radio"]):not([type="checkbox"]){
     color: #EEE !important;
 }
+
+.dash-table-tooltip {
+    background-color: #212121!important;
+    color: #EEE;
+}
