@@ -194,7 +194,7 @@ def show_groups_content(raid, fight):
             player_row = html.Tr(
                 [html.Td([
                     html.Img(src=f"assets/profession_icons/{df_groups[df_groups['Character'] == player]['Profession'].values[0]}.png", width='20px'),
-                    player,
+                    html.A(player, href=f'/details/{player}'),
                     html.Img(src='assets/logo.png', width='20px') if player in top_stats else '',
                     dbc.Tooltip(
                         hover_text, target=f'td-{player}', placement='right'
