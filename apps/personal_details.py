@@ -76,7 +76,7 @@ def layout(name):
     # OLD PART. ONLY ADMINS COULD SEE ALL THE STATS
     # enabled_columns = ['Date', 'Start Time', 'Damage', 'Rips', 'Cleanses', 'Stab', 'Healing', 'Sticky', 'Prot', 'Aegis', 'Might', 'Fury', 'Barrier']
     # if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
-    enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id']]
+    enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id', 'Deaths']]
 
     tab_list = layout_config['details_tabs']
     layout = [
