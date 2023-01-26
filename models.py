@@ -20,6 +20,7 @@ class Character(db.Model):
     account = relationship("Account", back_populates='characters')
     playerstats = relationship("PlayerStat", back_populates="character")
     character_fight_stats = relationship('CharacterFightStat', back_populates='character')
+    character_fight_ratings = relationship('CharacterFightRating', back_populates='character')
 
 
 class Profession(db.Model):
@@ -146,6 +147,7 @@ class Fight(db.Model):
     
     raid = relationship("Raid", back_populates="fights")
     character_fight_stats = relationship('CharacterFightStat', back_populates='fight')
+    character_fight_ratings = relationship('CharacterFightRating', back_populates='fight')
 
     def to_dict(self):
         return {
@@ -171,6 +173,7 @@ class CharacterFightStat(db.Model):
     id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
     fight_id = db.Column(db.Integer(), db.ForeignKey('fight.id', ondelete='CASCADE'))
     character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
+    build_type_id = db.Column(db.Integer(), db.ForeignKey('build_type.id', ondelete='CASCADE'))
     damage = db.Column(db.Integer())
     boonrips = db.Column(db.Integer())
     cleanses = db.Column(db.Integer())
@@ -188,6 +191,7 @@ class CharacterFightStat(db.Model):
 
     fight = relationship('Fight', back_populates='character_fight_stats')
     character = relationship('Character', back_populates='character_fight_stats')
+    build_type = relationship("BuildType", back_populates='character_fight_stats')
 
 
 
@@ -572,3 +576,40 @@ class Guild(db.Model):
 
     members = relationship('Account', back_populates='guild')
     
+class BuildType(db.Model):
+
+    __tablename__ = 'build_type'
+
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    name = db.Column(db.String())
+
+    character_fight_stats = relationship("CharacterFightStat", back_populates="build_type")
+    character_fight_ratings = relationship("CharacterFightRating", back_populates="build_type")
+
+
+class CharacterFightRating(db.Model):
+
+    __tablename__ = 'character_fight_rating'
+    
+    id = db.Column(db.Integer(), autoincrement=True, primary_key=True)
+    fight_id = db.Column(db.Integer(), db.ForeignKey('fight.id', ondelete='CASCADE'))
+    character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
+    build_type_id = db.Column(db.Integer(), db.ForeignKey('build_type.id', ondelete='CASCADE'))
+    damage = db.Column(db.Float())
+    boonrips = db.Column(db.Float())
+    cleanses = db.Column(db.Float())
+    stability = db.Column(db.Float())
+    healing = db.Column(db.Float())
+    distance_to_tag = db.Column(db.Float())
+    deaths = db.Column(db.Float())
+    protection = db.Column(db.Float())
+    aegis = db.Column(db.Float())
+    might = db.Column(db.Float())
+    fury = db.Column(db.Float())
+    barrier = db.Column(db.Float())
+    dmg_taken = db.Column(db.Float())
+    group = db.Column(db.Integer())
+
+    fight = relationship("Fight", back_populates="character_fight_ratings")
+    character = relationship("Character", back_populates="character_fight_ratings")
+    build_type = relationship("BuildType", back_populates="character_fight_ratings")

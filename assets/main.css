@@ -51,7 +51,7 @@ td {
 
 #header {
     display: flex;
-    background-image: url('Banner.jpg');
+    background-image: url('/assets/Banner.jpg');
     background-color: #1c1c1c87;
     background-position-y: 600px;
     background-blend-mode: overlay;
@@ -61,7 +61,7 @@ td {
     height: 100px;
     background: #404040;
     border-top: #EEE solid 1px;
-    background-image: url('Banner.jpg');
+    background-image: url('/assets/Banner.jpg');
     background-position-y: inherit;
     background-blend-mode: overlay;
     margin-top: 10px;
@@ -93,7 +93,7 @@ td {
 .card-header {
     text-align: center;
     background-color: #6a6a6a;
-    background-image: url('Banner.jpg');
+    background-image: url('/assets/Banner.jpg');
     background-blend-mode: overlay;
     background-position: top;
 }
@@ -360,6 +360,7 @@ td {
 
 .groups-prof-icon {
     margin-left: 5px;
+    height: 2em;
 }
 
 .collapse-cross {

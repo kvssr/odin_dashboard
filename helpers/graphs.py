@@ -489,6 +489,43 @@ def get_personal_chart(df, y):
     return fig
 
 
+def get_rating_line_chart(df, cols):
+    fig = go.Figure()
+    for stat in cols:
+        fig.add_trace(go.Scatter(
+            x=df['raid_date'],
+            y=df[stat],
+            name=stat,
+            text=[stat for x in range(len(df))],
+            customdata=df['raid_id'],
+            hovertemplate = '%{text}: %{y:.0f}<extra></extra>',
+        ))
+
+    fig.update_layout(
+        title=f"Ratings History",
+        showlegend=True,
+        legend=dict(
+            title='',
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        xaxis_tickformat='%d-%m-%y',
+        yaxis_showline=True,
+        yaxis_rangemode='tozero',
+        xaxis_gridcolor='grey',
+        yaxis_gridcolor='grey',
+        hovermode='x'
+    )
+    fig.update_layout(general_layout_line)
+    fig.update_layout(dict(margin=dict(r=10)))
+    return fig
+
+
+
+
 def get_top_bar_chart_p(df, x, date):
     fig = px.bar(df, y="Name", x=f'{x}', 
                  color="Profession", 
