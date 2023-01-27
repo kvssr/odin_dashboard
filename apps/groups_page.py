@@ -6,7 +6,6 @@ from numpy import int64
 from app import app, db
 from models import Account, BuildType, Character, CharacterFightRating, CharacterFightStat, CleanseStat, DeathStat, DistStat, DmgStat, Fight, HealStat, PlayerStat, Profession, RipStat, StabStat, Raid
 import pandas as pd
-import rating as rt
 
 _stats_order = {
     'Damage':'',
@@ -25,7 +24,7 @@ _stats_order = {
 }
 
 _build_options = [
-    {'label': 'Unkown', 'value': '1'},
+    {'label': 'Unknown', 'value': '1'},
     {'label': 'Dps', 'value': '2'},
     {'label': 'Sup', 'value': '3'},
 ]
