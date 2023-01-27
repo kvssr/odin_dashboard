@@ -61,8 +61,11 @@ def layout():
                                 id="rating-switch",
                                 label="Show Rating",
                                 value=False,
+                                style={
+                                    'display': 'block' if current_user.is_authenticated and current_user.role.power == 100 else 'none'
+                                }
                             ),
-                        )
+                        ) 
                     ]),
                     dbc.Row([
                         dbc.Col(id='groups-content')
@@ -90,9 +93,9 @@ def get_number_of_fights(raid):
 def show_fight_summary(raid, fight):
     fight -= 1
     fight_sum = [db.session.query(Fight).filter_by(raid_id = raid, number = fight).first().to_dict()]
-    print(fight_sum)
+    #print(fight_sum)
     fight_df = pd.DataFrame.from_dict(fight_sum)
-    print(fight_df)
+    #print(fight_df)
     return dash_table.DataTable(
         id='groups-table',
         columns=[{
@@ -134,7 +137,7 @@ def show_groups_content(raid, fight, rating):
         fight = 0
     else:
         fight -= 1
-    print(raid)
+    #print(raid)
     model = CharacterFightStat
     df_groups_prev = None
     if rating:
@@ -153,7 +156,7 @@ def show_groups_content(raid, fight, rating):
         for stat in _stats_order:
             df_groups[f'{stat}_d'] = 0
 
-    print(df_groups.head())   
+    #print(df_groups.head())   
     # return 
 
     top_dmg = {name[0]:['damage'] for name in db.session.query(Character.name).join(Character.playerstats).filter_by(raid_id=raid).join(PlayerStat.dmg_stat).order_by(-DmgStat.total).limit(5).all()}
@@ -171,19 +174,19 @@ def show_groups_content(raid, fight, rating):
 
     start_time = datetime.strptime(db.session.query(Fight.start_time).filter_by(raid_id=raid, number=fight).scalar(), '%H:%M:%S')
     end_time = datetime.strptime(db.session.query(Fight.end_time).filter_by(raid_id=raid, number=fight).scalar(), '%H:%M:%S')
-    print(f'{start_time=}')
+    #print(f'{start_time=}')
     duration = (end_time - start_time).total_seconds()
 
     #top_stats = { **top_dmg , **top_heals , **top_distance , **top_strips , **top_cleanses , **top_stab}
 
-    table_header = [html.Thead(html.Tr([html.Th('Professions'), html.Th('Build')]+[html.Th(stat) for stat in _stats_order]))]
+    table_header = [html.Thead(html.Tr([html.Th('Professions'), html.Th('Build') if current_user.is_authenticated and current_user.role.power == 100 else '']+[html.Th(stat) for stat in _stats_order]))]
 
     table_rows = []
     for party in df_groups['Party'].unique():
         sum_row = html.Tr(
             [html.Td([html.Div(id={'type': 'collapse-cross', 'index': str(party)}, children='-', className='collapse-cross')]+
                 [html.Img(src=f'assets/profession_icons/{player}.png', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
-            [html.Td('')]+
+            [html.Td('') if current_user.is_authenticated and current_user.role.power == 100 else '']+
             [html.Td(f"{df_groups[df_groups['Party'] == party]['Damage'].sum():,.0f} ({df_groups[df_groups['Party'] == party]['Damage'].sum()/df_groups['Damage'].sum()*100:.0f}%)")]+
             [html.Td(format_stat(df_groups[df_groups['Party'] == party][stat].sum())) for stat in _stats_order if stat != 'Damage']
         , className='groups-row', id={'type': 'groups-row', 'index': str(party)})
@@ -191,16 +194,10 @@ def show_groups_content(raid, fight, rating):
 
         player_rows = []
         rows = df_groups.loc[df_groups['Party'] == party]
-        #print(f'{rows=}')
         for i, player in df_groups.loc[df_groups['Party'] == party].iterrows():
-            #print(f'{player=}')
             hover_text = f'{player["Account"]}'
             fight_id = player['FightId']
-            #fight_id = df_groups.loc[df_groups["Character"] == player, "FightId"].values[0]
             build_type = player['BuildType']
-            #build_type = df_groups.loc[df_groups["Character"] == player, "BuildType"].values[0]
-            #print(f'{fight_id=}')
-            #print(f'{build_type=}')
             if player['Character'] in top_stats:
                 top_text = ''.join([f'| Top {p} ' for p in top_stats[player["Character"]]])
                 hover_text += top_text
@@ -213,7 +210,7 @@ def show_groups_content(raid, fight, rating):
                         hover_text, target=f'td-{player["Character"]}', placement='right'
                     )
                 ], id=f'td-{player["Character"]}')]+
-                [html.Td(dbc.Select(id={'type': 'build-type-select', 'index': str(fight_id)}, options=_build_options, value=build_type, size='sm', disabled=not current_user.is_authenticated))]+
+                [html.Td(dbc.Select(id={'type': 'build-type-select', 'index': str(fight_id)}, options=_build_options, value=build_type, size='sm', disabled=not current_user.is_authenticated)) if current_user.is_authenticated and current_user.role.power == 100 else '']+
                 [html.Td([
                     format_stat(player[stat], rating),
                     html.P(f" ({format_stat(player[f'{stat}_d'], rating)})", style={'color': get_rating_dif_col(player[f'{stat}_d']), 'display': 'inline'}) if rating else ''

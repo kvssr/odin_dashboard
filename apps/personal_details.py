@@ -118,6 +118,9 @@ def layout(name):
                             id="rating-switch-pers",
                             label="Show Rating",
                             value=False,
+                            style={
+                                'display': 'block' if current_user.is_authenticated and current_user.role.power == 50 else 'none'
+                            }
                     ), width={'size': 1}
             ),
         ]),
