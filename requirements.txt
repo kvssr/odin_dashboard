@@ -30,7 +30,7 @@ urllib3==1.26.7
 Werkzeug==2.0.2
 xlrd==2.0.1
 psycopg2-binary
-Flask-SQLAlchemy
+Flask-SQLAlchemy==2.5.1
 Flask-Migrate
 Flask-Script
 ruamel.yaml
