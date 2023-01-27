@@ -91,8 +91,7 @@ def hide_tabs(url):
 
 
 @app.callback(Output('summary-table', 'children'),
-              Input('raids-dropdown', 'value'),
-              prevent_initial_call=True)
+              Input('raids-dropdown', 'value'),)
 def get_summary_table(raid):
     try:
         query = db.session.query(FightSummary).join(
@@ -117,7 +116,6 @@ def get_dropdown_raids(value):
 @app.callback(Output('subtabs', 'children'),
               Output('subtabs', 'active_tab'),
               Input('tabs', 'active_tab'),
-              prevent_initial_call=True
             )
 def switch_tabs(tab):
     tab = int(tab.split('-')[-1])
@@ -139,7 +137,6 @@ def switch_tabs(tab):
               [Input('subtabs', 'active_tab'),
               Input('tabs', 'active_tab'),
               Input('raids-dropdown', 'value')],
-              prevent_initial_call=True
               )
 def switch_subtabs(tab, tabs, raid):
     tab = int(tab.split('-')[-1])
