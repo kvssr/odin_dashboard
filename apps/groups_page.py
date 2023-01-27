@@ -38,7 +38,7 @@ def layout():
                     dbc.Row(id='input-row-top',class_name='input-row', children=[
                         dbc.Col([
                             html.Div("Select Raid", style={'text-align': 'center'}),
-                            dcc.Dropdown(id='raids-dropdown',
+                            dcc.Dropdown(id='raids-dropdown-groups',
                                         placeholder='Select raid type',
                                         options=options,
                                         value=options[0]['value']
@@ -77,7 +77,7 @@ def layout():
 @app.callback(
     Output('fight-page', 'max_value'),
     Output('fight-page', 'active_page'),
-    Input('raids-dropdown', 'value')
+    Input('raids-dropdown-groups', 'value')
 )
 def get_number_of_fights(raid):
     num_fights = db.session.query(Fight.id).filter_by(raid_id = raid).count()
@@ -86,7 +86,7 @@ def get_number_of_fights(raid):
 
 @app.callback(
     Output('fight-group-summary', 'children'),
-    Input('raids-dropdown', 'value'),
+    Input('raids-dropdown-groups', 'value'),
     Input('fight-page', 'active_page'),
 )
 def show_fight_summary(raid, fight):
@@ -127,7 +127,7 @@ def show_fight_summary(raid, fight):
 
 @app.callback(
     Output('groups-content', 'children'),
-    Input('raids-dropdown', 'value'),
+    Input('raids-dropdown-groups', 'value'),
     Input('fight-page', 'active_page'),
     Input('rating-switch', 'value'),
 )

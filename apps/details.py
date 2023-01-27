@@ -91,7 +91,8 @@ def hide_tabs(url):
 
 
 @app.callback(Output('summary-table', 'children'),
-              Input('raids-dropdown', 'value'))
+              Input('raids-dropdown', 'value'),
+              prevent_initial_call=True)
 def get_summary_table(raid):
     try:
         query = db.session.query(FightSummary).join(
@@ -105,7 +106,8 @@ def get_summary_table(raid):
 
 
 @app.callback(Output('raids-dropdown', 'options'),
-              Input('raids-dropdown', 'value'))
+              Input('raids-dropdown', 'value'),
+              prevent_initial_call=True)
 def get_dropdown_raids(value):
     dropdown_options = [{'label': f'{s.raid_date} | {s.fightsummary[0].start_time} - {s.fightsummary[0].end_time} | {s.raid_type.name} | {s.name}',
                          'value': s.id} for s in db.session.query(Raid).order_by(Raid.raid_date.desc()).all()]
@@ -115,6 +117,7 @@ def get_dropdown_raids(value):
 @app.callback(Output('subtabs', 'children'),
               Output('subtabs', 'active_tab'),
               Input('tabs', 'active_tab'),
+              prevent_initial_call=True
             )
 def switch_tabs(tab):
     tab = int(tab.split('-')[-1])
