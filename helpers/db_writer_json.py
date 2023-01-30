@@ -363,14 +363,14 @@ def delete_raid(raid):
 
 
 def check_if_raid_exists(date, time):
-    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary, aliased=True).filter_by(start_time=time).first()
+    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary).filter_by(start_time=time).first()
     if raid:
         return raid
     return False
 
 
 def get_raid_by_summary(date, kills, deaths):
-    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary, aliased=True).filter_by(kills=kills, deaths=deaths).first()
+    raid = db.session.query(Raid).filter_by(raid_date = date).join(FightSummary).filter_by(kills=kills, deaths=deaths).first()
     if raid:
         return raid
     return False
