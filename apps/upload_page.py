@@ -43,7 +43,7 @@ def layout():
             dbc.Col([
                 dbc.Row(id='input-row', class_name='input-row', children=[
                     dbc.Col(dcc.Loading(html.Div(id='save-msg'))),
-                    dbc.Col(dbc.Input(id='raid-name-input',placeholder='Raid title (optionel)', value='')),
+                    dbc.Col(dbc.Input(id='raid-name-input',placeholder='Raid title (optional)', value='')),
                     dbc.Col(dcc.Dropdown(id='raid-type-dropdown',
                                         placeholder='Select raid type',
                                         options=dropdown_options,
