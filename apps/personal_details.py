@@ -119,7 +119,7 @@ def layout(name):
                             label="Show Rating",
                             value=False,
                             style={
-                                'display': 'block' if current_user.is_authenticated and current_user.role.power == 50 else 'none'
+                                'display': 'block' if current_user.is_authenticated and current_user.role.power >= 50 else 'none'
                             }
                     ), width={'size': 1}
             ),
