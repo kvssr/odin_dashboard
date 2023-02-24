@@ -613,3 +613,28 @@ class CharacterFightRating(db.Model):
     fight = relationship("Fight", back_populates="character_fight_ratings")
     character = relationship("Character", back_populates="character_fight_ratings")
     build_type = relationship("BuildType", back_populates="character_fight_ratings")
+
+    def to_dict(self):
+        return {
+            'raid_id': self.fight.raid_id,
+            'Date': self.fight.raid.raid_date,
+            'Start Time': self.fight.raid.fightsummary[0].start_time,
+            'character_id': self.character_id,
+            'Name': self.character.name,
+            'Damage': self.damage,
+            'Rips': self.boonrips,
+            'Cleanses': self.cleanses,
+            'Stab': self.stability,
+            'Heals': self.healing,
+            'Sticky': f'{self.distance_to_tag}%' if self.distance_to_tag else '0%',
+            'Prot': self.protection,
+            'Aegis': self.aegis,
+            'Might': self.might,
+            'Fury': self.fury,
+            'Barrier': self.barrier,
+            # 'Quick': self.quickness,
+            # 'Alac': self.alacrity,
+            # 'SSpeed': self.sup_speed_stat.avg_s,
+            'Dmg In': self.dmg_taken if self.dmg_taken else None,
+            'Deaths': self.deaths,
+        }

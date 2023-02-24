@@ -24,7 +24,7 @@ config = {
     'scrollZoom': False,
 }
 
-colum_models = {
+column_models = {
     'Damage': [DmgStat, 'total', 'avg_s', 'Average per s', 5],
     'Rips': [RipStat, 'total', 'avg_s', 'Average per s', 3],
     'Cleanses': [CleanseStat, 'total', 'avg_s', 'Average per s', 3],
@@ -119,7 +119,7 @@ def layout(name):
                             label="Show Rating",
                             value=False,
                             style={
-                                'display': 'block' if current_user.is_authenticated and current_user.role.power == 50 else 'none'
+                                'display': 'block' if current_user.is_authenticated and current_user.role.power >= 50 else 'none'
                             }
                     ), width={'size': 1}
             ),
@@ -127,7 +127,7 @@ def layout(name):
         dbc.Row([
             dbc.Col(
                 dcc.Loading(html.Div(id='raids-graph'), color='grey'),
-                width={'size': 8}
+                width={}
             ),
             dbc.Col(
                 dcc.Loading(html.Div(id='raids-top10'), color='grey'),
@@ -186,7 +186,6 @@ def layout(name):
 @app.callback(
     Output('pers-raids-table', 'column_selectable'),
     Input('rating-switch-pers', 'value'),
-    prevent_initial_call=True
 )
 def switch_table_col_selection(switch):
     selectable = 'single'
@@ -198,10 +197,38 @@ def switch_table_col_selection(switch):
 @app.callback(
     Output('pers-raids-table', 'data'),
     Input('name-dropdown', 'value'),
+    Input('rating-switch-pers', 'value')
 )
-def update_raids_table(character):
-    raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
+def update_raids_table(character, rating_switch):
+    if not rating_switch:
+        raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
+    else:
+        all_raids = [s for (s,) in db.session.query(Raid.id).join(PlayerStat).filter_by(character_id=character).order_by(Raid.raid_date.desc()).all()]
+        print(all_raids)
+        raids_dict = get_rating_per_character_for_raids(character, all_raids).round(0).to_dict('records')
     return raids_dict
+
+
+def get_rating_per_character_for_raids(character_id:int, raids:list) -> pd.DataFrame:
+    print('get_rating_per_character_for_raids')
+    print(raids)
+    df = pd.DataFrame
+    for raid in raids:
+        raid_date = db.session.query(Raid.raid_date).filter_by(id=raid).first()[0]
+        raid_stats = db.session.query(CharacterFightRating).filter_by(character_id=str(character_id)).join(CharacterFightRating.fight).filter_by(raid_id=raid)\
+            .order_by(CharacterFightRating.id.desc()).first()
+        if raid_stats is None:
+            continue
+        raid_stats = raid_stats.to_dict()
+        raid_stats['raid_date'] = raid_date
+        raid_stats['raid_id'] = raid
+        print(f'{raid_stats=}')
+        if df.empty:
+            df = pd.DataFrame(raid_stats, columns = raid_stats.keys(), index=['id'])
+        else:
+            df = df.append(raid_stats, ignore_index=True)
+
+    return df
 
 
 @app.callback(
@@ -223,7 +250,7 @@ def update_highest_stats(character, col):
     fights_missed = total_fights - fights_attended
 
     if col:
-        model = colum_models[col[0]][0]
+        model = column_models[col[0]][0]
         times_top = db.session.query(func.sum(model.times_top)).join(PlayerStat).filter_by(character_id=character).first()[0]
     return (raids_attended, fights_attended, fights_missed, times_top, f'Times Top: {col[0]}')
 
@@ -240,7 +267,7 @@ def show_selected_column(col, rows, data, switch):
     print(f'col: {col}'),
     print(f'rows: {rows}')
     print(f'data: {data}')
-    if rows and col is not None and col[0] in colum_models:
+    if rows and col is not None and col[0] in column_models:
         selected_raids = [data[s]['raid_id'] for s in rows]
         df_p = pd.DataFrame(data)
 
@@ -256,37 +283,20 @@ def show_selected_column(col, rows, data, switch):
 
 
 def get_rating_graph(cols, df_p, selected_raids):
-    # df = df[df['raid_id'].isin(selected_raids)]
-    df = pd.DataFrame
-    _columns = [col for col in CharacterFightRating.__table__.columns.keys()] + ['raid_date', 'raid_id']
-    for raid in selected_raids:
-        raid_date = df_p.loc[df_p['raid_id']==raid, 'Date'].item()
-        raid_stats = db.session.query(CharacterFightRating).filter_by(character_id=str(df_p['character_id'][0])).join(CharacterFightRating.fight).filter_by(raid_id=raid)\
-            .order_by(CharacterFightRating.id.desc()).first().__dict__
-        raid_stats['raid_date'] = raid_date
-        raid_stats['raid_id'] = raid
-        print(f'{raid_stats=}')
-        if df.empty:
-            df = pd.DataFrame(raid_stats, columns = _columns, index=['id'])
-        else:
-            df = df.append(raid_stats, ignore_index=True)
-
-
-    print(f'{cols=}')
-    print(f'{cols[0]=}')
-    print(f'{raid_date=}')
+    character = df_p['character_id'][0]
+    df = get_rating_per_character_for_raids(character, selected_raids)
     df.sort_values(by=['raid_date'], inplace=True)
     print(df)
-    selected_cols = [colum_models[col][1] for col in cols]
-    fig = graphs.get_rating_line_chart(df, selected_cols)
+    # selected_cols = [column_models[col][1] for col in cols]
+    fig = graphs.get_rating_line_chart(df, cols)
     return fig
 
 
 def get_value_graph(col, df_p, selected_raids):
 
     # Get model and attribute depending on selected column
-    model = colum_models[col[0]][0]
-    model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
+    model = column_models[col[0]][0]
+    model_attr = getattr(column_models[col[0]][0], column_models[col[0]][2])
 
 
     df_p['mode'] = 'markers+lines'
@@ -351,13 +361,15 @@ def get_value_graph(col, df_p, selected_raids):
     State('pers-raids-table', 'selected_rows'),
     State('pers-raids-table', 'data'),
     State('hover-store', 'data'),
+    State('rating-switch-pers', 'value'),
     prevent_initial_call=True)
-def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
+def display_hover_data(hoverData, col, drop, rows, data, hoverstore, rating_switch):
     print(hoverData)
     print(f'HOVERSTORE: {hoverstore}')
 
     ctx = dash.callback_context
-
+    if rating_switch:
+        return None, None, None
     if ctx.triggered:
         if ctx.triggered[0]['prop_id'].split('.')[0] == 'name-dropdown':
             return None, None, None
@@ -375,16 +387,16 @@ def display_hover_data(hoverData, col, drop, rows, data, hoverstore):
             raid = hoverstore[0]
             raid_date = hoverstore[1]
             selected_raid = hoverstore[2]
-        model = colum_models[col[0]][0]
-        model_attr = getattr(colum_models[col[0]][0], colum_models[col[0]][2])
-        show_limit = colum_models[col[0]][4]
+        model = column_models[col[0]][0]
+        model_attr = getattr(column_models[col[0]][0], column_models[col[0]][2])
+        show_limit = column_models[col[0]][4]
 
         max_attendance = db.session.query(PlayerStat.attendance_count).join(Raid).filter_by(id = raid).first()[0]
         print(f'Max Attendance: {max_attendance}')
         min_attend = int(max_attendance * 0.2)
         stat_list = db.session.query(model).filter(model_attr > 0).order_by(-model_attr).join(PlayerStat).filter_by(raid_id = raid).filter(PlayerStat.attendance_count > min_attend).limit(10).all()
         df = pd.DataFrame([s.to_dict(masked) if i >= show_limit else s.to_dict() for i, s in enumerate(stat_list)])
-        fig = graphs.get_top_bar_chart_p(df, colum_models[col[0]][3], raid_date)
+        fig = graphs.get_top_bar_chart_p(df, column_models[col[0]][3], raid_date)
         highlight = [{"if": {"row_index":selected_raid[0]}, "backgroundColor": "grey"},]
 
         return dcc.Graph(figure=fig, style=dict(height='500px'), config=config), highlight, json.dumps([raid, raid_date, selected_raid])
