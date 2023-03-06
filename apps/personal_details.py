@@ -79,7 +79,8 @@ def layout(name):
     # if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated:
     enabled_columns = [c for c in raids_df.columns if c not in ['Name', 'character_id', 'raid_id', 'Deaths']]
 
-    tab_list = layout_config['details_tabs']
+    tab_style = {'padding': '.5rem 0',
+             'cursor': 'pointer'}
     layout = [
         dbc.Row(class_name='input-row', children=[
             dbc.Col([
@@ -109,7 +110,7 @@ def layout(name):
         ]),
         dbc.Row(class_name='input-row', children=[
             dbc.Col(dcc.Dropdown(
-                id='name-dropdown',
+                id='name-dropdown-pers',
                 options=dropdown_options,
                 value=character_id
                 ), width={'size': 4 , 'offset': 4}
@@ -134,6 +135,22 @@ def layout(name):
                 id='raids-top10-col',
                 width={'size': 4}
             )
+        ]),
+        dbc.Row([
+            dbc.Tabs(id='tabs-buildtype-pers', children=[
+                    dbc.Tab(
+                        label='Damage',
+                        tab_id='dps-tab-pers-2',
+                        label_style=tab_style,
+                    ),
+                    dbc.Tab(
+                        label='Support',
+                        tab_id='sup-tab-pers-3',
+                        label_style=tab_style,
+                    ),
+                ], class_name='nav-justified flex-nowrap',
+                active_tab = 'dps-tab-pers-2'
+                ),
         ]),
         dbc.Row([
             dbc.Col(id='personal-raids-table', children=[
@@ -196,26 +213,36 @@ def switch_table_col_selection(switch):
 
 @app.callback(
     Output('pers-raids-table', 'data'),
-    Input('name-dropdown', 'value'),
-    Input('rating-switch-pers', 'value')
+    Input('name-dropdown-pers', 'value'),
+    Input('rating-switch-pers', 'value'),
+    Input('tabs-buildtype-pers', 'active_tab')
 )
-def update_raids_table(character, rating_switch):
+def update_raids_table(character, rating_switch, active_tab):
+    build_type = int(active_tab[-1])
+    print(f'{build_type=}')
     if not rating_switch:
         raids_dict = [s.to_dict() for s in db.session.query(PlayerStat).filter_by(character_id=character).join(Raid).join(FightSummary).order_by(Raid.raid_date.desc(), FightSummary.start_time.desc()).all()]
     else:
-        all_raids = [s for (s,) in db.session.query(Raid.id).join(PlayerStat).filter_by(character_id=character).order_by(Raid.raid_date.desc()).all()]
-        print(all_raids)
-        raids_dict = get_rating_per_character_for_raids(character, all_raids).round(0).to_dict('records')
+        all_raids = [s for (s,) in db.session.query(Raid.id)\
+                     .join(Fight).join(CharacterFightRating)\
+                        .filter_by(character_id=character, build_type_id=build_type)\
+                            .order_by(Raid.raid_date.desc())\
+                                .distinct()]
+        print(f'{all_raids=}')
+        if not all_raids:
+            raise PreventUpdate
+        raids_dict = get_rating_per_character_for_raids(character, all_raids, build_type).round(0).to_dict('records')
     return raids_dict
 
 
-def get_rating_per_character_for_raids(character_id:int, raids:list) -> pd.DataFrame:
+def get_rating_per_character_for_raids(character_id:int, raids:list, build_type:int) -> pd.DataFrame:
     print('get_rating_per_character_for_raids')
     print(raids)
     df = pd.DataFrame
     for raid in raids:
         raid_date = db.session.query(Raid.raid_date).filter_by(id=raid).first()[0]
-        raid_stats = db.session.query(CharacterFightRating).filter_by(character_id=str(character_id)).join(CharacterFightRating.fight).filter_by(raid_id=raid)\
+        print(f'{raid_date=}')
+        raid_stats = db.session.query(CharacterFightRating).filter_by(character_id=str(character_id), build_type_id=build_type).join(CharacterFightRating.fight).filter_by(raid_id=raid)\
             .order_by(CharacterFightRating.id.desc()).first()
         if raid_stats is None:
             continue
@@ -237,7 +264,7 @@ def get_rating_per_character_for_raids(character_id:int, raids:list) -> pd.DataF
     Output('fights-missed', 'children'),
     Output('times-top', 'children'),
     Output('times-top-header', 'children'),
-    Input('name-dropdown', 'value'),
+    Input('name-dropdown-pers', 'value'),
     Input('pers-raids-table', 'selected_columns'),
 )
 def update_highest_stats(character, col):
@@ -266,29 +293,30 @@ def update_highest_stats(character, col):
 def show_selected_column(col, rows, data, switch):
     print(f'col: {col}'),
     print(f'rows: {rows}')
-    print(f'data: {data}')
-    if rows and col is not None and col[0] in column_models:
+    # print(f'data: {data}')
+    if data and rows and col is not None and col[0] in column_models:
         selected_raids = [data[s]['raid_id'] for s in rows]
-        df_p = pd.DataFrame(data)
 
         if not switch:
+            df_p = pd.DataFrame(data)
             print(df_p.head())
             fig = get_value_graph(col, df_p, selected_raids)
         elif switch:
-            print(df_p.head())
-            fig = get_rating_graph(col, df_p, selected_raids)
+            selected_data = [data[s] for s in rows]
+            df_s = pd.DataFrame(selected_data)
+            print(df_s.head())
+            fig = get_rating_graph(col, df_s)
         else:
             return None
         return dcc.Graph(id='personal-graph',figure=fig, style={'height': 500}, config=config)
+    raise PreventUpdate
 
 
-def get_rating_graph(cols, df_p, selected_raids):
-    character = df_p['character_id'][0]
-    df = get_rating_per_character_for_raids(character, selected_raids)
-    df.sort_values(by=['raid_date'], inplace=True)
-    print(df)
+def get_rating_graph(cols, df_p):
+    df_p.sort_values(by=['raid_date'], inplace=True)
+    #print(df)
     # selected_cols = [column_models[col][1] for col in cols]
-    fig = graphs.get_rating_line_chart(df, cols)
+    fig = graphs.get_rating_line_chart(df_p, cols)
     return fig
 
 
@@ -357,7 +385,7 @@ def get_value_graph(col, df_p, selected_raids):
     Output('hover-store', 'data'),
     Input('personal-graph', 'hoverData'),
     Input('pers-raids-table', 'selected_columns'),
-    Input('name-dropdown', 'value'),
+    Input('name-dropdown-pers', 'value'),
     State('pers-raids-table', 'selected_rows'),
     State('pers-raids-table', 'data'),
     State('hover-store', 'data'),
@@ -371,7 +399,7 @@ def display_hover_data(hoverData, col, drop, rows, data, hoverstore, rating_swit
     if rating_switch:
         return None, None, None
     if ctx.triggered:
-        if ctx.triggered[0]['prop_id'].split('.')[0] == 'name-dropdown':
+        if ctx.triggered[0]['prop_id'].split('.')[0] == 'name-dropdown-pers':
             return None, None, None
 
     if hoverData or hoverstore:        
