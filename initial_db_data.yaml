@@ -51,3 +51,8 @@ professions:
 - {name: Reaper, abbreviation: Rea, color: /#2C9D5D}
 - {name: Scourge, abbreviation: Scg, color: /#2C9D5D}
 - {name: Harbinger, abbreviation: Hrb, color: /#2C9D5D}
+
+build_types:
+- {name: Unknown}
+- {name: Dps}
+- {name: Sup}

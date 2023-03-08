@@ -2,14 +2,16 @@ import os
 import dash
 import dash_bootstrap_components as dbc
 from flask import Flask
-from flask_login import LoginManager, UserMixin
+from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+# Uncomment the next line for local use
 #from dotenv import load_dotenv
 from flask_migrate import Migrate
 from helpers import yaml_writer
 from werkzeug.security import generate_password_hash
 
 external_stylesheets = [dbc.themes.DARKLY]
+# Uncomment the next line for local use
 #load_dotenv()
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
@@ -42,6 +44,7 @@ def load_initial_db_data():
     raid_types = db.session.query(RaidType).first()
     admin = db.session.query(User).first()
     profession = db.session.query(Profession).first()
+    build_types = db.session.query(BuildType).first()
     print('****************')
     print('INITIAL DB DATA')
     print('****************')
@@ -77,5 +80,12 @@ def load_initial_db_data():
             prof.name = profession['name']
             prof.abbreviation = profession['abbreviation']
             prof.color = profession['color'][1:]
+            db.session.add(rt)
+            db.session.commit()
+    if not build_types:
+        print('No build types in db')
+        for build_type in db_data['build_types']:
+            bt = BuildType()
+            bt.name = build_type['name']
             db.session.add(rt)
             db.session.commit()
