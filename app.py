@@ -59,7 +59,7 @@ def load_initial_db_data():
             db.session.commit()
     if not raid_types:
         print('No raid types in db')
-        for raid_type in db_data['raid_type']:
+        for raid_type in db_data['raid_types']:
             rt = RaidType()
             rt.name = raid_type['name']
             db.session.add(rt)
@@ -80,12 +80,12 @@ def load_initial_db_data():
             prof.name = profession['name']
             prof.abbreviation = profession['abbreviation']
             prof.color = profession['color'][1:]
-            db.session.add(rt)
+            db.session.add(prof)
             db.session.commit()
     if not build_types:
         print('No build types in db')
         for build_type in db_data['build_types']:
             bt = BuildType()
             bt.name = build_type['name']
-            db.session.add(rt)
+            db.session.add(bt)
             db.session.commit()

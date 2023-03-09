@@ -35,7 +35,10 @@ def get_fig_with_model(model, t, title, limit, raid):
 
 def get_fig_dist(raid, title):
     try:
-        dist_list = db.session.query(DistStat).order_by(-DistStat.percentage_top).join(
+        max_attendance = db.session.query(PlayerStat.attendance_count).join(Raid).filter_by(id = raid).first()[0]
+        min_attend = int(max_attendance * 0.3)
+
+        dist_list = db.session.query(DistStat).filter(PlayerStat.attendance_count > min_attend).order_by(-DistStat.percentage_top).join(
             PlayerStat).join(Raid).filter_by(id=raid).limit(5).all()
 
         if dist_list:
