@@ -5,14 +5,14 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 # Uncomment the next line for local use
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 from flask_migrate import Migrate
 from helpers import yaml_writer
 from werkzeug.security import generate_password_hash
 
 external_stylesheets = [dbc.themes.DARKLY]
 # Uncomment the next line for local use
-#load_dotenv()
+load_dotenv()
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = 'Records of Valhalla'
@@ -59,7 +59,7 @@ def load_initial_db_data():
             db.session.commit()
     if not raid_types:
         print('No raid types in db')
-        for raid_type in db_data['raid_type']:
+        for raid_type in db_data['raid_types']:
             rt = RaidType()
             rt.name = raid_type['name']
             db.session.add(rt)
@@ -80,12 +80,12 @@ def load_initial_db_data():
             prof.name = profession['name']
             prof.abbreviation = profession['abbreviation']
             prof.color = profession['color'][1:]
-            db.session.add(rt)
+            db.session.add(prof)
             db.session.commit()
     if not build_types:
         print('No build types in db')
         for build_type in db_data['build_types']:
             bt = BuildType()
             bt.name = build_type['name']
-            db.session.add(rt)
+            db.session.add(bt)
             db.session.commit()
