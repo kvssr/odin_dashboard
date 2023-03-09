@@ -5,14 +5,14 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 # Uncomment the next line for local use
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from flask_migrate import Migrate
 from helpers import yaml_writer
 from werkzeug.security import generate_password_hash
 
 external_stylesheets = [dbc.themes.DARKLY]
 # Uncomment the next line for local use
-load_dotenv()
+#load_dotenv()
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = 'Records of Valhalla'
