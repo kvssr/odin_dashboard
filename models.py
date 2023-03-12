@@ -78,6 +78,7 @@ class PlayerStat(db.Model):
     quick_stat = relationship("QuickStat", back_populates="player_stat", uselist=False, lazy='select')
     alac_stat = relationship("AlacStat", back_populates="player_stat", uselist=False, lazy='select')
     sup_speed_stat = relationship("SupSpeedStat", back_populates="player_stat", uselist=False, lazy='select')
+    stripped_stat = relationship("StrippedStat", back_populates="player_stat", uselist=False, lazy='select')
 
     def to_dict(self):
         return {
@@ -102,6 +103,7 @@ class PlayerStat(db.Model):
             'SSpeed': self.sup_speed_stat.avg_s,
             'Dmg In': self.dmg_taken_stat.times_top if self.dmg_taken_stat else None,
             'Deaths': self.death_stat.times_top,
+            'Stripped': self.stripped_stat.times_top if self.stripped_stat else None,
         }
 
 
@@ -187,6 +189,7 @@ class CharacterFightStat(db.Model):
     fury = db.Column(db.Float())
     barrier = db.Column(db.Integer())
     dmg_taken = db.Column(db.Integer())
+    stripped = db.Column(db.Integer())
     group = db.Column(db.Integer())
 
     fight = relationship('Fight', back_populates='character_fight_stats')
@@ -419,6 +422,16 @@ class KillsStat(BaseStat):
         }
 
 
+    
+class StrippedStat(BaseStat):
+
+    __tablename__ = 'stripped_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="stripped_stat")
+
+
+
 class FightSummary(db.Model):
     __tablename__ = 'fight_summary'
 
@@ -448,6 +461,7 @@ class FightSummary(db.Model):
     quickness = db.Column(db.Float())
     alacrity = db.Column(db.Float())
     superspeed = db.Column(db.Float())
+    stripped = db.Column(db.Float())    
 
     raid = relationship("Raid", back_populates="fightsummary")
 
@@ -477,7 +491,9 @@ class FightSummary(db.Model):
                 'Fury': f'{self.fury:,.2f}',
                 'Quickness': f'{self.quickness:,.2f}',
                 'Alacrity': f'{self.alacrity:,.2f}',
-                'Superspeed': f'{self.superspeed:,.2f}'
+#                'Superspeed': f'{self.superspeed:,.2f}'
+                'Superspeed': f'{self.superspeed:,.2f}',
+                'Stripped': f'{self.stripped:,}'
             })
         return d
 
@@ -608,6 +624,7 @@ class CharacterFightRating(db.Model):
     fury = db.Column(db.Float())
     barrier = db.Column(db.Float())
     dmg_taken = db.Column(db.Float())
+    stripped = db.Column(db.Float())
     group = db.Column(db.Integer())
 
     fight = relationship("Fight", back_populates="character_fight_ratings")

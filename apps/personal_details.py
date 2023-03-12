@@ -6,7 +6,7 @@ from flask import session
 from flask_login import current_user
 from numpy import character
 from app import db, app, layout_config
-from models import AegisStat, AlacStat, BarrierStat, Character, CharacterFightRating, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, QuickStat, RipStat, StabStat, SupSpeedStat
+from models import AegisStat, AlacStat, BarrierStat, Character, CharacterFightRating, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, QuickStat, RipStat, StabStat, StrippedStat, SupSpeedStat
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from helpers import graphs
@@ -40,7 +40,9 @@ colum_models = {
     'Alac': [AlacStat, 'total', 'avg_s', 'Average per s', 3],
     'SSpeed': [SupSpeedStat, 'total', 'avg_s', 'Average per s', 3],
     'Dmg In': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
-    'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
+#    'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
+    'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5],
+    'Stripped': [StrippedStat, 'total', 'avg_s', 'Average per s', 5]
 }
 
 

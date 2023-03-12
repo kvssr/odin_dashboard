@@ -4,7 +4,8 @@ from models import (Account, AegisStat, AlacStat, BarrierStat, Character,
                     CharacterFightStat, CleanseStat, DeathStat, DistStat,
                     DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat,
                     HealStat, MightStat, PlayerStat, Profession, ProtStat,
-                    QuickStat, Raid, RaidType, RipStat, StabStat, SupSpeedStat)
+                    QuickStat, Raid, RaidType, RipStat, StabStat, StrippedStat,
+                    SupSpeedStat)
 from helpers import graphs
 
 stats = {
@@ -24,6 +25,7 @@ stats = {
     'quick': QuickStat,
     'alac': AlacStat,
     'speed': SupSpeedStat,
+    'stripped': StrippedStat,
 }
 
 
@@ -95,6 +97,7 @@ def write_xls_to_db(json_file, name = '' , t = 1):
                 cf_stat.fury = fight['fury']
                 cf_stat.barrier = fight['barrier'] if fight['barrier'] != -1 else 0
                 cf_stat.dmg_taken = fight['dmg_taken']
+                cf_stat.stripped = fight['stripped']
                 try:
                     db.session.add(cf_stat)
                     db.session.commit()
@@ -300,6 +303,7 @@ def write_fight_summary_to_db(raid, raid_id, start_time, end_time):
         fight.distance_to_tag = raid['overall_squad_stats']['dist']
         fight.barrier = raid['overall_squad_stats']['barrier']
         fight.dmg_taken = raid['overall_squad_stats']['dmg_taken']
+        fight.stripped = raid['overall_squad_stats']['stripped']
         # Boons
         fight.stability = raid['overall_squad_stats']['stab']
         fight.protection = raid['overall_squad_stats']['prot']

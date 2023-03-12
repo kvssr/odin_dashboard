@@ -7,7 +7,8 @@ from app import app, db, layout_config
 import pandas as pd
 from helpers import graphs
 
-from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
+#from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
+from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat, StrippedStat
 
 
 tab_style = {'padding': '.5rem 0',
