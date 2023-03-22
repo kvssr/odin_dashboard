@@ -103,7 +103,7 @@ class PlayerStat(db.Model):
             'SSpeed': self.sup_speed_stat.avg_s,
             'Dmg In': self.dmg_taken_stat.times_top if self.dmg_taken_stat else None,
             'Deaths': self.death_stat.times_top,
-            'Stripped': self.stripped_stat.times_top if self.stripped_stat else None,
+            'Stripped': self.stripped_stat.avg_s if self.stripped_stat else None,
         }
 
 

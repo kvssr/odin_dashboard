@@ -21,6 +21,7 @@ _stats_order = {
     'Barrier':'',
     'Damage In':'',
     'Deaths':'',
+    'Stripped': '',
 }
 
 _build_options = [
@@ -255,6 +256,7 @@ def get_groups_df(raid:int, fight:int, model:db.Model) -> pd.DataFrame:
         model.fury,
         model.barrier,
         model.dmg_taken,
+        model.stripped,
         ).join(model.fight).filter_by(raid_id = raid).filter_by(number = fight).join(model.character).join(Character.profession).join(Character.account).all()
 
     df_groups = pd.DataFrame(all_players, columns=[
@@ -278,6 +280,7 @@ def get_groups_df(raid:int, fight:int, model:db.Model) -> pd.DataFrame:
         'Fury',
         'Barrier',
         'Damage In',
+        'Stripped',
         ]).sort_values(['Party', 'Profession'])
     return df_groups
     
