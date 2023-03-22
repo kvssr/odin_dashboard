@@ -103,7 +103,7 @@ class PlayerStat(db.Model):
             'SSpeed': self.sup_speed_stat.avg_s,
             'Dmg In': self.dmg_taken_stat.times_top if self.dmg_taken_stat else None,
             'Deaths': self.death_stat.times_top,
-            'Stripped': self.stripped_stat.avg_s if self.stripped_stat else None,
+            'Rips In': self.stripped_stat.avg_s if self.stripped_stat else None,
         }
 
 
@@ -493,7 +493,7 @@ class FightSummary(db.Model):
                 'Alacrity': f'{self.alacrity:,.2f}',
 #                'Superspeed': f'{self.superspeed:,.2f}'
                 'Superspeed': f'{self.superspeed:,.2f}',
-                'Stripped': f'{self.stripped:,}'
+                'Rips Taken': f'{self.stripped:,}'
             })
         return d
 

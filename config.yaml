@@ -16,7 +16,7 @@ details_tabs:
 - General:
   - {model: DistStat, name: Distance}
   - {model: DmgTakenStat, name: DmgTaken}
-  - {model: StrippedStat, name: Stripped}
+  - {model: StrippedStat, name: RipsTaken}
   - {model: SupSpeedStat, name: SuperSpeed}
   - {model: DeathStat, name: Deaths}
   - {model: Summary, name: Summary}

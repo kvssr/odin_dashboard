@@ -42,7 +42,7 @@ colum_models = {
     'Dmg In': [DmgTakenStat, 'times_top', 'times_top', 'Times Top', 5],
 #    'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5]
     'Deaths': [DeathStat, 'times_top', 'times_top', 'Times Top', 5],
-    'Stripped': [StrippedStat, 'total', 'avg_s', 'Average per s', 5]
+    'Rips In': [StrippedStat, 'total', 'avg_s', 'Average per s', 5]
 }
 
 
