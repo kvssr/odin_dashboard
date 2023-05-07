@@ -1,6 +1,8 @@
 details_tabs:
 - Offensive:
   - {model: DmgStat, name: Damage}
+  - {model: DmgPlayersStat, name: DamagePlayers}
+  - {model: DmgOtherStat, name: DamageOther}
   - {model: RipStat, name: Rips}
   - {model: MightStat, name: Might}
   - {model: FuryStat, name: Fury}
@@ -10,6 +12,8 @@ details_tabs:
   - {model: StabStat, name: Stability}
   - {model: CleanseStat, name: Cleanses}
   - {model: HealStat, name: Healing}
+  - {model: HealPlayersStat, name: HealingPlayers}
+  - {model: HealOthersStat, name: HealingOthers}
   - {model: BarrierStat, name: Barrier}
   - {model: ProtStat, name: Protection}
   - {model: AegisStat, name: Aegis}
@@ -21,7 +25,7 @@ details_tabs:
   - {model: DeathStat, name: Deaths}
   - {model: Summary, name: Summary}
 model_list: null
-model_names_list: [DmgStat, DistStat, StabStat, CleanseStat, HealStat, RipStat, BarrierStat,
+model_names_list: [DmgStat, DmgPlayersStat, DmgOtherStat, DistStat, StabStat, CleanseStat, HealStat, HealPlayersStat, HealOtherStat, RipStat, BarrierStat,
   ProtStat, AegisStat, MightStat, DmgTakenStat, FuryStat, QuickStat, AlacStat, SupSpeedStat,
   DeathStat, StrippedStat]
 top_page_stats:

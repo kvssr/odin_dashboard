@@ -62,10 +62,14 @@ class PlayerStat(db.Model):
     character = relationship("Character", back_populates="playerstats")
 
     dmg_stat = relationship("DmgStat", back_populates="player_stat", uselist=False, lazy='select')
+    dmg_players_stat = relationship("DmgPlayersStat", back_populates="player_stat", uselist=False, lazy='select')
+    dmg_other_stat = relationship("DmgOtherStat", back_populates="player_stat", uselist=False, lazy='select')
     rip_stat = relationship("RipStat", back_populates="player_stat", uselist=False, lazy='select')
     cleanse_stat = relationship("CleanseStat", back_populates="player_stat", uselist=False, lazy='select')
     stab_stat = relationship("StabStat", back_populates="player_stat", uselist=False, lazy='select')
     heal_stat = relationship("HealStat", back_populates="player_stat", uselist=False, lazy='select')
+    heal_players_stat = relationship("HealPlayersStat", back_populates="player_stat", uselist=False, lazy='select')
+    heal_other_stat = relationship("HealOtherStat", back_populates="player_stat", uselist=False, lazy='select')
     dist_stat = relationship("DistStat", back_populates="player_stat", uselist=False, lazy='select')
     prot_stat = relationship("ProtStat", back_populates="player_stat", uselist=False, lazy='select')
     aegis_stat = relationship("AegisStat", back_populates="player_stat", uselist=False, lazy='select')
@@ -88,10 +92,14 @@ class PlayerStat(db.Model):
             'character_id': self.character_id,
             'Name': self.character.name,
             'Damage': self.dmg_stat.avg_s,
+            'DamagePlayers': self.dmg_players_stat.avg_s,
+            'DamageOther': self.dmg_other_stat.avg_s,
             'Rips': self.rip_stat.avg_s,
             'Cleanses': self.cleanse_stat.avg_s,
             'Stab': self.stab_stat.avg_s,
             'Heals': self.heal_stat.avg_s,
+            'HealsPlayers': self.heal_players_stat.avg_s,
+            'HealsOther': self.heal_other_stat.avg_s,
             'Sticky': f'{self.dist_stat.percentage_top}%' if self.dist_stat else '0%',
             'Prot': self.prot_stat.avg_s,
             'Aegis': self.aegis_stat.avg_s,
@@ -177,10 +185,14 @@ class CharacterFightStat(db.Model):
     character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
     build_type_id = db.Column(db.Integer(), db.ForeignKey('build_type.id', ondelete='CASCADE'))
     damage = db.Column(db.Integer())
+    damage_players = db.Column(db.Integer())
+    damage_other = db.Column(db.Integer())
     boonrips = db.Column(db.Integer())
     cleanses = db.Column(db.Integer())
     stability = db.Column(db.Float())
     healing = db.Column(db.Integer())
+    healing_players = db.Column(db.Integer())
+    healing_other = db.Column(db.Integer())
     distance_to_tag = db.Column(db.Integer())
     deaths = db.Column(db.Integer())
     protection = db.Column(db.Float())
@@ -234,6 +246,20 @@ class DmgStat(BaseStat):
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="dmg_stat")
 
+class DmgPlayersStat(BaseStat):
+    
+    __tablename__ = 'dmg_players_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="dmg_players_stat")
+
+class DmgOtherStat(BaseStat):
+    
+    __tablename__ = 'dmg_other_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="dmg_other_stat")
+
 
 class RipStat(BaseStat):
 
@@ -266,6 +292,20 @@ class HealStat(BaseStat):
 
     player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
     player_stat = relationship("PlayerStat", back_populates="heal_stat")
+
+class HealPlayersStat(BaseStat):
+
+    __tablename__ = 'heal_players_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="heal_players_stat")
+
+class HealOtherStat(BaseStat):
+
+    __tablename__ = 'heal_other_stat'
+
+    player_stat_id = db.Column(db.Integer(), db.ForeignKey('player_stat.id', ondelete="CASCADE"), unique= True)
+    player_stat = relationship("PlayerStat", back_populates="heal_other_stat")
 
 
 class DistStat(BaseStat):
@@ -444,9 +484,13 @@ class FightSummary(db.Model):
     avg_allies = db.Column(db.Float())
     avg_enemies = db.Column(db.Float())
     damage = db.Column(db.Integer())
+    damage_players = db.Column(db.Integer())
+    damage_other = db.Column(db.Integer())
     boonrips = db.Column(db.Integer())
     cleanses = db.Column(db.Integer())
     healing = db.Column(db.Integer())
+    healing_players = db.Column(db.Integer())
+    healing_other = db.Column(db.Integer())
     deaths = db.Column(db.Integer())
     kills = db.Column(db.Integer())
     distance_to_tag = db.Column(db.Integer())
@@ -491,7 +535,6 @@ class FightSummary(db.Model):
                 'Fury': f'{self.fury:,.2f}',
                 'Quickness': f'{self.quickness:,.2f}',
                 'Alacrity': f'{self.alacrity:,.2f}',
-#                'Superspeed': f'{self.superspeed:,.2f}'
                 'Superspeed': f'{self.superspeed:,.2f}',
                 'Rips Taken': f'{self.stripped:,}'
             })
@@ -612,10 +655,14 @@ class CharacterFightRating(db.Model):
     character_id = db.Column(db.Integer(), db.ForeignKey('character.id', ondelete='CASCADE'))
     build_type_id = db.Column(db.Integer(), db.ForeignKey('build_type.id', ondelete='CASCADE'))
     damage = db.Column(db.Float())
+    damage_players = db.Column(db.Float())
+    damage_other = db.Column(db.Float())
     boonrips = db.Column(db.Float())
     cleanses = db.Column(db.Float())
     stability = db.Column(db.Float())
     healing = db.Column(db.Float())
+    healing_players = db.Column(db.Float())
+    healing_other = db.Column(db.Float())
     distance_to_tag = db.Column(db.Float())
     deaths = db.Column(db.Float())
     protection = db.Column(db.Float())

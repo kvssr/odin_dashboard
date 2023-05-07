@@ -6,7 +6,7 @@ from flask import session
 from flask_login import current_user
 from numpy import character
 from app import db, app, layout_config
-from models import AegisStat, AlacStat, BarrierStat, Character, CharacterFightRating, CleanseStat, DistStat, DmgTakenStat, Fight, FuryStat, HealStat, KillsStat, MightStat, Profession, ProtStat, QuickStat, RipStat, StabStat, StrippedStat, SupSpeedStat
+from models import AegisStat, AlacStat, BarrierStat, Character, CharacterFightRating, CleanseStat, DeathStat, DistStat, DmgStat, DmgPlayersStat, DmgOtherStat, DmgTakenStat, Fight, FuryStat, HealStat, HealPlayersStat, HealOtherStat, KillsStat, MightStat, Profession, ProtStat, QuickStat, RipStat, StabStat, StrippedStat, SupSpeedStat, FightSummary, PlayerStat, Raid
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from helpers import graphs
@@ -14,9 +14,6 @@ from dash import dash_table
 from sqlalchemy import func
 from dash.exceptions import PreventUpdate
 import dash
-
-from models import DeathStat, DmgStat, FightSummary, PlayerStat, Raid
-
 
 config = {
     'displayModeBar': False,
@@ -26,10 +23,14 @@ config = {
 
 colum_models = {
     'Damage': [DmgStat, 'total', 'avg_s', 'Average per s', 5],
+    'DamagePlayers': [DmgPlayersStat, 'total', 'avg_s', 'Average per s', 5],
+    'DamageOther': [DmgOtherStat, 'total', 'avg_s', 'Average per s', 5],
     'Rips': [RipStat, 'total', 'avg_s', 'Average per s', 3],
     'Cleanses': [CleanseStat, 'total', 'avg_s', 'Average per s', 3],
     'Stab': [StabStat, 'total', 'avg_s', 'Average per s', 3],
     'Heals': [HealStat, 'total', 'avg_s', 'Average per s', 3],
+    'HealsPlayers': [HealPlayersStat, 'total', 'avg_s', 'Average per s', 3],
+    'HealsOther': [HealOtherStat, 'total', 'avg_s', 'Average per s', 3],
     'Sticky': [DistStat, 'percentage_top', 'percentage_top', 'Percentage Top', 5],
     'Prot': [ProtStat, 'total', 'avg_s', 'Average per s', 3],
     'Aegis': [AegisStat, 'total', 'avg_s', 'Average per s', 3],

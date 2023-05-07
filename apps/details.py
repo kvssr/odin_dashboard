@@ -7,8 +7,7 @@ from app import app, db, layout_config
 import pandas as pd
 from helpers import graphs
 
-#from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat
-from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat, StrippedStat
+from models import AegisStat, BarrierStat, CleanseStat, DeathStat, DistStat, DmgStat, DmgPlayersStat, DmgOtherStat, DmgTakenStat, Fight, FightSummary, FuryStat, HealStat, HealPlayersStat, HealOtherStat, MightStat, PlayerStat, ProtStat, Raid, RipStat, StabStat, StrippedStat
 
 
 tab_style = {'padding': '.5rem 0',
@@ -179,6 +178,18 @@ def get_top_stat_graph(model, raid, name):
         query = db.session.query(DeathStat).join(PlayerStat).filter_by(raid_id=raid).order_by(DeathStat.times_top.desc(), PlayerStat.attendance_count.desc(), DeathStat.total.asc()).limit(MAX_PLAYERS).all()
         df = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query)])
         fig = graphs.get_top_survivor_chart(df, 'deaths', "Top Survivor", False)
+    elif isinstance(model(), DmgStat):
+        print(f'query:')
+        query_player_dmg = db.session.query(DmgPlayersStat).join(PlayerStat).filter_by(raid_id=raid).join(DmgStat).order_by(DmgStat.total.desc()).limit(MAX_PLAYERS).all()
+        query_other_dmg = db.session.query(DmgOtherStat).join(PlayerStat).filter_by(raid_id=raid).join(DmgStat).order_by(DmgStat.total.desc()).limit(MAX_PLAYERS).all()
+        print(f'{query_player_dmg}')
+        print(f'{query_other_dmg}')
+
+        df_player_dmg = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query_player_dmg)])
+        df_other_dmg = pd.DataFrame([s.to_dict() if i < 5 else s.to_dict(masked) for i, s in enumerate(query_other_dmg)])
+        df = pd.concat([df_player_dmg, df_other_dmg])
+        print(f'{df}')
+        fig = graphs.get_top_bar_chart(df, model, f'Top {name}', True, True)
     else:
         query = db.session.query(model).join(PlayerStat).filter_by(
         raid_id=raid).order_by(-model.total).limit(MAX_PLAYERS).all()

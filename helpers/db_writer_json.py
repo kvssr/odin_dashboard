@@ -2,14 +2,16 @@ from datetime import datetime
 from app import db
 from models import (Account, AegisStat, AlacStat, BarrierStat, Character,
                     CharacterFightStat, CleanseStat, DeathStat, DistStat,
-                    DmgStat, DmgTakenStat, Fight, FightSummary, FuryStat,
-                    HealStat, MightStat, PlayerStat, Profession, ProtStat,
+                    DmgStat, DmgPlayersStat, DmgOtherStat, DmgTakenStat, Fight, FightSummary, FuryStat,
+                    HealStat, HealPlayersStat, HealOtherStat, MightStat, PlayerStat, Profession, ProtStat,
                     QuickStat, Raid, RaidType, RipStat, StabStat, StrippedStat,
                     SupSpeedStat)
 from helpers import graphs
 
 stats = {
     'dmg': DmgStat,
+    'dmg_players': DmgPlayersStat,
+    'dmg_other': DmgOtherStat,
     'aegis': AegisStat,
     'barrier': BarrierStat,
     'cleanses': CleanseStat,
@@ -18,6 +20,8 @@ stats = {
     'dmg_taken': DmgTakenStat,
     'fury': FuryStat,
     'heal': HealStat,
+    'heal_players': HealPlayersStat,
+    'heal_other': HealOtherStat,
     'might': MightStat,
     'prot': ProtStat,
     'rips': RipStat,
@@ -85,10 +89,14 @@ def write_xls_to_db(json_file, name = '' , t = 1):
                 cf_stat.fight_id = fight_id
                 cf_stat.group = fight['group']
                 cf_stat.damage = fight['dmg']
+                cf_stat.damage_players = fight['dmg_players']
+                cf_stat.damage_other = fight['dmg_other']
                 cf_stat.boonrips = fight['rips']
                 cf_stat.cleanses = fight['cleanses']
                 cf_stat.stability = fight['stab']
                 cf_stat.healing = fight['heal'] if fight['heal'] != -1 else 0
+                cf_stat.healing_players = fight['heal_players'] if fight['heal_players'] != -1 else 0
+                cf_stat.healing_other = fight['heal_other'] if fight['heal_other'] != -1 else 0
                 cf_stat.distance_to_tag = fight['dist']
                 cf_stat.deaths = fight['deaths']
                 cf_stat.protection = fight['prot']
@@ -297,9 +305,13 @@ def write_fight_summary_to_db(raid, raid_id, start_time, end_time):
         fight.avg_allies = raid['overall_raid_stats']['mean_allies']
         fight.avg_enemies = raid['overall_raid_stats']['mean_enemies']
         fight.damage = raid['overall_squad_stats']['dmg']
+        fight.damage_players = raid['overall_squad_stats']['dmg_players']
+        fight.damage_other = raid['overall_squad_stats']['dmg_other']
         fight.boonrips = raid['overall_squad_stats']['rips']
         fight.cleanses = raid['overall_squad_stats']['cleanses']
         fight.healing = raid['overall_squad_stats']['heal']
+        fight.healing_players = raid['overall_squad_stats']['heal_players']
+        fight.healing_other = raid['overall_squad_stats']['heal_other']
         fight.distance_to_tag = raid['overall_squad_stats']['dist']
         fight.barrier = raid['overall_squad_stats']['barrier']
         fight.dmg_taken = raid['overall_squad_stats']['dmg_taken']
