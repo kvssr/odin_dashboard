@@ -5,22 +5,23 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 # Uncomment the next line for local use
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 from flask_migrate import Migrate
 from helpers import yaml_writer
 from werkzeug.security import generate_password_hash
 
 external_stylesheets = [dbc.themes.DARKLY]
 # Uncomment the next line for local use
-#load_dotenv()
+load_dotenv()
 server = Flask(__name__)
-app = dash.Dash(__name__, server=server, external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+app = dash.Dash(__name__, server=server,
+                external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
 app.title = 'Records of Valhalla'
 env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
 server.config.from_object(env_config)
 server.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(server)
-from models import *
+from models import User, Role, RaidType, Profession, BuildType
 migrate = Migrate(server, db, compare_type=True)
 
 layout_config = yaml_writer.load_config_file(db)
@@ -35,7 +36,7 @@ login_manager.login_view = '/login'
 
 @login_manager.user_loader
 def load_user(id):
-    return db.session.query(User).filter_by(id = id).first()
+    return db.session.query(User).filter_by(id=id).first()
 
 
 @server.before_first_request
@@ -68,7 +69,8 @@ def load_initial_db_data():
         print('No admin in db')
         print(db_data['admin_user'][0])
         user = User(db_data['admin_user'][0]['username'])
-        user.password = generate_password_hash(db_data['admin_user'][0]['password'])
+        user.password = generate_password_hash(
+            db_data['admin_user'][0]['password'])
         user.role_id = db_data['admin_user'][0]['role_id']
         user.active = db_data['admin_user'][0]['active']
         db.session.add(user)
