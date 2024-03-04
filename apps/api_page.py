@@ -10,12 +10,16 @@ from dash import dash_table
 from sqlalchemy import distinct, func
 from dash.exceptions import PreventUpdate
 import urllib
+from flask_login import login_user
+from models import User
+from werkzeug.security import check_password_hash
 
 from app import app, db
 from models import Character, PlayerStat
 
 
 layout = dbc.Row([
+    dcc.Location(id='url_login_guest', refresh=True),
     dbc.Row(id='api-explain-row', children=[
         dbc.Col([
             html.H1('Add your API Key'),
@@ -29,6 +33,7 @@ layout = dbc.Row([
         dcc.Loading(dbc.Col(id='api-add-col', children=[
             dbc.Input(id='api-input', placeholder='Put your API Key here'),
             dbc.Button("Add", id='api-btn'),
+            dbc.Button("Continue as Guest", id='guest-btn', class_name='ml-1'),
             html.Div(id='api-msg', style={'display': 'none'})
         ], width={'size': 4, 'offset': 4}), color='grey')
     ]),
@@ -63,7 +68,8 @@ layout = dbc.Row([
                 },
             ), color='grey')
         ), width={'size': 10, 'offset': 1}),
-        html.Div(id='api-delete-msg', style={'display': 'none'})
+        html.Div(id='api-delete-msg', style={'display': 'none'}),
+        html.Div(children='', id='output-state-guest')
     ]),
     dbc.Row(id='api-characters-row', children=[
         html.H1('Characters'),
@@ -214,3 +220,15 @@ def delete_api_key(data, prev):
         print('session cleared')
         session.clear()
         return 'Session Cleared'
+
+
+@app.callback(Output('url_login_guest', 'pathname'),
+              Output('output-state-guest', 'children'),
+              Input('guest-btn', 'n_clicks'),
+              prevent_initial_call=True)
+def login_button_click(n_clicks):
+    if n_clicks:
+        user = db.session.query(User).filter_by(username = 'Guest').first()
+        login_user(user)
+        return '/', ''
+    return '/login', ''
