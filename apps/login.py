@@ -15,7 +15,7 @@ def login(redirect):
         dbc.Col([
             html.H2('Login Form', style={'text-align': 'center'}),
             dbc.Card([
-                dbc.CardImg(src="/assets/logo.png", top=True, style={'width': 200, 'margin': 'auto'}),
+                dbc.CardImg(src="/rovpy/assets/logo.png", top=True, style={'width': 200, 'margin': 'auto'}),
                 dbc.CardBody([
                     html.Div(
                         className='mb-3',
@@ -43,40 +43,40 @@ def login(redirect):
 # Successful login
 success = html.Div([html.Div([html.H2('Login successful.'),
                               html.Br(),
-                              dcc.Link('Home', href='/')])
+                              dcc.Link('Home', href='/rovpy/')])
                     ])
 
 # Failed Login
 failed = html.Div([html.Div([html.H2('Log in Failed. Please try again.'),
                              html.Br(),
                              html.Div([login]),
-                             dcc.Link('Home', href='/')
+                             dcc.Link('Home', href='/rovpy/')
                              ])
                    ])
 
 # Logout
 logout = html.Div([html.Div(html.H2('You have been logged out - Please login')),
                    html.Br(),
-                   dcc.Link('Home', href='/')
+                   dcc.Link('Home', href='/rovpy/')
                    ])
 
 
 logged_in_menu = dbc.Nav(className='menu', children=[
     dbc.DropdownMenu(
-            [dbc.DropdownMenuItem("API Key", href='/api'), 
-            dbc.DropdownMenuItem("Profile", href='/details/')],
+            [dbc.DropdownMenuItem("API Key", href='/rovpy/api'), 
+            dbc.DropdownMenuItem("Profile", href='/rovpy/details/')],
             label="Account",
             caret=True,
             nav=True,
             id='account-dpn',
         ),
-    dbc.NavItem(dbc.NavLink("Home", href='/')),
-    dbc.NavItem(dbc.NavLink("Details", href='/details')),
-    dbc.NavItem(dbc.NavLink("Groups", href='/groups')),
+    dbc.NavItem(dbc.NavLink("Home", href='/rovpy/')),
+    dbc.NavItem(dbc.NavLink("Details", href='/rovpy/details')),
+    dbc.NavItem(dbc.NavLink("Groups", href='/rovpy/groups')),
      dbc.DropdownMenu(
          [
-             dbc.DropdownMenuItem("Howto", href='/howto'),
-             dbc.DropdownMenuItem("Contact", href='/contact'),
+             dbc.DropdownMenuItem("Howto", href='/rovpy/howto'),
+             dbc.DropdownMenuItem("Contact", href='/rovpy/contact'),
           ],
          label="Help",
          caret=True,
@@ -84,42 +84,42 @@ logged_in_menu = dbc.Nav(className='menu', children=[
          id='help',
      ),
     dbc.DropdownMenu([
-        dbc.DropdownMenuItem("Overview", href='/upload'), 
-        dbc.DropdownMenuItem("Visit log", href='/logs'),
-        dbc.DropdownMenuItem("Users", href='/admin/users'),
+        dbc.DropdownMenuItem("Overview", href='/rovpy/upload'), 
+        dbc.DropdownMenuItem("Visit log", href='/rovpy/logs'),
+        dbc.DropdownMenuItem("Users", href='/rovpy/admin/users'),
         ],
         label="Admin",
         caret=True,
         nav=True,
         id='upload-dpn',
     ),
-    dbc.NavItem(dbc.NavLink("Logout", href='/logout')),
+    dbc.NavItem(dbc.NavLink("Logout", href='/rovpy/logout')),
 ],
 )
 
 login_menu = dbc.Nav(className='menu', children=[
     dbc.DropdownMenu([
-        dbc.DropdownMenuItem("API Key", href='/api'), 
-        dbc.DropdownMenuItem("Profile", href='/details/')
+        dbc.DropdownMenuItem("API Key", href='/rovpy/api'), 
+        dbc.DropdownMenuItem("Profile", href='/rovpy/details/')
         ],
         label="Account",
         caret=True,
         nav=True,
         id='account-dpn',
     ),
-    dbc.NavItem(dbc.NavLink("Home", href='/')),
-    dbc.NavItem(dbc.NavLink("Details", href='/details')),
-    dbc.NavItem(dbc.NavLink("Groups", href='/groups')),
+    dbc.NavItem(dbc.NavLink("Home", href='/rovpy/')),
+    dbc.NavItem(dbc.NavLink("Details", href='/rovpy/details')),
+    dbc.NavItem(dbc.NavLink("Groups", href='/rovpy/groups')),
     dbc.DropdownMenu([
-        dbc.DropdownMenuItem("Howto", href='/howto'),
-        dbc.DropdownMenuItem("Contact", href='/contact'),
+        dbc.DropdownMenuItem("Howto", href='/rovpy/howto'),
+        dbc.DropdownMenuItem("Contact", href='/rovpy/contact'),
         ],
         label="Help",
         caret=True,
         nav=True,
         id='help',
     ),
-    dbc.NavItem(dbc.NavLink("Admin", id='admin-link', href='/login')),
+    dbc.NavItem(dbc.NavLink("Admin", id='admin-link', href='/rovpy/login')),
 ])
 
 
@@ -130,7 +130,7 @@ login_menu = dbc.Nav(className='menu', children=[
               prevent_initial_call=True)
 def login_button_click(n_clicks, username, password, redirect):
     if redirect == '':
-        redirect = '/'
+        redirect = '/rovpy/'
     if n_clicks > 0:
         user = db.session.query(User).filter_by(username = username).first()
         if user is not None and user.active:
@@ -138,10 +138,10 @@ def login_button_click(n_clicks, username, password, redirect):
                 login_user(user)
                 return redirect, ''
             else:
-                return '/login', 'Incorrect username or password'
+                return '/rovpy/login', 'Incorrect username or password'
         else:
-            return '/login', 'Incorrect username or password'
-    return '/login', ''
+            return '/rovpy/login', 'Incorrect username or password'
+    return '/rovpy/login', ''
 
 
 @app.callback(
@@ -164,7 +164,7 @@ def login_status(state, url):
             return login_menu, 'loggedout'
         
     if hasattr(current_user, 'is_authenticated') and current_user.is_authenticated \
-            and url != '/logout':  # If the URL is /logout, then the user is about to be logged out anyways
+            and url != '/rovpy/logout':  # If the URL is /logout, then the user is about to be logged out anyways
         return logged_in_menu, current_user.get_id()
     else:
         return login_menu, 'loggedout'
@@ -175,4 +175,4 @@ def login_status(state, url):
     Input('url', 'pathname')
 )
 def admin_link_redirect_update(pathname):
-    return f'/login{pathname}'
+    return f'/rovpy/login{pathname}'

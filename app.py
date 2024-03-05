@@ -15,7 +15,7 @@ external_stylesheets = [dbc.themes.DARKLY]
 load_dotenv()
 server = Flask(__name__)
 app = dash.Dash(__name__, server=server,
-                external_stylesheets=external_stylesheets, suppress_callback_exceptions=True)
+                external_stylesheets=external_stylesheets, suppress_callback_exceptions=True, requests_pathname_prefix='/rovpy/', routes_pathname_prefix='/rovpy/')
 app.title = 'Records of Valhalla'
 env_config = os.getenv("APP_SETTINGS", "config.DevelopmentConfig")
 server.config.from_object(env_config)

@@ -24,7 +24,7 @@ app.layout = dbc.Container(id='container', children=[
     dcc.Store(id='login-status', storage_type='session'),
     dbc.Row(id='login-row', children=dbc.Col(html.Div(id='user-status-div'))),
     dbc.Row(id='header', children=[
-        dbc.Col(html.Img(id='logo', src='/assets/logo.png'), sm=1),
+        dbc.Col(html.Img(id='logo', src=app.get_asset_url('logo.png')), sm=1),
         dbc.Col(children=[
             html.H1('Records of Valhalla', 'title'),
             ], sm=10)]),
@@ -41,7 +41,9 @@ app.layout = dbc.Container(id='container', children=[
 def display_page(pathname):
     view = None
     url = dash.no_update
-    
+    print(f'pathname: %s' % pathname)
+    pathname = pathname.split('/rovpy')[-1]
+    print(f'pathname: %s' % pathname)
     if pathname.startswith('/login'):
         redirect = pathname[6:]
         view = login.login(redirect)
@@ -127,6 +129,9 @@ def display_page(pathname):
         view = 'Redirecting to api...'
         url = '/api'
     # You could also return a 404 "URL not found" page here
+    res = isinstance(url, str)
+    if res:
+        url = '/rovpy' + url
     return view, url
 
 

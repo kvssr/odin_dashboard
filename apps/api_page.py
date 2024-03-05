@@ -32,8 +32,8 @@ layout = dbc.Row([
     dbc.Row(id='api-add-row', class_name='input-row',children=[
         dcc.Loading(dbc.Col(id='api-add-col', children=[
             dbc.Input(id='api-input', placeholder='Put your API Key here'),
-            dbc.Button("Add", id='api-btn'),
-            dbc.Button("Continue as Guest", id='guest-btn', class_name='ml-1'),
+            dbc.Button("Add", id='api-btn', class_name='api-btn'),
+            dbc.Button("Continue as Guest", id='guest-btn', class_name='api-btn'),
             html.Div(id='api-msg', style={'display': 'none'})
         ], width={'size': 4, 'offset': 4}), color='grey')
     ]),
@@ -230,5 +230,5 @@ def login_button_click(n_clicks):
     if n_clicks:
         user = db.session.query(User).filter_by(username = 'Guest').first()
         login_user(user)
-        return '/', ''
-    return '/login', ''
+        return '/rovpy/', ''
+    return '/rovpy/login', ''

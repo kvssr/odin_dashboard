@@ -61,7 +61,7 @@ layout = [
                         " to the Records of Valhalla. You will then see your account name and a list of your characters. Next to each character, their class and the number of raids they attended is shown. The characters that attended at least one raid are clickable. We will come to that later. You will only need to add your API key once, unless you start playing with a new character. ",
                     ]),
                     dbc.Col(
-                        html.Div(html.Img(id={'type': 'image', 'index': 1},src="assets/API_permissions.png", style={'width': img_size[1]}, className='bordered-img'),
+                        html.Div(html.Img(id={'type': 'image', 'index': 1},src="/rovpy/assets/API_permissions.png", style={'width': img_size[1]}, className='bordered-img'),
                                  id={'type': 'image-div', 'index': 1}, style={}),
                         className="centered-col"),
                 ],
@@ -71,7 +71,7 @@ layout = [
             dbc.Row([
                 dbc.Col(html.H3("Home page")),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 2}, src="assets/home.png", style={'width': img_size[2]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 2}, src="/rovpy/assets/home.png", style={'width': img_size[2]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 2}, style={}),
                     className="centered-col"),
             ],
@@ -80,7 +80,7 @@ layout = [
             dbc.Row([
                 dbc.Col("This shows what you have previously known as the Carrot Awards. At the top, there is a dropdown menu where you can choose which raid you want to see the stats of. By default, the last raid will be chosen. Below that, there is a table with a short summary of the raid, like the date, how many kills and deaths we had, the average number of squad members and enemies, the total squad damage, and so on."),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 3}, src="assets/summary_table.png", style={'width': img_size[3]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 3}, src="/rovpy/assets/summary_table.png", style={'width': img_size[3]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 3}, style={}),
                     className="centered-col"),
             ],
@@ -89,7 +89,7 @@ layout = [
             dbc.Row([
                 dbc.Col("In the bar charts, the top performing players for the most relevant stats are shown. These stats are damage, tag distance, stability, condition cleanse, healing, and boon rips. Top performing players for damage and tag distance are the top 5, for all other stats on this page it’s the top 3. All except tag distance are sorted by the total values achieved in the chosen raid. Each line shows the name and profession of the character. The classes are also color coded as shown in the legend on the bottom right of each graph. The two numbers at the beginning of each bar indicate how often this character was one of the top performing players and in how many fights they were present. The value at the end of each bar shows the total value achieved over the whole raid, which also corresponds to the length of the bars in the graphs. The value behind the bar is the average stat value per second over all fights a character was involved in. "),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 4}, src="assets/award_bar_chart.png", style={'width': img_size[4]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 4}, src="/rovpy/assets/award_bar_chart.png", style={'width': img_size[4]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 4}, style={}),
                     className="centered-col")
             ],
@@ -98,7 +98,7 @@ layout = [
             dbc.Row([
                 dbc.Col("For tag distance, the graph looks slightly different. Here, the characters are sorted by the percentage of times they reached top 5 closest to tag. Again, the character name, profession, times top and number of fights in which a character was involved are given. The percentage at the end of the bar indicates how often a character achieved top 5 distance to tag in the fights they were involved in, so times top 5 divided by number of fights present."),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 5}, src="assets/distance_bar_chart.png", style={'width': img_size[5]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 5}, src="/rovpy/assets/distance_bar_chart.png", style={'width': img_size[5]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 5}, style={}),
                     className="centered-col")
             ],
@@ -107,7 +107,7 @@ layout = [
             dbc.Row([
                 dbc.Col(html.H3("Details")),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 6}, src="assets/details.png", style={'width': img_size[6]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 6}, src="/rovpy/assets/details.png", style={'width': img_size[6]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 6}, style={}),
                     className="centered-col")
             ],
@@ -127,7 +127,7 @@ layout = [
                     html.Br(),
                     html.Br(),
                     html.Br(),
-                    html.Div(html.Img(id={'type': 'image', 'index': 15}, src="assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 15}, src="/rovpy/assets/dmg_in.png", style={'width': img_size[15]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 15}, style={}),
                 ], className="centered-col")
             ]),
@@ -135,7 +135,7 @@ layout = [
             dbc.Row([
                 dbc.Col("On the top left, there is a drop down menu to sort the graphs differently. For most stats, the choices are: 'total', which usually is the default and means the total stat value achieved over the whole raid; 'average', which is the average stat value per second over all fights a character was involved in (default for Damage In); 'times top', which indicates how often someone achieved top stats; and 'attendance', which is how many fights someone was there for. Using this, you can for example check how you were doing compared to others on average, if you weren’t able to attend the whole raid."),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 7}, src="assets/sorting_order.png", style={'width': img_size[7]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 7}, src="/rovpy/assets/sorting_order.png", style={'width': img_size[7]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 7}, style={}),
                     className="centered-col")
             ],
@@ -151,15 +151,15 @@ layout = [
             ]),
             dbc.Row([
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 8}, src="assets/profile_from_api.png", style={'width': img_size[8]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 8}, src="/rovpy/assets/profile_from_api.png", style={'width': img_size[8]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 8}, style={}),
                     className="centered-col", width={'size': 4}),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 9}, src="assets/profile_from_graph.png", style={'width': img_size[9]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 9}, src="/rovpy/assets/profile_from_graph.png", style={'width': img_size[9]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 9}, style={}),
                     className="centered-col", width={'size': 4}),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 10}, src="assets/profile_from_prof.png", style={'width': img_size[10]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 10}, src="/rovpy/assets/profile_from_prof.png", style={'width': img_size[10]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 10}, style={}),
                     className="centered-col", width={'size': 4}),
             ]),
@@ -167,7 +167,7 @@ layout = [
             dbc.Row([
                 dbc.Col("At the top, you see a summary table of how many raids and how many fights this character attended, how many fights you missed if you weren’t there for a whole raid, and how often you achieved top stats in a chosen stat. Below that is a drop down menu showing all characters that were present for at least one raid. You can also type to search for a specific character. "),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 11}, src="assets/profile_overview.png", style={'width': img_size[11]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 11}, src="/rovpy/assets/profile_overview.png", style={'width': img_size[11]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 11}, style={}),
                     className="centered-col"),
             ],
@@ -182,7 +182,7 @@ layout = [
                     "If you want to look at something more closely, you can draw a rectangle in the chart to zoom in on that part, which might be interesting for stats to which your class is not a main contributor, for example boon rips on scrapper or stability on scourge. To reset the graph, double click anywhere in the graph area."
                 ]),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 12}, src="assets/line_chart_annotated.png", style={'width': img_size[12]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 12}, src="/rovpy/assets/line_chart_annotated.png", style={'width': img_size[12]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 12}, style={}),
                     className="centered-col"),
             ],
@@ -191,7 +191,7 @@ layout = [
             dbc.Row([
                 dbc.Col("If you hover over any of the data points, you will see the top 10 average stats as a bar chart on the right. "),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 13}, src="assets/hover_bar_chart.png", style={'width': img_size[13]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 13}, src="/rovpy/assets/hover_bar_chart.png", style={'width': img_size[13]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 13}, style={}),
                     className="centered-col"),
             ],
@@ -200,7 +200,7 @@ layout = [
             dbc.Row([
                 dbc.Col("The table at the bottom shows your average stats for each raid in numbers, if you want to look at several stats at once. You can also enable and disable showing some raids in the line chart by ticking the checkboxes at the left of the table."),
                 dbc.Col(
-                    html.Div(html.Img(id={'type': 'image', 'index': 14}, src="assets/profile_table.png", style={'width': img_size[14]}, className="bordered-img"),
+                    html.Div(html.Img(id={'type': 'image', 'index': 14}, src="/rovpy/assets/profile_table.png", style={'width': img_size[14]}, className="bordered-img"),
                              id={'type': 'image-div', 'index': 14}, style={}),
                     className="centered-col"),
             ],

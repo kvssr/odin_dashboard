@@ -184,7 +184,7 @@ def show_groups_content(raid, fight, rating):
     for party in df_groups['Party'].unique():
         sum_row = html.Tr(
             [html.Td([html.Div(id={'type': 'collapse-cross', 'index': str(party)}, children='-', className='collapse-cross')]+
-                [html.Img(src=f'assets/profession_icons/{player}.png', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
+                [html.Img(src=f'/rovpy/assets/profession_icons/{player}.png', className='groups-prof-icon') for player in df_groups[df_groups['Party'] == party]['Profession']], className='groups-prof-icon-col')]+
             [html.Td('') if current_user.is_authenticated and current_user.role.power == 100 else '']+
             [html.Td(f"{df_groups[df_groups['Party'] == party]['Damage'].sum():,.0f} ({df_groups[df_groups['Party'] == party]['Damage'].sum()/df_groups['Damage'].sum()*100:.0f}%)")]+
             [html.Td(format_stat(df_groups[df_groups['Party'] == party][stat].sum())) for stat in _stats_order if stat != 'Damage']
@@ -202,9 +202,9 @@ def show_groups_content(raid, fight, rating):
                 hover_text += top_text
             player_row = html.Tr(
                 [html.Td([
-                    html.Img(src=f"assets/profession_icons/{player['Profession']}.png", width='20px'),
+                    html.Img(src=f"/rovpy/assets/profession_icons/{player['Profession']}.png", width='20px'),
                     html.A(player["Character"], href=f'/details/{player["Character"]}'),
-                    html.Img(src='assets/logo.png', width='20px') if player["Character"] in top_stats else '',
+                    html.Img(src='/rovpy/assets/logo.png', width='20px') if player["Character"] in top_stats else '',
                     dbc.Tooltip(
                         hover_text, target=f'td-{player["Character"]}', placement='right'
                     )
